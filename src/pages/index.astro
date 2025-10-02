@@ -82,7 +82,7 @@ const featuredProjects = projects.slice(0, 3);
           <article class="card-glass flex h-full flex-col overflow-hidden">
             {project.data.heroImage && (
               <img
-                src={`/${project.data.heroImage}`}
+                src={project.data.heroImage}
                 alt=""
                 class="h-48 w-full rounded-t-lg object-cover"
                 loading="lazy"
