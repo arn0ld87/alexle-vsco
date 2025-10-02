@@ -4,7 +4,7 @@ summary: "Dynamische KI-News mit automatisierten Updates – Machine-Learning-Tr
 tags:
   - KI
   - Automation
-heroImage: "/media/ki_nachrichten.png"
+heroImage: "/media/nachrichtenportal.png"
 demo: "ki-nachrichten.html"
 ---
 

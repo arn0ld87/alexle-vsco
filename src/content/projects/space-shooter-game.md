@@ -4,7 +4,7 @@ summary: "Browser-basiertes Spiel mit HTML5 Canvas – zeigt praktische JavaScri
 tags:
   - JavaScript
   - Game Dev
-heroImage: "/media/shoot.webp"
+heroImage: "/media/spaceshooter.png"
 demo: "space-shooter.html"
 ---
 ## Überblick

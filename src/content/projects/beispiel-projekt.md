@@ -5,7 +5,7 @@ tags:
   - KI
   - Agenten
   - DevOps
-heroImage: "/media/ki_agenten.png"
+heroImage: "/media/ticketrouting.png"
 ---
 
 ## Problem
