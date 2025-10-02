@@ -37,6 +37,14 @@ const absoluteOgImage = ogImage.startsWith('http')
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={absoluteOgImage} />
+    <script is:inline>
+      // Theme initialization (before paint to prevent flash)
+      (function() {
+        const theme = localStorage.getItem('theme') || 
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.add(theme);
+      })();
+    </script>
     {import.meta.env.PROD && (
       <>
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
@@ -49,7 +57,7 @@ const absoluteOgImage = ogImage.startsWith('http')
       </>
     )}
   </head>
-  <body class="min-h-screen bg-gray-950 text-gray-100 font-sans">
+  <body class="min-h-screen bg-gray-950 text-gray-100 font-sans dark:bg-gray-950 dark:text-gray-100 light:bg-gray-50 light:text-gray-900">
     <Header />
     <slot />
     <Footer />
