@@ -4,15 +4,9 @@ on:
   push:
     branches: [ main ]
 
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: Checkout
@@ -22,12 +16,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
+          cache: 'pnpm'        # Cache funktioniert jetzt, weil pnpm gleich aktiviert wird
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      - name: Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@8 --activate
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
@@ -36,16 +30,13 @@ jobs:
         run: pnpm run build
 
       - name: Prepare SSH
-        shell: bash
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          # Host Key vorab eintragen, damit kein Prompt kommt
           ssh-keyscan -p 2222 "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Deploy via rsync
-        shell: bash
         run: |
           rsync -az --delete \
             -e "ssh -i ~/.ssh/id_ed25519 -p 2222" \
