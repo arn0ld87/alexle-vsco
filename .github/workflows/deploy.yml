@@ -1,5 +1,4 @@
 name: Build & Deploy
-
 on:
   push:
     branches: [ main ]
@@ -7,7 +6,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -15,13 +13,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'        # Cache funktioniert jetzt, weil pnpm gleich aktiviert wird
+          node-version: '20'   # ⬅︎ KEIN cache hier!
 
       - name: Enable pnpm via Corepack
         run: |
           corepack enable
           corepack prepare pnpm@8 --activate
+
+      - name: Cache pnpm store
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-store-
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
