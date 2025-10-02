@@ -45,27 +45,27 @@ const stats = kiNewsData.stats;
 >
   <main class="container mx-auto px-4 pb-24 pt-16">
     <!-- Hero Section -->
-    <section class="relative bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-indigo-900/20 rounded-3xl p-12 mb-16 overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-3xl"></div>
+    <section class="relative bg-gradient-to-br from-gray-900/50 via-gray-800/30 to-gray-900/50 rounded-2xl p-8 mb-16 overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 rounded-2xl"></div>
       <div class="relative z-10 text-center">
-        <h1 class="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+        <h1 class="text-4xl md:text-5xl font-semibold mb-4 text-white">
           KI-Nachrichten Portal
         </h1>
-        <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+        <p class="text-lg text-gray-300 mb-6 max-w-2xl mx-auto">
           Täglich aktualisierte Nachrichten und Updates aus der Welt der Künstlichen Intelligenz
         </p>
-        <div class="flex flex-wrap justify-center gap-4">
-          <a href="/" class="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white hover:bg-white/20 transition-all">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex flex-wrap justify-center gap-3">
+          <a href="/" class="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all text-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
             Zurück zur Startseite
           </a>
-          <button id="refreshNews" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full text-white hover:from-blue-700 hover:to-purple-700 transition-all">
-            <svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button id="refreshNews" class="inline-flex items-center px-4 py-2 bg-gray-700/50 backdrop-blur-sm border border-gray-600/50 rounded-lg text-white hover:bg-gray-600/50 transition-all text-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
-            Jetzt aktualisieren
+            Aktualisieren
           </button>
         </div>
       </div>
@@ -91,52 +91,61 @@ const stats = kiNewsData.stats;
     </div>
 
     <!-- News Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
       {kiNews.map((news) => (
-        <article class="card-glass group hover:scale-105 transition-all duration-300">
+        <article class="card-glass group hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+          <!-- Thumbnail -->
+          <div class="h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-gray-800/50 to-gray-900/50"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="text-center">
+                <svg class="w-12 h-12 text-blue-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                <span class="text-xs text-gray-400 uppercase tracking-wide">{news.source}</span>
+              </div>
+            </div>
+            <div class="absolute top-3 right-3">
+              <div class="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                {news.relevanceScore}%
+              </div>
+            </div>
+          </div>
+          
           <div class="p-6">
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex-1">
-                <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors">
-                  {news.title}
-                </h3>
-                <p class="text-gray-300 text-sm mb-4 line-clamp-3">
-                  {news.summary}
-                </p>
-              </div>
-              <div class="ml-4 flex-shrink-0">
-                <div class="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full">
-                  {news.relevanceScore}%
-                </div>
-              </div>
-            </div>
+            <h3 class="text-lg font-medium text-white mb-3 group-hover:text-blue-400 transition-colors line-clamp-2">
+              {news.title}
+            </h3>
+            <p class="text-gray-300 text-sm mb-4 line-clamp-3">
+              {news.summary}
+            </p>
             
-            <div class="flex flex-wrap gap-2 mb-4">
-              {news.tags.map((tag) => (
-                <span class="bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full">
-                  {tag}
-                </span>
-              ))}
-            </div>
+            {news.tags.length > 0 && (
+              <div class="flex flex-wrap gap-2 mb-4">
+                {news.tags.slice(0, 3).map((tag) => (
+                  <span class="bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
             
-            <div class="flex items-center justify-between text-sm text-gray-400">
+            <div class="flex items-center justify-between text-sm text-gray-400 mb-4">
               <span>{news.source}</span>
               <span>{new Date(news.publishedAt).toLocaleDateString('de-DE')}</span>
             </div>
             
-            <div class="mt-4">
-              <a 
-                href={news.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                Artikel lesen
-                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                </svg>
-              </a>
-            </div>
+            <a 
+              href={news.url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors text-sm"
+            >
+              Artikel lesen
+              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
           </div>
         </article>
       ))}

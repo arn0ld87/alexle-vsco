@@ -14,62 +14,91 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// RSS-Feeds von führenden KI-Publikationen
+// RSS-Feeds von führenden KI-Publikationen (deutschsprachige zuerst)
 const RSS_FEEDS = [
+  // Deutschsprachige Quellen (höchste Priorität)
+  {
+    name: 'Heise AI',
+    url: 'https://www.heise.de/rss/feeds/ai.xml',
+    category: 'Heise',
+    language: 'de',
+    priority: 1
+  },
+  {
+    name: 'Golem KI',
+    url: 'https://www.golem.de/specials/ki/rss.xml',
+    category: 'Golem',
+    language: 'de',
+    priority: 1
+  },
+  {
+    name: 'Computerwoche KI',
+    url: 'https://www.computerwoche.de/rss/ki.xml',
+    category: 'Computerwoche',
+    language: 'de',
+    priority: 1
+  },
+  {
+    name: 't3n KI',
+    url: 'https://t3n.de/rss/ki/',
+    category: 't3n',
+    language: 'de',
+    priority: 1
+  },
+  // Englischsprachige Quellen (niedrigere Priorität)
   {
     name: 'OpenAI Blog',
     url: 'https://openai.com/blog/rss.xml',
-    category: 'OpenAI'
+    category: 'OpenAI',
+    language: 'en',
+    priority: 2
   },
   {
     name: 'Google AI Blog',
     url: 'https://ai.googleblog.com/feeds/posts/default',
-    category: 'Google'
+    category: 'Google',
+    language: 'en',
+    priority: 2
   },
   {
     name: 'Anthropic Blog',
     url: 'https://www.anthropic.com/news/rss.xml',
-    category: 'Anthropic'
+    category: 'Anthropic',
+    language: 'en',
+    priority: 2
   },
   {
     name: 'Microsoft AI Blog',
     url: 'https://blogs.microsoft.com/ai/feed/',
-    category: 'Microsoft'
+    category: 'Microsoft',
+    language: 'en',
+    priority: 2
   },
   {
     name: 'Meta AI Blog',
     url: 'https://ai.meta.com/blog/rss.xml',
-    category: 'Meta'
-  },
-  {
-    name: 'DeepMind Blog',
-    url: 'https://deepmind.com/blog/rss.xml',
-    category: 'DeepMind'
-  },
-  {
-    name: 'Hugging Face Blog',
-    url: 'https://huggingface.co/blog/rss.xml',
-    category: 'Hugging Face'
-  },
-  {
-    name: 'AI News',
-    url: 'https://www.artificialintelligence-news.com/feed/',
-    category: 'AI News'
-  },
-  {
-    name: 'VentureBeat AI',
-    url: 'https://venturebeat.com/ai/feed/',
-    category: 'VentureBeat'
+    category: 'Meta',
+    language: 'en',
+    priority: 2
   },
   {
     name: 'MIT Technology Review AI',
     url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed/',
-    category: 'MIT'
+    category: 'MIT',
+    language: 'en',
+    priority: 2
   }
 ];
 
-// KI-relevante Keywords für Filterung
+// KI-relevante Keywords für Filterung (deutsch und englisch)
 const KI_KEYWORDS = [
+  // Deutsche Begriffe
+  'künstliche intelligenz', 'maschinelles lernen', 'deep learning', 'neuronales netzwerk',
+  'KI', 'ML', 'GPT', 'ChatGPT', 'OpenAI', 'Claude', 'Gemini', 'LLM', 'transformer',
+  'computervision', 'computersehen', 'sprachverarbeitung', 'roboter', 'automatisierung',
+  'verstärkungslernen', 'generative KI', 'diffusionsmodell', 'stable diffusion',
+  'midjourney', 'dall-e', 'copilot', 'assistent', 'agent', 'autonom',
+  // Englische Begriffe
   'artificial intelligence', 'machine learning', 'deep learning', 'neural network',
   'AI', 'ML', 'GPT', 'ChatGPT', 'OpenAI', 'Claude', 'Gemini', 'LLM', 'transformer',
   'computer vision', 'natural language processing', 'NLP', 'robotics', 'automation',
@@ -134,7 +163,9 @@ function parseRSSFeed(xmlContent, source) {
           source: source.name,
           publishedAt: new Date(pubDate).toISOString().split('T')[0],
           tags: extractTags(title, description),
-          relevanceScore: calculateRelevanceScore(title, description)
+          relevanceScore: calculateRelevanceScore(title, description, source),
+          language: source.language || 'en',
+          priority: source.priority || 2
         });
       }
     }
@@ -161,16 +192,19 @@ function extractTags(title, description) {
   const tags = [];
   
   const tagMap = {
-    'openai': ['openai', 'gpt', 'chatgpt'],
-    'google': ['google', 'gemini', 'deepmind'],
-    'anthropic': ['anthropic', 'claude'],
-    'microsoft': ['microsoft', 'copilot'],
-    'meta': ['meta', 'llama'],
-    'machine learning': ['machine learning', 'ml'],
-    'deep learning': ['deep learning', 'neural network'],
-    'computer vision': ['computer vision', 'cv'],
-    'nlp': ['natural language processing', 'nlp'],
-    'robotics': ['robotics', 'robot']
+    'OpenAI': ['openai', 'gpt', 'chatgpt'],
+    'Google': ['google', 'gemini', 'deepmind'],
+    'Anthropic': ['anthropic', 'claude'],
+    'Microsoft': ['microsoft', 'copilot'],
+    'Meta': ['meta', 'llama'],
+    'Machine Learning': ['machine learning', 'ml', 'maschinelles lernen'],
+    'Deep Learning': ['deep learning', 'neural network', 'neuronales netzwerk'],
+    'Computer Vision': ['computer vision', 'cv', 'computersehen'],
+    'NLP': ['natural language processing', 'nlp', 'sprachverarbeitung'],
+    'Robotics': ['robotics', 'robot', 'roboter'],
+    'Künstliche Intelligenz': ['künstliche intelligenz', 'ki', 'artificial intelligence', 'ai'],
+    'Generative KI': ['generative ai', 'generative ki', 'diffusion model', 'diffusionsmodell'],
+    'Automatisierung': ['automation', 'automatisierung', 'automatisch']
   };
   
   for (const [tag, keywords] of Object.entries(tagMap)) {
@@ -185,7 +219,7 @@ function extractTags(title, description) {
 /**
  * Calculate relevance score
  */
-function calculateRelevanceScore(title, description) {
+function calculateRelevanceScore(title, description, source) {
   const text = (title + ' ' + description).toLowerCase();
   let score = 0;
   
@@ -203,6 +237,16 @@ function calculateRelevanceScore(title, description) {
       score += 1;
     }
   });
+  
+  // Bonus für deutschsprachige Artikel
+  if (source.language === 'de') {
+    score += 20;
+  }
+  
+  // Bonus für höhere Priorität
+  if (source.priority === 1) {
+    score += 15;
+  }
   
   return Math.min(Math.max(score * 5, 60), 100); // Score zwischen 60-100
 }
@@ -268,7 +312,12 @@ async function scrapeKINews() {
   // Duplikate entfernen und nach Relevanz sortieren
   const uniqueArticles = removeDuplicates(allArticles);
   const sortedArticles = uniqueArticles
-    .sort((a, b) => b.relevanceScore - a.relevanceScore)
+    .sort((a, b) => {
+      // Erst nach Sprache (deutsch zuerst), dann nach Relevanz
+      if (a.language === 'de' && b.language !== 'de') return -1;
+      if (a.language !== 'de' && b.language === 'de') return 1;
+      return b.relevanceScore - a.relevanceScore;
+    })
     .slice(0, 20); // Top 20 Artikel
   
   console.log(`🎯 ${sortedArticles.length} relevante Artikel gefunden`);
