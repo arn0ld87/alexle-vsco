@@ -3,7 +3,9 @@ import { getEntry } from 'astro:content';
 const hero = await getEntry('hero', 'hero');
 const data = hero.data;
 const ctaHref = data.ctaHref ?? '/projekte';
-const isVideo = data.media?.includes('.mp4');
+const mediaPath = data.media ? (data.media.startsWith('/') ? data.media : `/${data.media}`) : undefined;
+const isVideo = mediaPath?.includes('.mp4');
+const mediaWebm = isVideo ? mediaPath.replace(/\.mp4$/, '.webm') : undefined;
 ---
 <section class="container mx-auto grid items-center gap-12 px-4 py-24 md:grid-cols-2">
   <div>
@@ -20,7 +22,7 @@ const isVideo = data.media?.includes('.mp4');
       </a>
     )}
   </div>
-  {data.media && (
+  {mediaPath && (
     <div class="card-glass relative aspect-video overflow-hidden">
       {isVideo ? (
         <video
@@ -32,11 +34,11 @@ const isVideo = data.media?.includes('.mp4');
           poster="/media/alex.avif"
           class="h-full w-full object-cover"
         >
-          <source src={data.media.replace('.mp4', '.webm')} type="video/webm" />
-          <source src={data.media} type="video/mp4" />
+          {mediaWebm && <source src={mediaWebm} type="video/webm" />}
+          <source src={mediaPath} type="video/mp4" />
         </video>
       ) : (
-        <img src={data.media} alt="" class="h-full w-full object-cover" loading="lazy" />
+        <img src={mediaPath} alt="" class="h-full w-full object-cover" loading="lazy" />
       )}
     </div>
   )}

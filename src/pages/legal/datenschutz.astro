@@ -6,7 +6,11 @@ const legalEntry = await getEntry('legal', 'datenschutz');
 const { Content } = await legalEntry.render();
 const { title, updated } = legalEntry.data;
 ---
-<BaseLayout title={`${title} – Alexander Schneider`} description="Datenschutzerklärung von Alexander Schneider">
+<BaseLayout
+  title={`${title} – Alexander Schneider`}
+  description="Datenschutzerklärung von Alexander Schneider"
+  ogImage="/media/alex-gemini.webp"
+>
   <main class="container mx-auto px-4 pb-24 pt-16">
     <header class="section-intro">
       <p class="text-sm uppercase tracking-[0.3em] text-blue-400">Rechtliches</p>

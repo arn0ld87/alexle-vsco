@@ -4,7 +4,11 @@ import { getCollection } from 'astro:content';
 
 const projects = await getCollection('projects');
 ---
-<BaseLayout title="Projekte" description="Case Studies zu Infrastruktur, Automatisierung und KI-Lösungen.">
+<BaseLayout
+  title="Projekte – Case Studies zu Infrastruktur & KI-Agenten"
+  description="Ausgewählte Projekte zu Systemintegration, DevOps, Automatisierung und KI-Agenten-Workflows von Alexander Schneider."
+  ogImage="/media/alex-gemini.webp"
+>
   <main class="container mx-auto px-4 pb-24 pt-16">
     <header class="section-intro">
       <p class="text-sm uppercase tracking-[0.3em] text-blue-400">Case Studies</p>

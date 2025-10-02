@@ -6,7 +6,11 @@ const aboutEntry = await getEntry('about', 'about');
 const { Content } = await aboutEntry.render();
 const { title, profileImage, profileImageAlt } = aboutEntry.data;
 ---
-<BaseLayout title={`${title} – Alexander Schneider`} description="Über mich – IT-Systemintegration & DevOps aus Leipzig">
+<BaseLayout
+  title={`${title} – Alexander Schneider`}
+  description="Über mich – IT-Systemintegration & DevOps aus Leipzig"
+  ogImage={`/${profileImage ?? 'media/alex-gemini.png'}`}
+>
   <main class="container mx-auto px-4 pb-24 pt-16">
     <header class="grid gap-12 md:grid-cols-[1fr_2fr] md:items-center">
       {profileImage && (

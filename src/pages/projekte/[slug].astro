@@ -16,8 +16,10 @@ if (!project) {
 
 const { Content } = await project.render();
 const { title, summary, tags, heroImage, demo } = project.data;
+const ogImage = heroImage ? (heroImage.startsWith('/') ? heroImage : `/${heroImage}`) : '/media/alex-gemini.webp';
 ---
-<BaseLayout title={`${title} – Projekte`} description={summary}>
+
+<BaseLayout title={`${title} – Projekte`} description={summary} ogImage={ogImage}>
   <main class="container mx-auto px-4 pb-24 pt-16">
     <nav class="text-sm text-blue-400">
       <a href="/" class="hover:text-blue-300">Startseite</a>
