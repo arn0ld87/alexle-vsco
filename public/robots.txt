@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://alexle135.de/sitemap.xml
+
+# Crawl-delay für freundliches Crawling
+Crawl-delay: 1
+
+# Spezielle Regeln für bestimmte Bereiche
+Disallow: /admin/
+Disallow: /neuaufbau/
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /.vscode/
+
+# Erlaube wichtige Seiten
+Allow: /media/
+Allow: /projekte/
+Allow: /ueber-mich/
+Allow: /ki-agenten-lab/
+Allow: /kontakt/
+Allow: /legal/

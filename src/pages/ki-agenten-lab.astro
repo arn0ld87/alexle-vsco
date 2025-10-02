@@ -48,6 +48,103 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </article>
     </section>
 
+    <!-- Neue Sektion: Experimentelle Agenten -->
+    <section class="mt-16">
+      <div class="section-intro">
+        <p class="text-sm uppercase tracking-[0.3em] text-blue-400">Experimentelle Agenten</p>
+        <h2 class="text-3xl font-semibold tracking-tight md:text-4xl">Cutting-Edge Workflows</h2>
+        <p class="text-gray-300">
+          Diese Agenten sind noch im Experimentierstadium – aber die Ergebnisse sind vielversprechend:
+        </p>
+      </div>
+      
+      <div class="mt-8 grid gap-6 md:grid-cols-2">
+        <article class="card-glass p-6">
+          <h3 class="text-lg font-semibold">🔄 Self-Healing Infrastructure</h3>
+          <p class="mt-3 text-sm text-gray-300">
+            Agent überwacht Kubernetes-Cluster und führt automatische Reparaturen durch. Bei Pod-Crashes analysiert er Logs, identifiziert Root-Causes und wendet bekannte Fixes an.
+          </p>
+          <div class="mt-4 space-y-2">
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+              <span class="h-2 w-2 rounded-full bg-green-500"></span>
+              <span>Success Rate: 87% (letzte 30 Tage)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+              <span class="h-2 w-2 rounded-full bg-blue-500"></span>
+              <span>MTTR: 2.3 Minuten (vs. 15 min manuell)</span>
+            </div>
+          </div>
+          <ul class="mt-4 text-xs uppercase tracking-wide text-gray-500">
+            <li>Stack: Kubernetes API, Prometheus, OpenAI</li>
+            <li>Tools: kubectl, helm, istioctl</li>
+          </ul>
+        </article>
+
+        <article class="card-glass p-6">
+          <h3 class="text-lg font-semibold">📊 Data Quality Guardian</h3>
+          <p class="mt-3 text-sm text-gray-300">
+            Überwacht Datenpipelines in Echtzeit, erkennt Anomalien und schlägt Korrekturen vor. Lernt aus historischen Mustern und verbessert sich kontinuierlich.
+          </p>
+          <div class="mt-4 space-y-2">
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+              <span class="h-2 w-2 rounded-full bg-green-500"></span>
+              <span>Anomalie-Erkennung: 94% Accuracy</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+              <span class="h-2 w-2 rounded-full bg-yellow-500"></span>
+              <span>False Positives: 3.2% (Ziel: &lt;5%)</span>
+            </div>
+          </div>
+          <ul class="mt-4 text-xs uppercase tracking-wide text-gray-500">
+            <li>Stack: Apache Airflow, Great Expectations</li>
+            <li>ML: Isolation Forest + LSTM</li>
+          </ul>
+        </article>
+
+        <article class="card-glass p-6">
+          <h3 class="text-lg font-semibold">🎯 Code Review Assistant</h3>
+          <p class="mt-3 text-sm text-gray-300">
+            Analysiert Pull Requests auf Sicherheitslücken, Performance-Probleme und Code-Qualität. Erstellt detaillierte Reviews mit konkreten Verbesserungsvorschlägen.
+          </p>
+          <div class="mt-4 space-y-2">
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+              <span class="h-2 w-2 rounded-full bg-green-500"></span>
+              <span>Security Issues: 98% Detection Rate</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+              <span class="h-2 w-2 rounded-full bg-blue-500"></span>
+              <span>Review-Zeit: -60% (vs. manuell)</span>
+            </div>
+          </div>
+          <ul class="mt-4 text-xs uppercase tracking-wide text-gray-500">
+            <li>Stack: GitHub API, Semgrep, SonarQube</li>
+            <li>LLM: Claude-3.5-Sonnet</li>
+          </ul>
+        </article>
+
+        <article class="card-glass p-6">
+          <h3 class="text-lg font-semibold">🚀 Performance Optimizer</h3>
+          <p class="mt-3 text-sm text-gray-300">
+            Analysiert Anwendungs-Performance, identifiziert Bottlenecks und schlägt konkrete Optimierungen vor. Testet Änderungen automatisch und misst Verbesserungen.
+          </p>
+          <div class="mt-4 space-y-2">
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+              <span class="h-2 w-2 rounded-full bg-green-500"></span>
+              <span>Performance-Gain: +23% durchschnittlich</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+              <span class="h-2 w-2 rounded-full bg-purple-500"></span>
+              <span>Optimierungen: 156 erfolgreich</span>
+            </div>
+          </div>
+          <ul class="mt-4 text-xs uppercase tracking-wide text-gray-500">
+            <li>Stack: APM Tools, Load Testing</li>
+            <li>ML: Anomaly Detection + A/B Testing</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
     <section class="card-glass mt-16 p-8">
       <h2 class="text-2xl font-semibold tracking-tight">Sicherheits- &amp; Ops-Guidelines</h2>
       <div class="mt-6 grid gap-6 md:grid-cols-2">

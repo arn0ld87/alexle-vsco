@@ -205,5 +205,61 @@ Checks
 - Nach jeder Phase (0–5) eine neue Unterhaltung eröffnen mit knackigem Titel und kurzem Status (kopiere relevante Codepfade + offene Punkte). 
 - Für Ideen/UX/Texte kurz auf „GPT‑5 High“ wechseln (Kreativ‑Feinschliff), Implementierung wieder „GPT‑5 Codex Medium“.
 
-Letzter Stand: 02.10.2025  
-Autor: Codex (GPT‑5)
+---
+
+## 13. Aktueller Status (Stand: Januar 2025)
+
+### ✅ Abgeschlossen
+- Astro-Projekt mit TypeScript und Tailwind CSS eingerichtet
+- Grundlegende Projektstruktur implementiert
+- Content Collections definiert und teilweise befüllt
+- Basis-Komponenten (Header, Footer, Hero) umgesetzt
+- GitHub Actions Deployment funktioniert (rsync auf Server)
+- Grundlegende Seitenstruktur vorhanden
+
+### 🔄 In Bearbeitung / Offene Punkte
+
+#### 1. Content & Texte
+- [ ] **Projekt-Screenshots**: Echte Screenshots statt Platzhalter (Hero, Projekt-Detailseiten)
+- [ ] **Projekttexte ausbauen**: Kennzahlen, Tools, Ergebnisse ergänzen
+- [ ] **Rechtliche Texte**: Impressum/Datenschutz rechtlich sauber ausarbeiten (Ansprechpartner, Haftung, AV)
+- [ ] **Über-mich/Kontakt**: Finaler Feinschliff, Referenzen, Logos, Testimonials
+
+#### 2. CMS / Content-Workflow
+- [ ] **Decap CMS Setup**: admin/index.html, config.yml, Auth (Netlify/GitHub OAuth)
+- [ ] **Preview-Templates**: Live-Vorschau für MDX-Inhalte
+- [ ] **Content-Editing-Workflow**: Dokumentation für Content-Updates
+
+#### 3. KI-Agenten-Lab / Inhalte
+- [ ] **Lab-Details**: Code-Snippets, Diagramm-Assets, Video/GIF-Demos
+- [ ] **Case-Studies prüfen**: Mindestens eine KI-Agenten-Case-Study sicherstellen
+- [ ] **Demos/Downloads**: Konkrete Beispiele und Ressourcen
+
+#### 4. SEO & Metadaten
+- [ ] **robots.txt** und **sitemap.xml** erstellen
+- [ ] **Schema.org**: Organisation/Person-Markup
+- [ ] **Favicon/Webmanifest** prüfen und optimieren
+
+#### 5. Performance & QA
+- [ ] **Lighthouse-Run**: Live-Domain testen (Desktop & Mobile)
+- [ ] **Browser-Tests**: Responsiveness und Formspree-Formular
+- [ ] **Server-Header**: Gzip/Brotli, Cache-Control für _astro-Assets verifizieren
+
+#### 6. Deployment/Infra
+- [ ] **HTTPS/Security**: Zertifikat, HSTS, Redirects (www ↔ bare domain)
+- [ ] **Rollback-Strategie**: Backup-Verfahren dokumentieren
+
+#### 7. Dokumentation
+- [ ] **README**: Deployment-Workflow, Umgebungsvariablen, Content-Editing
+- [ ] **Issues/Todos**: Verbleibende Arbeiten tracken
+
+### 🎯 Nächste Prioritäten
+1. Screenshots und Projekttexte finalisieren
+2. Decap CMS vollständig einrichten
+3. SEO-Grundlagen (robots.txt, sitemap.xml)
+4. Performance-Tests auf Live-Domain
+
+---
+
+Letzter Stand: Januar 2025  
+Autor: Codex (GPT‑5) - Aktualisiert basierend auf Projektstatus
