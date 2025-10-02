@@ -1,73 +1,91 @@
 backend:
-  name: git-gateway # oder 'github' falls direkt via GitHub OAuth
+  name: github
+  repo: alexle135/alexle-vsco
   branch: main
+  base_url: https://alexle135.de
+  auth_endpoint: api/auth
   commit_messages:
-    create: 'feat(cms): create {{collection}} “{{slug}}”'
-    update: 'chore(cms): update {{collection}} “{{slug}}”'
-    delete: 'chore(cms): delete {{collection}} “{{slug}}”'
-    uploadMedia: 'chore(media): upload “{{path}}”'
-    deleteMedia: 'chore(media): delete “{{path}}”'
+    create: 'feat(cms): create {{collection}} "{{slug}}"'
+    update: 'chore(cms): update {{collection}} "{{slug}}"'
+    delete: 'chore(cms): delete {{collection}} "{{slug}}"'
+    uploadMedia: 'chore(media): upload "{{path}}"'
+    deleteMedia: 'chore(media): delete "{{path}}"'
 local_backend: true
 publish_mode: editorial_workflow
+site_url: https://alexle135.de
 media_folder: public/media/uploads
 public_folder: /media/uploads
+slug:
+  encoding: unicode
+  clean_accents: true
 
 collections:
   - name: hero
-    label: Hero
+    label: Hero Bereich
     format: json
     delete: false
     editor:
-      preview: false
+      preview: true
     files:
-      - file: src/content/site/hero.json
-        label: Hero Content
+      - file: src/content/hero/hero.json
+        label: Hero Inhalt
         name: hero
         fields:
           - { name: title, label: Titel, widget: string }
-          - { name: subtitle, label: Untertitel, widget: string, required: false }
+          - { name: subtitle, label: Untertitel, widget: text, required: false }
           - { name: cta, label: CTA-Text, widget: string, required: false }
           - { name: media, label: Medien (Bild/Video-URL), widget: string, required: false }
 
   - name: about
     label: Über mich
     delete: false
+    editor:
+      preview: true
     files:
-      - file: src/content/site/about.md
-        label: Über mich Text
+      - file: src/content/about/about.md
+        label: Über mich Inhalt
         name: about
         fields:
           - { name: title, label: Titel, widget: string }
+          - { name: profileImage, label: Profilbild, widget: image, required: false }
+          - { name: profileImageAlt, label: Alt-Text, widget: string, required: false }
           - { name: body, label: Inhalt, widget: markdown }
 
   - name: services
     label: Services
     format: json
+    editor:
+      preview: true
     files:
-      - file: src/content/site/services.json
-        label: Services Liste
+      - file: src/content/services/services.json
+        label: Service Liste
         name: services
         fields:
           - label: Services
             name: items
             widget: list
+            summary: '{{fields.title}}'
             fields:
               - { name: title, label: Titel, widget: string }
-              - { name: description, label: Beschreibung, widget: string }
+              - { name: description, label: Beschreibung, widget: text }
               - { name: icon, label: Icon (Klasse/Name), widget: string, required: false }
+              - { name: color, label: Farbkennung, widget: string, required: false }
               - { name: tags, label: Tags, widget: list, required: false }
 
   - name: skills
     label: Skills
     format: json
+    editor:
+      preview: true
     files:
-      - file: src/content/site/skills.json
-        label: Skillliste
+      - file: src/content/skills/skills.json
+        label: Skill Liste
         name: skills
         fields:
           - label: Skills
             name: items
             widget: list
+            summary: '{{fields.name}} – {{fields.percentage}}%'
             fields:
               - { name: name, label: Name, widget: string }
               - { name: percentage, label: Prozent, widget: number, value_type: int, min: 0, max: 100 }
@@ -77,13 +95,14 @@ collections:
     label: Projekte
     folder: src/content/projects
     create: true
-    slug: "{{slug}}"
-    extension: md
+    slug: '{{slug}}'
     format: frontmatter
+    editor:
+      preview: true
     fields:
       - { name: title, label: Titel, widget: string }
-      - { name: date, label: Datum, widget: datetime, required: false }
       - { name: summary, label: Kurzbeschreibung, widget: text }
+      - { name: date, label: Datum, widget: datetime, required: false }
       - { name: tags, label: Tags, widget: list, required: false }
       - { name: heroImage, label: Hero-Bild, widget: image, required: false }
       - { name: repo, label: Repository-URL, widget: string, required: false }
@@ -93,16 +112,51 @@ collections:
   - name: legal
     label: Rechtliches
     delete: false
+    editor:
+      preview: true
     files:
       - file: src/content/legal/impressum.md
         label: Impressum
         name: impressum
         fields:
-          - { name: title, label: Titel, widget: string, default: Impressum }
+          - { name: title, label: Titel, widget: string, default: 'Impressum' }
           - { name: body, label: Inhalt, widget: markdown }
       - file: src/content/legal/datenschutz.md
         label: Datenschutzerklärung
         name: datenschutz
         fields:
-          - { name: title, label: Titel, widget: string, default: Datenschutzerklärung }
+          - { name: title, label: Titel, widget: string, default: 'Datenschutzerklärung' }
           - { name: body, label: Inhalt, widget: markdown }
+
+  - name: ki-news
+    label: KI News Feed
+    format: json
+    delete: false
+    editor:
+      preview: true
+    files:
+      - file: src/content/ki-news/index.json
+        label: KI News Daten
+        name: feed
+        fields:
+          - { name: lastUpdate, label: Letztes Update, widget: datetime }
+          - label: Artikel
+            name: articles
+            widget: list
+            summary: '{{fields.title}} – {{fields.source}}'
+            fields:
+              - { name: title, label: Titel, widget: string }
+              - { name: summary, label: Zusammenfassung, widget: text }
+              - { name: url, label: Quelle, widget: string }
+              - { name: source, label: Anbieter, widget: string }
+              - { name: publishedAt, label: Veröffentlich am, widget: datetime }
+              - { name: tags, label: Tags, widget: list, required: false }
+              - { name: relevanceScore, label: Relevanz (0-100), widget: number, min: 0, max: 100, value_type: int }
+          - label: Statistiken
+            name: stats
+            widget: object
+            fields:
+              - { name: totalFeeds, label: Eingelesene Feeds, widget: number }
+              - { name: totalArticles, label: Artikel gesamt, widget: number }
+              - { name: uniqueArticles, label: Einzigartige Artikel, widget: number }
+              - { name: finalArticles, label: Kuratierte Artikel, widget: number }

@@ -4,14 +4,77 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CMS – Alexander Schneider</title>
+    <meta
+      name="description"
+      content="Decap CMS Oberfläche für alexle135.de – Inhalte bearbeiten, Vorschauen prüfen und direkt via GitHub deployen."
+    />
     <style>
-      :root { color-scheme: light dark; }
-      body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; }
-      .hint { position: fixed; inset: auto 1rem 1rem auto; opacity: .7; font-size: .875rem; }
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at 20% 20%, rgba(148, 163, 184, 0.18), transparent 60%),
+          linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(15, 23, 42, 0.95));
+      }
+      .cms-wrapper {
+        position: relative;
+        width: min(420px, 92vw);
+        padding: 2.5rem 2rem 2rem;
+        border-radius: 1.5rem;
+        background: rgba(15, 23, 42, 0.88);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: 0 30px 60px -35px rgba(15, 23, 42, 0.9);
+        text-align: center;
+      }
+      .cms-wrapper h1 {
+        margin: 0;
+        font-size: 1.65rem;
+        color: #f8fafc;
+      }
+      .cms-wrapper p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: rgba(226, 232, 240, 0.78);
+        margin-bottom: 1.5rem;
+      }
+      .cms-wrapper code {
+        font-family: "JetBrains Mono", Consolas, monospace;
+        background: rgba(15, 23, 42, 0.55);
+        padding: 0.25rem 0.45rem;
+        border-radius: 0.5rem;
+        color: #60a5fa;
+      }
+      .cms-hint {
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: rgba(148, 163, 184, 0.85);
+      }
     </style>
   </head>
   <body>
-    <div class="hint">Decap CMS – Änderungen werden als Commits im Repo gespeichert.</div>
+    <div class="cms-wrapper">
+      <h1>Decap CMS</h1>
+      <p>
+        Änderungen werden versioniert in GitHub gespeichert. Nach dem Speichern erstellt GitHub Actions automatisch einen Deploy-Run
+        zum Server (rsync).
+      </p>
+      <p class="cms-hint">
+        Tipp: Vor dem Speichern rechts oben die Vorschau öffnen – dafür haben wir spezielle Templates für alle Content-Bereiche
+        hinterlegt.
+      </p>
+    </div>
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script src="./preview-templates.js"></script>
   </body>
 </html>
