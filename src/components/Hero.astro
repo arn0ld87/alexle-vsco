@@ -2,7 +2,7 @@
 import { getEntry } from 'astro:content';
 const hero = await getEntry('hero', 'hero');
 const data = hero.data;
-const ctaHref = data.ctaHref ?? '/projekte';
+const ctaHref = data.ctaHref ?? '/projekte/';
 const mediaPath = data.media ? (data.media.startsWith('/') ? data.media : `/${data.media}`) : undefined;
 const isVideo = mediaPath?.includes('.mp4');
 const mediaWebm = isVideo ? mediaPath.replace(/\.mp4$/, '.webm') : undefined;
