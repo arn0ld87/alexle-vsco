@@ -13,23 +13,24 @@ const featuredProjects = projects.slice(0, 3);
 ---
 <BaseLayout>
   <Hero />
-  <main class="container mx-auto space-y-20 px-4 py-16">
+  <main class="container mx-auto space-y-24 px-4 pb-24">
     <section id="services" class="space-y-8">
-      <div class="max-w-2xl">
-        <h2 class="text-3xl font-semibold tracking-tight">Leistungen</h2>
-        <p class="mt-2 text-gray-400">
+      <div class="section-intro">
+        <p class="text-sm uppercase tracking-[0.3em] text-blue-400">Leistungen</p>
+        <h2 class="text-3xl font-semibold tracking-tight md:text-4xl">Angebote für deinen stabilen IT-Betrieb</h2>
+        <p class="text-gray-300">
           Von klassischer Systemintegration bis zu automatisierten KI-Workflows – ich begleite Projekte ganzheitlich.
         </p>
       </div>
       <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {services.map((service) => (
-          <article class="rounded-lg border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur">
+          <article class="card-glass p-6">
             <h3 class="text-xl font-medium">{service.title}</h3>
             <p class="mt-2 text-sm text-gray-300">{service.description}</p>
             {service.tags && (
               <ul class="mt-4 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-gray-400">
                 {service.tags.map((tag) => (
-                  <li class="rounded bg-white/10 px-2 py-1" aria-label={`Tag ${tag}`}>
+                  <li class="rounded-full bg-white/10 px-3 py-1" aria-label={`Tag ${tag}`}>
                     {tag}
                   </li>
                 ))}
@@ -41,22 +42,23 @@ const featuredProjects = projects.slice(0, 3);
     </section>
 
     <section id="skills" class="space-y-8">
-      <div class="max-w-2xl">
-        <h2 class="text-3xl font-semibold tracking-tight">Kompetenzen</h2>
-        <p class="mt-2 text-gray-400">
+      <div class="section-intro">
+        <p class="text-sm uppercase tracking-[0.3em] text-blue-400">Kompetenzen</p>
+        <h2 class="text-3xl font-semibold tracking-tight md:text-4xl">Know-how für Betrieb &amp; Automatisierung</h2>
+        <p class="text-gray-300">
           Technik-Schwerpunkte mit Fokus auf Betriebssicherheit, Automatisierung und Monitoring.
         </p>
       </div>
       <div class="grid gap-4 md:grid-cols-2">
         {skills.map((skill) => (
-          <div class="rounded-lg border border-white/10 bg-white/5 p-4">
+          <div class="card-glass p-5">
             <div class="flex items-baseline justify-between">
               <span class="font-medium">{skill.name}</span>
               <span class="text-sm text-gray-400">{skill.percentage}%</span>
             </div>
             {skill.category && <p class="mt-1 text-xs uppercase tracking-wide text-gray-500">{skill.category}</p>}
             <div class="mt-3 h-1.5 rounded-full bg-white/10" role="presentation">
-              <div class="h-full rounded-full bg-blue-500" style={`width: ${skill.percentage}%`}></div>
+              <div class="h-full rounded-full bg-blue-500 transition-[width] duration-300" style={`width: ${skill.percentage}%`}></div>
             </div>
           </div>
         ))}
@@ -64,15 +66,16 @@ const featuredProjects = projects.slice(0, 3);
     </section>
 
     <section id="projects" class="space-y-8">
-      <div class="max-w-2xl">
-        <h2 class="text-3xl font-semibold tracking-tight">Ausgewählte Projekte</h2>
-        <p class="mt-2 text-gray-400">
+      <div class="section-intro">
+        <p class="text-sm uppercase tracking-[0.3em] text-blue-400">Case Studies</p>
+        <h2 class="text-3xl font-semibold tracking-tight md:text-4xl">Ausgewählte Projekte</h2>
+        <p class="text-gray-300">
           Drei Beispiele, wie ich Infrastruktur, Automatisierung und KI-Anwendungen in realen Projekten zusammenbringe.
         </p>
       </div>
       <div class="grid gap-6 md:grid-cols-3">
         {featuredProjects.map((project) => (
-          <article class="flex h-full flex-col rounded-lg border border-white/10 bg-white/5">
+          <article class="card-glass flex h-full flex-col overflow-hidden">
             {project.data.heroImage && (
               <img
                 src={`/${project.data.heroImage}`}
@@ -87,7 +90,7 @@ const featuredProjects = projects.slice(0, 3);
               {project.data.tags && (
                 <ul class="mt-4 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-gray-500">
                   {project.data.tags.map((tag) => (
-                    <li class="rounded bg-white/10 px-2 py-1" aria-label={`Tag ${tag}`}>
+                    <li class="rounded-full bg-white/10 px-3 py-1" aria-label={`Tag ${tag}`}>
                       {tag}
                     </li>
                   ))}

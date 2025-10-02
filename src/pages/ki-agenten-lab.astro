@@ -2,17 +2,17 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="KI-Agenten-Lab" description="Showcase von KI-Agenten-Workflows und Automatisierung">
-  <main class="container mx-auto px-4 py-16">
-    <header class="max-w-3xl space-y-4">
+  <main class="container mx-auto px-4 pb-24 pt-16">
+    <header class="section-intro">
       <p class="text-sm uppercase tracking-[0.3em] text-blue-400">KI-Agenten-Lab</p>
-      <h1 class="text-4xl font-semibold tracking-tight">Experimentelle Workflows mit Agenten &amp; Automatisierung</h1>
+      <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">Experimentelle Workflows mit Agenten &amp; Automatisierung</h1>
       <p class="text-lg text-gray-300">
         Hier dokumentiere ich Proof-of-Concepts, Diagramme und Erkenntnisse rund um KI-Agenten in produktionsnahen Szenarien.
       </p>
     </header>
 
     <section class="mt-12 grid gap-8 md:grid-cols-3">
-      <article class="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg">
+      <article class="card-glass p-6">
         <h2 class="text-xl font-semibold">Incident Triage Agent</h2>
         <p class="mt-3 text-sm text-gray-300">
           Analysiert Alerts, reichert sie mit Metriken an und schlägt Workarounds vor – inkl. Eskalationslogik.
@@ -22,7 +22,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <li>Routing: PagerDuty API &amp; Slack Alerts</li>
         </ul>
       </article>
-      <article class="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg">
+      <article class="card-glass p-6">
         <h2 class="text-xl font-semibold">Onboarding Companion</h2>
         <p class="mt-3 text-sm text-gray-300">
           Erstellt Schritt-für-Schritt-Anleitungen aus Confluence &amp; Git-Repos, beantwortet Rückfragen per Chat.
@@ -32,7 +32,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <li>Modus: Retrieval-Augmented Chat + Step Recorder</li>
         </ul>
       </article>
-      <article class="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg">
+      <article class="card-glass p-6">
         <h2 class="text-xl font-semibold">Deployment Co-Pilot</h2>
         <p class="mt-3 text-sm text-gray-300">
           Prüft Infrastruktur-Änderungen, generiert Terraform-Plan-Kommentare und überwacht Rollbacks.
@@ -44,7 +44,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </article>
     </section>
 
-    <section class="mt-16 rounded-2xl border border-white/10 bg-white/5 p-8">
+    <section class="card-glass mt-16 p-8">
       <h2 class="text-2xl font-semibold tracking-tight">Sicherheits- &amp; Ops-Guidelines</h2>
       <div class="mt-6 grid gap-6 md:grid-cols-2">
         <ul class="space-y-3 text-sm text-gray-300">

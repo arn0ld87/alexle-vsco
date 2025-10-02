@@ -7,20 +7,20 @@ const { Content } = await aboutEntry.render();
 const { title, profileImage, profileImageAlt } = aboutEntry.data;
 ---
 <BaseLayout title={`${title} – Alexander Schneider`} description="Über mich – IT-Systemintegration & DevOps aus Leipzig">
-  <main class="container mx-auto px-4 py-16">
-    <header class="grid gap-10 md:grid-cols-[1fr_2fr] md:items-center">
+  <main class="container mx-auto px-4 pb-24 pt-16">
+    <header class="grid gap-12 md:grid-cols-[1fr_2fr] md:items-center">
       {profileImage && (
         <img
           src={`/${profileImage}`}
           alt={profileImageAlt ?? ''}
-          class="mx-auto aspect-square w-64 rounded-3xl border border-white/10 object-cover shadow-lg"
+          class="mx-auto aspect-square w-64 rounded-[2.5rem] border border-white/10 object-cover shadow-2xl"
           loading="lazy"
         />
       )}
       <div class="space-y-6">
         <p class="text-sm uppercase tracking-[0.3em] text-blue-400">Über mich</p>
-        <h1 class="text-4xl font-semibold tracking-tight">{title}</h1>
-        <p class="text-lg text-gray-300">
+        <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">{title}</h1>
+        <p class="max-w-copy text-lg text-gray-300">
           Fokus auf stabile Infrastrukturen, durchdachte Automatisierung und nachvollziehbare Dokumentation.
         </p>
       </div>
@@ -31,19 +31,19 @@ const { title, profileImage, profileImageAlt } = aboutEntry.data;
     </article>
 
     <section class="mt-16 grid gap-8 md:grid-cols-3">
-      <div class="rounded-lg border border-white/10 bg-white/5 p-6">
+      <div class="card-glass p-6">
         <h2 class="text-sm uppercase tracking-[0.2em] text-blue-400">Schwerpunkte</h2>
         <p class="mt-3 text-sm text-gray-300">
           Netzwerke, Container, Observability – Lösungen, die Betriebsteams sofort nutzen können.
         </p>
       </div>
-      <div class="rounded-lg border border-white/10 bg-white/5 p-6">
+      <div class="card-glass p-6">
         <h2 class="text-sm uppercase tracking-[0.2em] text-blue-400">Arbeitsweise</h2>
         <p class="mt-3 text-sm text-gray-300">
           Klar strukturierte Projekte, transparente Kommunikation und dokumentierte Übergaben.
         </p>
       </div>
-      <div class="rounded-lg border border-white/10 bg-white/5 p-6">
+      <div class="card-glass p-6">
         <h2 class="text-sm uppercase tracking-[0.2em] text-blue-400">Tooling</h2>
         <p class="mt-3 text-sm text-gray-300">
           Terraform, Ansible, Kubernetes, GitOps, Monitoring-Stacks – immer mit Blick auf Wartbarkeit.

@@ -4,7 +4,29 @@ module.exports = {
     './src/**/*.{astro,html,js,ts,jsx,tsx,md,mdx}'
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: [
+          '"Inter"',
+          '"IBM Plex Sans"',
+          'system-ui',
+          '"Segoe UI"',
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          'sans-serif'
+        ]
+      },
+      colors: {
+        surface: {
+          DEFAULT: '#0b0c10',
+          subtle: '#11131a'
+        }
+      },
+      maxWidth: {
+        copy: '65ch'
+      }
+    },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/typography')],
 };

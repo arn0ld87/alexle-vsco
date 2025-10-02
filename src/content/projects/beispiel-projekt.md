@@ -5,7 +5,7 @@ tags:
   - KI
   - Agenten
   - DevOps
-heroImage: "media/alex-gemini.png"
+heroImage: "media/alex-gemini.webp"
 ---
 ## Problem
 Das Support-Team ordnete Tickets manuell zu, wodurch SLA-Zeiten stiegen und Wissensträger überlastet waren.

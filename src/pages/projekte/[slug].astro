@@ -18,7 +18,7 @@ const { Content } = await project.render();
 const { title, summary, tags, heroImage, demo } = project.data;
 ---
 <BaseLayout title={`${title} – Projekte`} description={summary}>
-  <main class="container mx-auto px-4 py-16">
+  <main class="container mx-auto px-4 pb-24 pt-16">
     <nav class="text-sm text-blue-400">
       <a href="/" class="hover:text-blue-300">Startseite</a>
       <span class="mx-2 text-gray-500">/</span>
@@ -30,23 +30,25 @@ const { title, summary, tags, heroImage, demo } = project.data;
     <header class="mt-8 space-y-6">
       <div class="space-y-3">
         <p class="text-sm uppercase tracking-[0.2em] text-blue-400">Projekt</p>
-        <h1 class="text-4xl font-semibold tracking-tight">{title}</h1>
-        <p class="text-lg text-gray-300">{summary}</p>
+        <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">{title}</h1>
+        <p class="max-w-copy text-lg text-gray-300">{summary}</p>
       </div>
       {tags && (
         <ul class="flex flex-wrap gap-2 text-xs uppercase tracking-wide text-gray-500">
           {tags.map((tag) => (
-            <li class="rounded bg-white/10 px-3 py-1">{tag}</li>
+            <li class="rounded-full bg-white/10 px-3 py-1">{tag}</li>
           ))}
         </ul>
       )}
       {heroImage && (
-        <img
-          src={`/${heroImage}`}
-          alt=""
-          class="w-full rounded-lg border border-white/10 object-cover"
-          loading="lazy"
-        />
+        <div class="card-glass overflow-hidden">
+          <img
+            src={`/${heroImage}`}
+            alt=""
+            class="h-full w-full object-cover"
+            loading="lazy"
+          />
+        </div>
       )}
     </header>
 
@@ -58,7 +60,7 @@ const { title, summary, tags, heroImage, demo } = project.data;
       <div class="mt-16">
         <a
           href={demo.startsWith('http') ? demo : `/${demo}`}
-          class="inline-flex items-center gap-2 rounded bg-blue-600 px-5 py-3 text-sm font-medium transition hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+          class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-medium uppercase tracking-[0.25em] transition hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
         >
           Demo ansehen
           <span aria-hidden="true">↗</span>
