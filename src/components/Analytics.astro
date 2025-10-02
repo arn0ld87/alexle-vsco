@@ -1,0 +1,221 @@
+---
+// Analytics-Komponente für erweiterte Event-Tracking
+const GA_ID = 'G-MWDF3CGRHL';
+---
+
+<script>
+  // Google Analytics Event-Tracking Funktionen
+  function trackEvent(eventName, parameters = {}) {
+    if (typeof gtag !== 'undefined') {
+      gtag('event', eventName, {
+        event_category: parameters.category || 'engagement',
+        event_label: parameters.label || '',
+        value: parameters.value || 0,
+        ...parameters
+      });
+    }
+  }
+
+  // Button-Klick-Tracking
+  function trackButtonClick(buttonName, location = '') {
+    trackEvent('button_click', {
+      category: 'cta',
+      label: `${buttonName}${location ? ` - ${location}` : ''}`,
+      custom_map: {
+        button_name: buttonName,
+        page_location: location
+      }
+    });
+  }
+
+  // Link-Klick-Tracking
+  function trackLinkClick(linkText, destination, isExternal = false) {
+    trackEvent('link_click', {
+      category: isExternal ? 'external_link' : 'internal_link',
+      label: linkText,
+      custom_map: {
+        link_text: linkText,
+        destination: destination,
+        is_external: isExternal
+      }
+    });
+  }
+
+  // Formular-Interaktions-Tracking
+  function trackFormInteraction(action, formName = 'contact_form') {
+    trackEvent('form_interaction', {
+      category: 'form',
+      label: `${formName}_${action}`,
+      custom_map: {
+        form_name: formName,
+        action: action
+      }
+    });
+  }
+
+  // Scroll-Tiefe-Tracking
+  function trackScrollDepth() {
+    let maxScroll = 0;
+    const scrollThresholds = [25, 50, 75, 90, 100];
+    const trackedThresholds = new Set();
+
+    function checkScrollDepth() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = Math.round((scrollTop / scrollHeight) * 100);
+
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent;
+      }
+
+      scrollThresholds.forEach(threshold => {
+        if (scrollPercent >= threshold && !trackedThresholds.has(threshold)) {
+          trackedThresholds.add(threshold);
+          trackEvent('scroll_depth', {
+            category: 'engagement',
+            label: `${threshold}%`,
+            value: threshold,
+            custom_map: {
+              scroll_percent: threshold,
+              page_path: window.location.pathname
+            }
+          });
+        }
+      });
+    }
+
+    // Throttled scroll listener
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          checkScrollDepth();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  }
+
+  // KI-Nachrichten-spezifisches Tracking
+  function trackKINewsEvent(action, articleTitle = '', source = '') {
+    trackEvent('ki_news_interaction', {
+      category: 'ki_news',
+      label: `${action}${articleTitle ? ` - ${articleTitle}` : ''}`,
+      custom_map: {
+        action: action,
+        article_title: articleTitle,
+        source: source
+      }
+    });
+  }
+
+  // Projekt-Interaktions-Tracking
+  function trackProjectInteraction(action, projectName = '', projectType = '') {
+    trackEvent('project_interaction', {
+      category: 'project',
+      label: `${action}${projectName ? ` - ${projectName}` : ''}`,
+      custom_map: {
+        action: action,
+        project_name: projectName,
+        project_type: projectType
+      }
+    });
+  }
+
+  // Navigation-Tracking
+  function trackNavigation(target, fromPage = '') {
+    trackEvent('navigation', {
+      category: 'menu',
+      label: target,
+      custom_map: {
+        target: target,
+        from_page: fromPage,
+        page_path: window.location.pathname
+      }
+    });
+  }
+
+  // Zeit-auf-Seite-Tracking
+  function trackTimeOnPage() {
+    const startTime = Date.now();
+    
+    window.addEventListener('beforeunload', () => {
+      const timeOnPage = Math.round((Date.now() - startTime) / 1000);
+      if (timeOnPage > 5) { // Nur tracken wenn länger als 5 Sekunden
+        trackEvent('time_on_page', {
+          category: 'engagement',
+          label: `${timeOnPage}s`,
+          value: timeOnPage,
+          custom_map: {
+            time_seconds: timeOnPage,
+            page_path: window.location.pathname
+          }
+        });
+      }
+    });
+  }
+
+  // Automatisches Tracking initialisieren
+  document.addEventListener('DOMContentLoaded', () => {
+    // Scroll-Tracking aktivieren
+    trackScrollDepth();
+    
+    // Zeit-auf-Seite-Tracking aktivieren
+    trackTimeOnPage();
+
+    // Automatisches Button-Tracking
+    document.querySelectorAll('button, .btn, [role="button"]').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const buttonText = button.textContent?.trim() || button.getAttribute('aria-label') || 'unnamed_button';
+        const buttonId = button.id || '';
+        trackButtonClick(buttonText, buttonId);
+      });
+    });
+
+    // Automatisches Link-Tracking
+    document.querySelectorAll('a[href]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const linkText = link.textContent?.trim() || link.getAttribute('aria-label') || 'unnamed_link';
+        const href = link.getAttribute('href');
+        const isExternal = href?.startsWith('http') && !href.includes(window.location.hostname);
+        
+        trackLinkClick(linkText, href, isExternal);
+      });
+    });
+
+    // Automatisches Formular-Tracking
+    document.querySelectorAll('form').forEach(form => {
+      const formName = form.id || form.className || 'unnamed_form';
+      
+      // Formular-Start
+      form.addEventListener('focusin', () => {
+        trackFormInteraction('start', formName);
+      });
+      
+      // Formular-Submit
+      form.addEventListener('submit', () => {
+        trackFormInteraction('submit', formName);
+      });
+    });
+
+    // Navigation-Tracking für Menü-Links
+    document.querySelectorAll('nav a, .nav a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const target = link.textContent?.trim() || link.getAttribute('aria-label') || 'unnamed_nav';
+        trackNavigation(target);
+      });
+    });
+  });
+
+  // Globale Funktionen für manuelles Tracking verfügbar machen
+  window.analytics = {
+    trackEvent,
+    trackButtonClick,
+    trackLinkClick,
+    trackFormInteraction,
+    trackKINewsEvent,
+    trackProjectInteraction,
+    trackNavigation
+  };
+</script>

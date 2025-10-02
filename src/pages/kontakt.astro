@@ -20,6 +20,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         class="card-glass space-y-6 p-8"
         action="https://formspree.io/f/mnqennra"
         method="POST"
+        onsubmit="if(window.analytics) window.analytics.trackFormInteraction('submit', 'contact_form')"
       >
         <div>
           <label class="block text-sm font-medium text-gray-200" for="name">Name</label>

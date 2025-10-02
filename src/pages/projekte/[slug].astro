@@ -53,11 +53,28 @@ const ogImage = heroImage ? (heroImage.startsWith('/') ? heroImage : `/${heroIma
         <a
           href={demo.startsWith('http') ? demo : `/${demo}`}
           class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-medium uppercase tracking-[0.25em] transition hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+          data-track-demo="true"
         >
           Demo ansehen
           <span aria-hidden="true">↗</span>
         </a>
       </div>
     )}
+
+    <script define:vars={{ title, tags }}>
+      // Projekt-spezifisches Tracking
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.analytics) {
+          window.analytics.trackProjectInteraction('page_view', title, tags ? tags.join(', ') : 'unknown');
+        }
+
+        // Demo-Link-Tracking
+        document.querySelector('[data-track-demo="true"]')?.addEventListener('click', () => {
+          if (window.analytics) {
+            window.analytics.trackProjectInteraction('demo_view', title, tags ? tags.join(', ') : 'unknown');
+          }
+        });
+      });
+    </script>
   </main>
 </BaseLayout>

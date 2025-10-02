@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Analytics from '../components/Analytics.astro';
 
 const GA_ID = 'G-MWDF3CGRHL';
 const {
@@ -52,6 +53,7 @@ const absoluteOgImage = ogImage.startsWith('http')
     <Header />
     <slot />
     <Footer />
+    <Analytics />
     <script is:inline>
       (() => {
         const prefix = '/dist';

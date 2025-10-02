@@ -210,10 +210,35 @@ const stats = kiNewsData.stats;
   </main>
 
   <script>
-    // Auto-refresh functionality
+    // KI-Nachrichten-spezifisches Tracking
+    document.addEventListener('DOMContentLoaded', () => {
+      // Track KI-Nachrichten-Seitenaufruf
+      if (window.analytics) {
+        window.analytics.trackKINewsEvent('page_view', 'KI-Nachrichten Portal', 'ki-nachrichten-portal');
+      }
+
+      // Track Artikel-Klicks
+      document.querySelectorAll('article a[href^="http"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          const articleTitle = link.closest('article')?.querySelector('h3')?.textContent?.trim() || 'Unknown Article';
+          const source = link.closest('article')?.querySelector('.text-xs')?.textContent?.trim() || 'Unknown Source';
+          
+          if (window.analytics) {
+            window.analytics.trackKINewsEvent('article_click', articleTitle, source);
+          }
+        });
+      });
+    });
+
+    // Auto-refresh functionality mit Tracking
     document.getElementById('refreshNews')?.addEventListener('click', async () => {
       const button = document.getElementById('refreshNews');
       const originalText = button.innerHTML;
+      
+      // Track Refresh-Button-Klick
+      if (window.analytics) {
+        window.analytics.trackKINewsEvent('refresh_click', 'Manual Refresh', 'ki-nachrichten-portal');
+      }
       
       button.innerHTML = `
         <svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,6 +257,11 @@ const stats = kiNewsData.stats;
           lastUpdateElement.textContent = new Date().toLocaleString('de-DE');
         }
         
+        // Track erfolgreiche Aktualisierung
+        if (window.analytics) {
+          window.analytics.trackKINewsEvent('refresh_success', 'Manual Refresh Success', 'ki-nachrichten-portal');
+        }
+        
         // Show success message
         const indicator = document.createElement('div');
         indicator.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
@@ -244,16 +274,26 @@ const stats = kiNewsData.stats;
         
       } catch (error) {
         console.error('Fehler beim Aktualisieren:', error);
+        
+        // Track Fehler
+        if (window.analytics) {
+          window.analytics.trackKINewsEvent('refresh_error', 'Manual Refresh Error', 'ki-nachrichten-portal');
+        }
       } finally {
         button.innerHTML = originalText;
       }
     });
 
-    // Auto-refresh every 30 minutes
+    // Auto-refresh every 30 minutes mit Tracking
     setInterval(() => {
       const lastUpdateElement = document.querySelector('.font-mono');
       if (lastUpdateElement) {
         lastUpdateElement.textContent = new Date().toLocaleString('de-DE');
+        
+        // Track automatische Aktualisierung
+        if (window.analytics) {
+          window.analytics.trackKINewsEvent('auto_refresh', 'Automatic Refresh', 'ki-nachrichten-portal');
+        }
       }
     }, 30 * 60 * 1000);
   </script>

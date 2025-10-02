@@ -43,6 +43,7 @@ const projects = await getCollection('projects');
               <a
                 href={`/projekte/${project.slug}/`}
                 class="inline-flex items-center gap-2 text-sm font-medium text-blue-400 transition hover:text-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+                onclick={`if(window.analytics) window.analytics.trackProjectInteraction('project_card_click', '${project.data.title}', '${project.data.tags?.join(', ') || 'unknown'}')`}
               >
                 Projekt ansehen
                 <span aria-hidden="true">→</span>
