@@ -42,16 +42,6 @@ const ogImage = heroImage ? (heroImage.startsWith('/') ? heroImage : `/${heroIma
           ))}
         </ul>
       )}
-      {heroImage && (
-        <div class="card-glass overflow-hidden">
-          <img
-            src={`/${heroImage}`}
-            alt=""
-            class="h-full w-full object-cover"
-            loading="lazy"
-          />
-        </div>
-      )}
     </header>
 
     <article class="prose prose-invert mt-12 max-w-none">
