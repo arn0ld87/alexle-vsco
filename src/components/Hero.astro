@@ -23,7 +23,18 @@ const isVideo = data.media?.includes('.mp4');
   {data.media && (
     <div class="card-glass relative aspect-video overflow-hidden">
       {isVideo ? (
-        <video src={data.media} autoplay loop muted playsinline class="h-full w-full object-cover" />
+        <video
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="metadata"
+          poster="/media/alex.avif"
+          class="h-full w-full object-cover"
+        >
+          <source src={data.media.replace('.mp4', '.webm')} type="video/webm" />
+          <source src={data.media} type="video/mp4" />
+        </video>
       ) : (
         <img src={data.media} alt="" class="h-full w-full object-cover" loading="lazy" />
       )}

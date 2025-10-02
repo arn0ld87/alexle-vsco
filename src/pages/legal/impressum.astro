@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+
+const legalEntry = await getEntry('legal', 'impressum');
+const { Content } = await legalEntry.render();
+const { title, updated } = legalEntry.data;
+---
+<BaseLayout title={`${title} – Alexander Schneider`} description="Impressum von Alexander Schneider">
+  <main class="container mx-auto px-4 pb-24 pt-16">
+    <header class="section-intro">
+      <p class="text-sm uppercase tracking-[0.3em] text-blue-400">Rechtliches</p>
+      <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">{title}</h1>
+      {updated && <p class="text-sm text-gray-500">Stand: {updated}</p>}
+    </header>
+
+    <article class="prose prose-invert mt-12 max-w-none">
+      <Content />
+    </article>
+  </main>
+</BaseLayout>

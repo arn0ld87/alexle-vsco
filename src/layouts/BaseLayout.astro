@@ -15,5 +15,29 @@ const { title = 'Alexander Schneider', description = 'IT‑Systemintegration & D
     <Header />
     <slot />
     <Footer />
+    <script is:inline>
+      (() => {
+        const prefix = '/dist';
+        const { pathname } = window.location;
+        if (!pathname.startsWith(prefix)) return;
+
+        const rewriteAttr = (selector, attr) => {
+          document.querySelectorAll(selector).forEach((el) => {
+            const value = el.getAttribute(attr);
+            if (!value || value.startsWith('//') || value.startsWith(prefix + '/')) return;
+            if (value.startsWith('/')) {
+              el.setAttribute(attr, prefix + value);
+            }
+          });
+        };
+
+        rewriteAttr('a[href^="/"]', 'href');
+        rewriteAttr('img[src^="/"]', 'src');
+        rewriteAttr('source[src^="/"]', 'src');
+        rewriteAttr('video[src^="/"]', 'src');
+        rewriteAttr('link[href^="/"]', 'href');
+        rewriteAttr('form[action^="/"]', 'action');
+      })();
+    </script>
   </body>
 </html>
