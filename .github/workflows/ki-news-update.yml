@@ -1,0 +1,63 @@
+name: KI-Nachrichten Update
+
+on:
+  schedule:
+    # Täglich um 6:00 Uhr UTC (8:00 Uhr MEZ)
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Manueller Trigger
+
+jobs:
+  update-ki-news:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: |
+          npm install -g pnpm
+          pnpm install
+      
+      - name: Scrape KI-Nachrichten
+        run: |
+          node scripts/scrape-ki-news.js
+        env:
+          NODE_ENV: production
+      
+      - name: Build Website
+        run: |
+          pnpm build
+      
+      - name: Commit Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add src/content/ki-news.json dist/
+          git diff --staged --quiet || git commit -m "🤖 Auto-update: KI-Nachrichten aktualisiert [skip ci]"
+          git push
+      
+      - name: Deploy to Server
+        run: |
+          # Hier würde der rsync-Befehl für das Deployment stehen
+          echo "Deployment würde hier stattfinden"
+      
+      - name: Notify Success
+        if: success()
+        run: |
+          echo "✅ KI-Nachrichten erfolgreich aktualisiert!"
+          echo "📊 $(date): $(cat src/content/ki-news.json | jq '.stats.finalArticles') Artikel verarbeitet"
+      
+      - name: Notify Failure
+        if: failure()
+        run: |
+          echo "❌ Fehler beim Aktualisieren der KI-Nachrichten!"
+          exit 1

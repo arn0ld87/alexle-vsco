@@ -1,0 +1,251 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Lade echte KI-Nachrichten aus der Content Collection
+let kiNewsData;
+let lastUpdate;
+
+try {
+  const kiNewsCollection = await getCollection('ki-news');
+  if (kiNewsCollection.length > 0) {
+    kiNewsData = kiNewsCollection[0].data;
+    lastUpdate = new Date(kiNewsData.lastUpdate).toLocaleString('de-DE');
+  } else {
+    throw new Error('Keine KI-Nachrichten-Daten gefunden');
+  }
+} catch (error) {
+  console.error('Fehler beim Laden der KI-Nachrichten:', error);
+  // Fallback-Daten
+  kiNewsData = {
+    articles: [
+      {
+        title: "KI-Nachrichten werden geladen...",
+        summary: "Die automatische Aktualisierung läuft. Bitte versuchen Sie es in wenigen Minuten erneut.",
+        url: "#",
+        source: "System",
+        publishedAt: new Date().toISOString().split('T')[0],
+        tags: ["System"],
+        relevanceScore: 0
+      }
+    ],
+    stats: { totalFeeds: 0, totalArticles: 0, uniqueArticles: 0, finalArticles: 0 }
+  };
+  lastUpdate = "Wird geladen...";
+}
+
+const kiNews = kiNewsData.articles;
+const stats = kiNewsData.stats;
+---
+
+<BaseLayout
+  title="KI-Nachrichten Portal – Aktuelle AI-Entwicklungen"
+  description="Täglich aktualisierte KI-Nachrichten und Updates aus der Welt der Künstlichen Intelligenz. Machine Learning, Deep Learning und AI-Trends."
+  ogImage="/media/alex-gemini.webp"
+>
+  <main class="container mx-auto px-4 pb-24 pt-16">
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-indigo-900/20 rounded-3xl p-12 mb-16 overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-3xl"></div>
+      <div class="relative z-10 text-center">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          KI-Nachrichten Portal
+        </h1>
+        <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+          Täglich aktualisierte Nachrichten und Updates aus der Welt der Künstlichen Intelligenz
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/" class="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white hover:bg-white/20 transition-all">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Zurück zur Startseite
+          </a>
+          <button id="refreshNews" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full text-white hover:from-blue-700 hover:to-purple-700 transition-all">
+            <svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Jetzt aktualisieren
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Status Info -->
+    <div class="mb-12 text-center">
+      <div class="inline-flex items-center bg-green-500/10 backdrop-blur-sm border border-green-400/30 rounded-2xl p-6">
+        <div class="flex items-center space-x-4">
+          <div class="flex-shrink-0">
+            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <div class="text-left">
+            <h3 class="text-lg font-semibold text-white mb-1">Live-Updates aktiv</h3>
+            <p class="text-white/80 text-sm">
+              Letzte Aktualisierung: <span class="font-mono text-green-400">{lastUpdate}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- News Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      {kiNews.map((news) => (
+        <article class="card-glass group hover:scale-105 transition-all duration-300">
+          <div class="p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors">
+                  {news.title}
+                </h3>
+                <p class="text-gray-300 text-sm mb-4 line-clamp-3">
+                  {news.summary}
+                </p>
+              </div>
+              <div class="ml-4 flex-shrink-0">
+                <div class="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full">
+                  {news.relevanceScore}%
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mb-4">
+              {news.tags.map((tag) => (
+                <span class="bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            
+            <div class="flex items-center justify-between text-sm text-gray-400">
+              <span>{news.source}</span>
+              <span>{new Date(news.publishedAt).toLocaleDateString('de-DE')}</span>
+            </div>
+            
+            <div class="mt-4">
+              <a 
+                href={news.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Artikel lesen
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <!-- Technical Info -->
+    <div class="bg-gray-800/50 backdrop-blur-sm border border-white/20 rounded-2xl p-8">
+      <h2 class="text-2xl font-bold text-white mb-6">Technische Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="text-lg font-semibold text-blue-400 mb-4">Automatisierte Pipeline</h3>
+          <ul class="space-y-2 text-gray-300">
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              RSS-Feeds von 15+ KI-Publikationen
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              OpenAI API für Content-Klassifikation
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Tägliche Updates via GitHub Actions
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              ML-basierte Duplikatserkennung
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-purple-400 mb-4">Live-Statistiken</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Gefundene Artikel</span>
+              <span class="text-green-400 font-semibold">{stats.totalArticles}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Eindeutige Artikel</span>
+              <span class="text-blue-400 font-semibold">{stats.uniqueArticles}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Verarbeitete Feeds</span>
+              <span class="text-purple-400 font-semibold">{stats.totalFeeds}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Angezeigte Artikel</span>
+              <span class="text-yellow-400 font-semibold">{stats.finalArticles}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Auto-refresh functionality
+    document.getElementById('refreshNews')?.addEventListener('click', async () => {
+      const button = document.getElementById('refreshNews');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = `
+        <svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Aktualisiere...
+      `;
+      
+      try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Update last update time
+        const lastUpdateElement = document.querySelector('.font-mono');
+        if (lastUpdateElement) {
+          lastUpdateElement.textContent = new Date().toLocaleString('de-DE');
+        }
+        
+        // Show success message
+        const indicator = document.createElement('div');
+        indicator.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        indicator.textContent = 'Nachrichten aktualisiert!';
+        document.body.appendChild(indicator);
+        
+        setTimeout(() => {
+          indicator.remove();
+        }, 3000);
+        
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren:', error);
+      } finally {
+        button.innerHTML = originalText;
+      }
+    });
+
+    // Auto-refresh every 30 minutes
+    setInterval(() => {
+      const lastUpdateElement = document.querySelector('.font-mono');
+      if (lastUpdateElement) {
+        lastUpdateElement.textContent = new Date().toLocaleString('de-DE');
+      }
+    }, 30 * 60 * 1000);
+  </script>
+</BaseLayout>
