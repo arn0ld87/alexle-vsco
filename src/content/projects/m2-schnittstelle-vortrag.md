@@ -4,7 +4,7 @@ summary: "Technische Präsentation über M.2 SSDs - Installation, Performance-Ve
 tags:
   - Hardware
   - Präsentation
-heroImage: "/media/schnittstelle.png"
+heroImage: "/media/schnittstelle.webp"
 demo: "https://alexle135.de/push/improved_index.html"
 ---
 
