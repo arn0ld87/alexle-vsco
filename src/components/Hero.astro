@@ -1,0 +1,17 @@
+---
+import { getEntry } from 'astro:content';
+const hero = await getEntry('hero', 'hero');
+const data = hero.data;
+---
+<section class="container mx-auto px-4 py-20 grid gap-8 md:grid-cols-2 items-center">
+  <div>
+    <h1 class="text-4xl md:text-6xl font-semibold tracking-tight">{data.title}</h1>
+    {data.subtitle && <p class="mt-4 text-gray-300 text-lg">{data.subtitle}</p>}
+    {data.cta && <a href="/projekte" class="inline-block mt-8 bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded">{data.cta}</a>}
+  </div>
+  {data.media && (
+    <picture>
+      <img src={data.media} alt="" class="w-full h-auto rounded-lg shadow-lg" />
+    </picture>
+  )}
+</section>

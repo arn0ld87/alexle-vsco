@@ -1,0 +1,193 @@
+{
+    "personalInfo": {
+        "name": "Alexander Schneider",
+        "title": "Fachinformatiker Systemintegration",
+        "email": "schneider@alexle135.de",
+        "phone": "015568920209",
+        "location": "Leipzig, Deutschland"
+    },
+    "header": {
+        "logo": "logo.jpg",
+        "video": "media/LOGONEU.mp4?v=2",
+        "showVideo": true
+    },
+    "hero": {
+        "title": "IT‑Systemintegration und DevOps in Leipzig",
+        "subtitle": "Netzwerke, Server, Container & Automatisierung – sauber geplant und zuverlässig umgesetzt.",
+        "cta": "Projekte entdecken"
+    },
+    "about": {
+        "title": "Über mich",
+        "description": "Ich plane, integriere und betreibe stabile IT-Infrastrukturen: Von Netzwerken und Servern über Container bis zu automatisierten Workflows. Mein Anspruch: nachvollziehbare Architektur, saubere Umsetzung, messbare Ergebnisse.",
+        "profileImage": "media/alex.webp",
+        "profileImageAlt": "Profilbild von Alexander Schneider – Fachinformatiker Systemintegration"
+    },
+    "services": [
+        {
+            "id": 1,
+            "icon": "fas fa-network-wired",
+            "title": "Systemintegration",
+            "description": "Netzwerke, Server, Container-Technologien",
+            "color": "blue"
+        },
+        {
+            "id": 2,
+            "icon": "fas fa-robot",
+            "title": "KI-Workflows",
+            "description": "Automatisierung & intelligente Systeme",
+            "color": "purple"
+        },
+        {
+            "id": 3,
+            "icon": "fas fa-desktop",
+            "title": "IT-Administration",
+            "description": "Windows & Linux Server-Administration",
+            "color": "green"
+        },
+        {
+            "id": 4,
+            "icon": "fas fa-cogs",
+            "title": "DevOps",
+            "description": "CI/CD, Deployment & Monitoring",
+            "color": "orange"
+        }
+    ],
+    "contact": {
+        "subtitle": "Lassen Sie uns zusammenarbeiten!",
+        "items": [
+            {
+                "id": 1,
+                "icon": "fas fa-envelope",
+                "title": "E-Mail",
+                "value": "schneider@alexle135.de",
+                "type": "email"
+            },
+            {
+                "id": 2,
+                "icon": "fas fa-phone",
+                "title": "Telefon",
+                "value": "015568920209",
+                "type": "phone"
+            },
+            {
+                "id": 3,
+                "icon": "fas fa-map-marker-alt",
+                "title": "Adresse",
+                "value": "Georg-Schumann-Straße 148, 04159 Leipzig",
+                "type": "address"
+            },
+            {
+                "id": 4,
+                "icon": "fas fa-clock",
+                "title": "Verfügbarkeit",
+                "value": "Mo-Fr 9-18 Uhr",
+                "type": "hours"
+            }
+        ]
+    },
+    "social": [
+        {
+            "id": 1,
+            "icon": "fab fa-github",
+            "url": "https://github.com/alexle135",
+            "name": "GitHub"
+        },
+        {
+            "id": 2,
+            "icon": "fab fa-linkedin",
+            "url": "https://linkedin.com/in/alex-schneider",
+            "name": "LinkedIn"
+        },
+        {
+            "id": 3,
+            "icon": "fab fa-twitter",
+            "url": "https://twitter.com/alexle135",
+            "name": "Twitter"
+        },
+        {
+            "id": 4,
+            "icon": "fab fa-instagram",
+            "url": "https://instagram.com/alexle135",
+            "name": "Instagram"
+        },
+        {
+            "id": 5,
+            "icon": "fab fa-youtube",
+            "url": "https://youtube.com/@alexle135",
+            "name": "YouTube"
+        }
+    ],
+    "legal": {
+        "impressum": {
+            "title": "Impressum",
+            "content": "<p><strong>Angaben gemäß § 5 TMG:</strong></p>\n<p>Alex Schneider<br>\nMusterstraße 123<br>\n12345 Musterstadt</p>\n\n<p><strong>Kontakt:</strong><br>\nTelefon: 015568920209<br>\nE-Mail: schneider@alexle135.de</p>"
+        },
+        "datenschutz": {
+            "title": "Datenschutzerklärung",
+            "content": "<p><strong>1. Datenschutz auf einen Blick</strong></p>\n<p>Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen.</p>\n\n<p><strong>2. Allgemeine Hinweise und Pflichtinformationen</strong></p>\n<p>Die Betreiber dieser Seiten nehmen den Schutz Ihrer persönlichen Daten sehr ernst.</p>"
+        }
+    },
+    "skills": [
+        {
+            "name": "Systemintegration",
+            "percentage": 85,
+            "category": "Netzwerke, Server, Infrastruktur"
+        },
+        {
+            "name": "Server-Administration",
+            "percentage": 80,
+            "category": "Windows & Linux Systeme"
+        },
+        {
+            "name": "Netzwerktechnik",
+            "percentage": 75,
+            "category": "Routing, Switching, Security"
+        },
+        {
+            "name": "DevOps & Automatisierung",
+            "percentage": 70,
+            "category": "CI/CD, Container, Monitoring"
+        }
+    ],
+    "projects": [
+        {
+            "id": 1,
+            "title": "M.2 Schnittstelle Vortrag",
+            "description": "Technische Präsentation über M.2 SSDs - Installation, Performance-Vergleich und praktische Anwendung",
+            "image": "push/Folie6.jpg",
+            "github": "",
+            "demo": "https://alexle135.de/push/improved_index.html",
+            "detail": "push/improved_index.html",
+            "tags": [
+                "Hardware",
+                "Präsentation"
+            ]
+        },
+        {
+            "id": 2,
+            "title": "Space Shooter Game",
+            "description": "Browser-basiertes Spiel mit HTML5 Canvas - zeigt praktische JavaScript-Anwendung und Game Development",
+            "image": "media/shoot.jpeg",
+            "github": "",
+            "demo": "space-shooter.html",
+            "detail": "space-shooter.html",
+            "tags": [
+                "JavaScript",
+                "Game Dev"
+            ]
+        },
+        {
+            "id": 3,
+            "title": "KI Nachrichten Portal",
+            "description": "Dynamische KI-News mit automatisierten Updates - Machine Learning Trends und AI-Entwicklungen",
+            "image": "media/schnittstelle.png",
+            "github": "",
+            "demo": "ki-nachrichten.html",
+            "detail": "ki-nachrichten.html",
+            "tags": [
+                "KI",
+                "Automation"
+            ]
+        }
+    ]
+}

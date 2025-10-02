@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+        
+    <!-- Google tag (gtag.js) -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI‑Nachrichten – Alexander Schneider</title>
+    <meta name="description" content="Täglich aktualisierte KI-Nachrichten und Updates aus der Welt der Künstlichen Intelligenz. Machine Learning, Deep Learning und AI-Trends." />
+    <link rel="canonical" href="https://www.alexle135.de/ki-nachrichten.html" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Alexander Schneider" />
+    <meta property="og:title" content="KI‑Nachrichten – Alexander Schneider" />
+    <meta property="og:description" content="Aktuelle KI‑Nachrichten und Updates – kuratiert." />
+    <meta property="og:url" content="https://www.alexle135.de/ki-nachrichten.html" />
+    <meta property="og:image" content="https://www.alexle135.de/media/logo_3d_game_asset_render.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="KI‑Nachrichten – Alexander Schneider" />
+    <meta name="twitter:description" content="Aktuelle KI‑Nachrichten und Updates – kuratiert." />
+    <meta name="twitter:image" content="https://www.alexle135.de/media/logo_3d_game_asset_render.png" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Startseite",
+          "item": "https://www.alexle135.de/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "KI-Nachrichten",
+          "item": "https://www.alexle135.de/ki-nachrichten.html"
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "KI-Nachrichten",
+      "description": "Aktuelle KI-Nachrichten und Updates",
+      "itemListElement": []
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "KI-Agenten Nachrichten",
+      "description": "Täglich aktualisierte Nachrichten und Updates aus der Welt der Künstlichen Intelligenz",
+      "author": {
+        "@type": "Person",
+        "name": "Alexander Schneider",
+        "url": "https://www.alexle135.de/ueber-mich.html"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Alexander Schneider",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.alexle135.de/logo.webp"
+        }
+      },
+      "datePublished": "2025-01-27",
+      "dateModified": "2025-01-27",
+      "mainEntityOfPage": "https://www.alexle135.de/ki-nachrichten.html",
+      "articleSection": "Künstliche Intelligenz",
+      "keywords": ["KI", "Künstliche Intelligenz", "Machine Learning", "AI News", "Tech News"]
+    }
+    </script>
+    
+    <meta name="theme-color" content="#3b82f6">
+    
+    <!-- Tailwind CSS -->
+    <link rel="preload" href="dist/tailwind.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="dist/tailwind.css"></noscript>
+
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-p1CmJ2k0rGZMfjNV8+UL1Ji2YfwjlZF7tUj5fe6kKIhxX3sI5Gucs5cjox96D65V6p9LhIwTZPIW4oP4g+OzYQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- Authentication System -->
+    <!-- Fallback API for when PHP is not available -->
+    <!-- Custom Styles -->
+    <style>
+        :root {
+    --brand-from: #3b82f6;
+    --brand-to: #8b5cf6;
+    
+    /* 2025 Modern Color Scheme */
+    --primary-50: #f0f9ff;
+    --primary-100: #e0f2fe;
+    --primary-200: #bae6fd;
+    --primary-300: #7dd3fc;
+    --primary-400: #38bdf8;
+    --primary-500: #0ea5e9;
+    --primary-600: #0284c7;
+    --primary-700: #0369a1;
+    --primary-800: #075985;
+    --primary-900: #0c4a6e;
+    --primary-950: #082f49;
+    
+    --accent-50: #fdf4ff;
+    --accent-100: #fae8ff;
+    --accent-200: #f5d0fe;
+    --accent-300: #f0abfc;
+    --accent-400: #e879f9;
+    --accent-500: #d946ef;
+    --accent-600: #c026d3;
+    --accent-700: #a21caf;
+    --accent-800: #86198f;
+    --accent-900: #701a75;
+    --accent-950: #4a044e;
+    
+    --neutral-50: #fafafa;
+    --neutral-100: #f4f4f5;
+    --neutral-200: #e4e4e7;
+    --neutral-300: #d4d4d8;
+    --neutral-400: #a1a1aa;
+    --neutral-500: #71717a;
+    --neutral-600: #52525b;
+    --neutral-700: #3f3f46;
+    --neutral-800: #27272a;
+    --neutral-900: #18181b;
+    --neutral-950: #09090b;
+    
+    --success-400: #4ade80;
+    --success-500: #22c55e;
+    --warning-400: #fbbf24;
+    --warning-500: #f59e0b;
+    --danger-400: #f87171;
+    --danger-500: #ef4444;
+    
+    /* Glass morphism variables */
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-blur: blur(16px);
+    
+    /* Animation variables */
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+        html, body { 
+    font-family: 'Manrope', 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
+    font-feature-settings: 'ss01' on, 'ss02' on, 'cv01' on, 'cv02' on;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+        /* Hero gradients */
+        .bg-gradient-blue { 
+    background: 
+        radial-gradient(1200px 600px at 10% -10%, rgba(14, 165, 233, 0.3), transparent 60%),
+        radial-gradient(1200px 600px at 90% -20%, rgba(217, 70, 239, 0.25), transparent 60%),
+        linear-gradient(135deg, var(--neutral-950) 0%, var(--neutral-900) 100%);
+}
+        .bg-gradient-light-blue { background: linear-gradient(135deg, #e8f1ff 0%, #f5f7ff 100%); }
+
+        /* Animated gradient utility */
+        .animated-gradient {
+            background: linear-gradient(90deg, var(--brand-from), var(--brand-to), #22d3ee);
+            background-size: 200% 200%;
+            animation: gradientShift 12s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fade-in-up 0.8s ease-out forwards;
+            opacity: 0;
+        }
+
+        /* Glass morphism */
+        .glass { 
+    background: var(--glass-bg); 
+    border: 1px solid var(--glass-border); 
+    backdrop-filter: var(--glass-blur); 
+    -webkit-backdrop-filter: var(--glass-blur);
+}
+
+        /* Gradient text */
+        .text-gradient { 
+    background: linear-gradient(135deg, var(--primary-400), var(--accent-500)); 
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent; 
+    background-size: 200% 200%;
+    animation: textGradientShift 8s ease infinite;
+}
+
+@keyframes textGradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+        /* Sticky nav */
+        .sticky-nav { backdrop-filter: saturate(180%) blur(14px); background: rgba(15,23,42,.5); border-bottom: 1px solid rgba(255,255,255,.08); }
+        .nav-link { color: rgba(255,255,255,.7); transition: color .2s ease; }
+        .nav-link:hover { color: #fff; }
+        .nav-link.active { color: #fff; }
+
+        /* Edit mode styles */
+        .edit-mode .editable {
+            border: 2px dashed #3b82f6;
+            padding: 4px;
+            margin: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-mode .editable:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-color: #1d4ed8;
+        }
+        
+        /* Edit panel */
+        .edit-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .edit-panel.open {
+            right: 0;
+        }
+        
+        /* Floating save button */
+        .floating-save {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        
+        .floating-save.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* News card animations */
+        .news-card {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .news-card.new {
+            animation: slideInFromRight 0.6s ease-out;
+        }
+        
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Auto-refresh indicator */
+        .refresh-indicator {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 50;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Modern Responsive Design */
+        @media (max-width: 768px) {
+            .edit-panel {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .refresh-indicator {
+                top: 60px;
+                right: 10px;
+                font-size: 10px;
+                padding: 6px 12px;
+            }
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .text-gradient {
+                background: none !important;
+                color: var(--primary-600) !important;
+            }
+            
+            .glass {
+                background: var(--neutral-800) !important;
+                border: 2px solid var(--neutral-600) !important;
+            }
+        }
+        
+    </style>
+
+<script>
+    (function() {
+        const manifestUrl = '/asset-manifest.json?ts=' + Date.now();
+        const cssId = 'app-style';
+        const jsId = 'app-script';
+
+        const normalize = (value) => {
+            if (!value) return null;
+            if (/^https?:\/\//i.test(value)) return value;
+            const cleaned = value.replace(/^\/+/, '');
+            return '/' + cleaned;
+        };
+
+        const injectAssets = ({ css, js }) => {
+            if (css && !document.getElementById(cssId)) {
+                const link = document.createElement('link');
+                link.id = cssId;
+                link.rel = 'stylesheet';
+                link.href = normalize(css);
+                link.crossOrigin = 'anonymous';
+                document.head.appendChild(link);
+            }
+
+            if (js && !document.getElementById(jsId)) {
+                const script = document.createElement('script');
+                script.id = jsId;
+                script.type = 'module';
+                script.defer = true;
+                script.src = normalize(js);
+                document.head.appendChild(script);
+            }
+        };
+
+        const loadFromManifest = (manifest) => {
+            const cssEntry = Object.keys(manifest).find((key) => key.endsWith('.css'));
+            const jsEntry = Object.keys(manifest).find((key) => key.endsWith('.js'));
+            injectAssets({
+                css: cssEntry ? manifest[cssEntry] : null,
+                js: jsEntry ? manifest[jsEntry] : null
+            });
+        };
+
+        const loadFallback = () => injectAssets({ css: 'dist/tailwind.css', js: 'src/main.js' });
+
+        fetch(manifestUrl, { cache: 'no-store' })
+            .then((response) => (response && response.ok ? response.json() : null))
+            .then((manifest) => {
+                if (manifest && Object.keys(manifest).length > 0) {
+                    loadFromManifest(manifest);
+                } else {
+                    loadFallback();
+                }
+            })
+            .catch(loadFallback);
+    })();
+</script>
+<noscript>
+    <link rel="stylesheet" href="/dist/tailwind.css">
+</noscript>
+
+</head>
+    <body class="bg-neutral-950 text-neutral-50">
+    <!-- Edit Controls -->
+    <div class="fixed top-4 left-4 z-50 flex space-x-2">
+        <button id="saveChanges" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg transition-colors hidden">
+            <i class="fas fa-save mr-2"></i>Speichern
+        </button>
+        <button id="syncData" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transition-colors hidden">
+            <i class="fas fa-sync mr-2"></i>Synchronisieren
+        </button>
+        <button id="resetData" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg shadow-lg transition-colors hidden">
+            <i class="fas fa-undo mr-2"></i>Reset
+        </button>
+    </div>
+    
+    <!-- Admin Controls -->
+    <div class="fixed top-4 right-4 z-50 flex space-x-2">
+        <div id="loggedInControls" class="flex space-x-2 hidden">
+            <span id="welcomeMessage" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></span>
+            <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-lg transition-colors">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Auto-refresh indicator -->
+    <div id="refreshIndicator" class="refresh-indicator">
+        <i class="fas fa-sync-alt mr-2"></i>Nachrichten aktualisiert
+    </div>
+
+    <!-- Header wird automatisch geladen -->
+
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-blue pt-32 pb-24 overflow-hidden">
+        <!-- Enhanced Background Video -->
+        <div class="absolute inset-0 -z-10 overflow-hidden">
+            <video
+                id="heroVideoBg"
+                class="w-full h-full object-cover opacity-60 transition-all duration-1000 ease-out"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                poster="logo.jpg"
+            >
+                <source src="https://alexle135.de/media/logovid.webm" type="video/webm">
+                <source src="https://alexle135.de/media/logovid.mp4" type="video/mp4">
+                Ihr Browser unterstützt das Video-Tag nicht.
+            </video>
+            <div class="absolute inset-0 bg-gradient-to-b from-neutral-950/70 via-neutral-950/40 to-neutral-950/80"></div>
+            <div class="absolute inset-0" style="background: radial-gradient(60% 50% at 50% 20%, rgba(14, 165, 233, 0.15), transparent 70%),
+                                              radial-gradient(40% 30% at 70% 80%, rgba(217, 70, 239, 0.1), transparent 60%);"></div>
+        </div>
+        <!-- Decorative blobs -->
+        <div class="pointer-events-none absolute inset-0" style="z-index:-20;">
+            <div id="blobLeft" class="absolute -top-24 -left-24 w-[28rem] h-[28rem] rounded-full blur-3xl opacity-30 animated-gradient"></div>
+            <div id="blobRight" class="absolute -bottom-24 -right-24 w-[30rem] h-[30rem] rounded-full blur-3xl opacity-30 animated-gradient"></div>
+        </div>
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h1 class="editable text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 text-gradient animate-fade-in-up" 
+                data-field="ki-news.title" data-type="text"
+                style="animation-delay: 0.2s;">
+                KI-Agenten Nachrichten
+            </h1>
+            <p class="editable text-xl md:text-2xl lg:text-3xl mb-10 max-w-4xl mx-auto text-neutral-200/90 leading-relaxed animate-fade-in-up" 
+               data-field="ki-news.subtitle" data-type="textarea"
+               style="animation-delay: 0.4s;">
+                Täglich aktualisierte Nachrichten und Updates aus der Welt der Künstlichen Intelligenz
+            </p>
+            <div class="flex justify-center space-x-4 animate-fade-in-up" style="animation-delay: 0.6s;">
+                <a href="index.html" 
+                   class="ripple inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-neutral-900 bg-white hover:bg-neutral-50 transition-all duration-500 shadow-2xl shadow-primary-500/30 hover:shadow-3xl hover:shadow-primary-500/40 ring-2 ring-white/20 hover:ring-primary-300/50">
+                    <span>Zurück zur Startseite</span>
+                    <svg class="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+                <button id="refreshNews" 
+                        class="ripple inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-500 shadow-2xl shadow-blue-500/30 hover:shadow-3xl hover:shadow-blue-500/40 ring-2 ring-white/20 hover:ring-blue-300/50">
+                    <i class="fas fa-sync-alt mr-2"></i>
+                    <span>Jetzt aktualisieren</span>
+                </button>
+                <button id="testAPIs" 
+                        class="ripple inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 transition-all duration-500 shadow-2xl shadow-green-500/30 hover:shadow-3xl hover:shadow-green-500/40 ring-2 ring-white/20 hover:ring-green-300/50 hidden">
+                    <i class="fas fa-vial mr-2"></i>
+                    <span>APIs testen</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <!-- Status Info -->
+                <div class="mb-12 text-center">
+                    <div class="bg-gradient-to-r from-green-500/10 to-blue-600/10 backdrop-blur-sm border border-green-400/30 rounded-2xl p-6 inline-block">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-robot text-green-400 text-2xl"></i>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="text-lg font-semibold text-white mb-2">Live-Updates aktiv</h3>
+                                <p class="text-white/80 text-sm">
+                                    Letzte Aktualisierung: <span id="lastUpdate" class="font-mono">Wird geladen...</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- News Grid -->
+                <div id="newsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- News cards will be dynamically generated here -->
+                </div>
+
+                <!-- Loading indicator -->
+                <div id="loadingIndicator" class="text-center py-12">
+                    <div class="inline-flex items-center space-x-3">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                        <span class="text-white/80">Lade KI-Nachrichten...</span>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div id="emptyState" class="text-center py-12 hidden">
+                    <div class="bg-gray-800/50 backdrop-blur-sm border border-white/20 rounded-2xl p-8">
+                        <i class="fas fa-robot text-6xl text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-white mb-2">Keine Nachrichten verfügbar</h3>
+                        <p class="text-white/80">Die KI-Agenten sind gerade offline. Versuchen Sie es später erneut.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Scroll Animation Script -->
+    <!-- Layout System -->
+    <!-- Scripts -->
+    
+        </body>
+</html>

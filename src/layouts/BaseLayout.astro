@@ -1,0 +1,14 @@
+---
+const { title = 'Alexander Schneider', description = 'IT‑Systemintegration & DevOps in Leipzig' } = Astro.props;
+---
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-gray-950 text-gray-100">
+    <slot />
+  </body>
+</html>

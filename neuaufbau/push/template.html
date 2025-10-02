@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktiver M.2 Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #e5e7eb;
+        }
+        .card {
+            background-color: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #374151;
+            color: #e5e7eb;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: 1px solid #4b5563;
+        }
+        .btn:hover, .btn.active {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+        }
+        .ssd-visualization {
+            background-color: #374151;
+            height: 22px;
+            border-radius: 4px;
+            transition: width 0.5s ease-in-out;
+            position: relative;
+        }
+        .ssd-visualization::before {
+            content: '';
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 4px;
+            background-color: #9ca3af;
+            border-radius: 50%;
+        }
+        .key-visualization {
+            height: 150px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: background-image 0.5s ease;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #374151;
+        }
+        th {
+            background-color: #374151;
+        }
+        .quiz-option {
+            border: 1px solid #4b5563;
+            transition: all 0.2s ease;
+        }
+        .quiz-option:hover {
+            background-color: #374151;
+            border-color: #4f46e5;
+        }
+        .correct {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+            color: white;
+        }
+        .incorrect {
+            background-color: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: white;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">Die M.2-Schnittstelle: Eine interaktive Analyse</h1>
+            <p class="text-lg text-gray-400">Ein kompakter Standard mit komplexen Möglichkeiten.</p>
+        </header>
+
+        <!-- Definition und Historie -->
+        <div class="card">
+            <h2 class="text-2xl font-semibold text-indigo-400 mb-4">Grundlagen</h2>
+            <p class="mb-2"><strong class="font-semibold text-white">Definition:</strong> M.2, ursprünglich als Next Generation Form Factor (NGFF) bekannt, ist ein Standard für interne Erweiterungskarten. Er löste mSATA ab und bietet eine höhere Flexibilität und Leistung auf kleinerem Raum.</p>
+            <p><strong class="font-semibold text-white">Motivation:</strong> Die Entwicklung wurde durch den Bedarf an immer kleineren und leistungsfähigeren Komponenten für Ultrabooks und andere kompakte Systeme angetrieben. M.2 spart Platz und ermöglicht höhere Datenübertragungsraten als sein Vorgänger.</p>
+        </div>
+
+        <!-- Physische Merkmale: Formfaktoren -->
+        <div class="card">
+            <h2 class="text-2xl font-semibold text-indigo-400 mb-4">Physische Merkmale I: Formfaktoren</h2>
+            <p class="mb-4">Die Größe einer M.2-Karte wird durch eine Zahlenkombination wie "2280" definiert. Die ersten beiden Ziffern geben die Breite (meist 22 mm) an, die folgenden die Länge in Millimetern. Wähle eine Länge, um die Skalierung zu visualisieren.</p>
+            <div class="flex flex-wrap gap-2 mb-4" id="formFactorButtons">
+                <button class="btn" data-length="42">2242</button>
+                <button class="btn" data-length="60">2260</button>
+                <button class="btn active" data-length="80">2280</button>
+                <button class="btn" data-length="110">22110</button>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg">
+                <div class="flex items-center">
+                    <span class="text-sm mr-2 w-12" id="ssdLabel">2280</span>
+                    <div class="w-full bg-gray-900 rounded-lg p-2">
+                         <div class="ssd-visualization" id="ssdVisualization" style="width: 70%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Physische Merkmale: Keying -->
+        <div class="card">
+            <h2 class="text-2xl font-semibold text-indigo-400 mb-4">Physische Merkmale II: Keying (Kodierung)</h2>
+            <p class="mb-4">Die Kerben ("Keys") im Anschluss einer M.2-Karte verhindern, dass sie in einen inkompatiblen Steckplatz gesteckt wird. Jeder Key ist für bestimmte Protokolle vorgesehen. Wähle einen Key, um die Details zu sehen.</p>
+            <div class="flex flex-wrap gap-2 mb-4" id="keyingButtons">
+                <button class="btn active" data-key="m">Key M</button>
+                <button class="btn" data-key="b">Key B</button>
+                <button class="btn" data-key="e">Key A/E</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                <div class="key-visualization rounded-lg" id="keyVisualization">
+                    <!-- Bild wird via JS geladen -->
+                </div>
+                <div id="keyDescription">
+                    <!-- Beschreibung wird via JS geladen -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Elektrische Schnittstellen & Protokolle -->
+        <div class="card">
+            <h2 class="text-2xl font-semibold text-indigo-400 mb-4">Elektrische Schnittstellen & Protokolle</h2>
+            <p class="mb-4">Hinter der physischen M.2-Schnittstelle können verschiedene elektrische Protokolle liegen. Die beiden dominanten für Speichermedien sind SATA und PCIe (typischerweise mit dem NVMe-Protokoll).</p>
+            <div class="overflow-x-auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Protokoll</th>
+                            <th>Max. Durchsatz (typisch)</th>
+                            <th>Anwendung</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SATA 3.0</td>
+                            <td>~550 MB/s (6 Gbit/s)</td>
+                            <td>Einsteiger-SSDs, Kompatibilität</td>
+                        </tr>
+                        <tr>
+                            <td>PCIe 3.0 x4 (NVMe)</td>
+                            <td>~3.500 MB/s (32 Gbit/s)</td>
+                            <td>High-Performance-SSDs</td>
+                        </tr>
+                         <tr>
+                            <td>PCIe 4.0 x4 (NVMe)</td>
+                            <td>~7.000 MB/s (64 Gbit/s)</td>
+                            <td>Sehr schnelle Consumer- & Pro-SSDs</td>
+                        </tr>
+                        <tr>
+                            <td>PCIe / USB</td>
+                            <td>Variabel</td>
+                            <td>WLAN-, Bluetooth-, 5G-Module</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- NVMe vs. SATA -->
+        <div class="card">
+            <h2 class="text-2xl font-semibold text-indigo-400 mb-4">Vergleich: NVMe vs. SATA über M.2</h2>
+            <p class="mb-4">Obwohl beide das M.2-Format nutzen können, sind die Leistungsunterschiede fundamental. NVMe wurde von Grund auf für Flash-Speicher über die schnelle PCIe-Schnittstelle entwickelt, während SATA ein älteres Protokoll für mechanische Festplatten ist.</p>
+            <div class="overflow-x-auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Merkmal</th>
+                            <th>SATA (via AHCI)</th>
+                            <th>NVMe (via PCIe)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Latenz</td>
+                            <td class="text-amber-400">Höher (~30-100 µs)</td>
+                            <td class="text-green-400">Extrem niedrig (~2-20 µs)</td>
+                        </tr>
+                        <tr>
+                            <td>IOPS (Input/Output pro Sek.)</td>
+                            <td class="text-amber-400">~100.000</td>
+                            <td class="text-green-400">> 500.000 (oft > 1 Mio.)</td>
+                        </tr>
+                        <tr>
+                            <td>Befehlswarteschlangen</td>
+                            <td class="text-amber-400">1 Warteschlange mit 32 Befehlen</td>
+                            <td class="text-green-400">65.536 Warteschlangen mit je 65.536 Befehlen</td>
+                        </tr>
+                        <tr>
+                            <td>Parallele Verarbeitung</td>
+                            <td class="text-amber-400">Limitiert</td>
+                            <td class="text-green-400">Massiv parallel, ideal für Multi-Core-CPUs</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Quiz -->
+        <div class="card">
+            <h2 class="text-2xl font-semibold text-indigo-400 mb-4">Wissensüberprüfung</h2>
+            <div id="quizContainer">
+                <!-- Quizfragen werden hier dynamisch eingefügt -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Interaktivität für Formfaktoren ---
+            const formFactorButtons = document.getElementById('formFactorButtons');
+            const ssdVisualization = document.getElementById('ssdVisualization');
+            const ssdLabel = document.getElementById('ssdLabel');
+            const formFactors = { '42': '40%', '60': '55%', '80': '70%', '110': '100%' };
+
+            formFactorButtons.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    // Klassenmanagement für Buttons
+                    formFactorButtons.querySelector('.active').classList.remove('active');
+                    e.target.classList.add('active');
+                    
+                    const length = e.target.dataset.length;
+                    ssdVisualization.style.width = formFactors[length];
+                    ssdLabel.textContent = `22${length}`;
+                }
+            });
+
+            // --- Interaktivität für Keying ---
+            const keyingButtons = document.getElementById('keyingButtons');
+            const keyVisualization = document.getElementById('keyVisualization');
+            const keyDescription = document.getElementById('keyDescription');
+            
+            const keyingData = {
+                m: {
+                    img: 'https://placehold.co/400x150/1f2937/e5e7eb?text=Key+M+SSD+(NVMe)',
+                    title: 'Key M (PCIe x4 & SATA)',
+                    desc: 'Primär für Hochleistungs-SSDs über das NVMe-Protokoll. Bietet die maximale Bandbreite mit bis zu vier PCIe-Lanes. Dies ist der gängigste Anschluss für schnelle Systemlaufwerke in modernen PCs und Notebooks.'
+                },
+                b: {
+                    img: 'https://placehold.co/400x150/1f2937/e5e7eb?text=Key+B+SSD+(SATA)',
+                    title: 'Key B (PCIe x2 & SATA)',
+                    desc: 'Wird für SATA-SSDs oder langsamere PCIe x2-SSDs verwendet. Dieser Key wird seltener, ist aber in einigen älteren oder kompakteren Systemen zu finden. Oft in Kombination als B+M-Key auf SATA-SSDs zu sehen.'
+                },
+                e: {
+                    img: 'https://placehold.co/400x150/1f2937/e5e7eb?text=Key+A/E+Modul+(WiFi)',
+                    title: 'Key A/E (PCIe x2, USB, I2C)',
+                    desc: 'Exklusiv für Konnektivitätsmodule wie WLAN und Bluetooth. Nutzt typischerweise PCIe- und USB-Signale. Diese Slots sind physisch und elektrisch inkompatibel mit SSDs.'
+                }
+            };
+
+            function updateKeyingView(key) {
+                const data = keyingData[key];
+                keyVisualization.style.backgroundImage = `url('${data.img}')`;
+                keyDescription.innerHTML = `
+                    <h3 class="text-xl font-semibold text-white mb-2">${data.title}</h3>
+                    <p class="text-gray-300">${data.desc}</p>
+                `;
+            }
+
+            keyingButtons.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    keyingButtons.querySelector('.active').classList.remove('active');
+                    e.target.classList.add('active');
+                    updateKeyingView(e.target.dataset.key);
+                }
+            });
+
+            // Initialansicht für Keying laden
+            updateKeyingView('m');
+
+            // --- Quiz Logik ---
+            const quizContainer = document.getElementById('quizContainer');
+            const quizQuestions = [
+                {
+                    question: "Welcher M.2-Key wird typischerweise für High-Speed NVMe SSDs verwendet?",
+                    options: ["Key A/E", "Key B", "Key M", "Key G"],
+                    answer: "Key M"
+                },
+                {
+                    question: "Was bedeutet die Bezeichnung '2280' bei einer M.2 SSD?",
+                    options: ["22mm breit, 80mm lang", "22 Pins, 80 Gbit/s", "Version 2.2, 80mm lang", "2mm hoch, 280mm lang"],
+                    answer: "22mm breit, 80mm lang"
+                },
+                {
+                    question: "Welches Protokoll bietet die niedrigste Latenz und die höchste Anzahl an I/O-Operationen pro Sekunde?",
+                    options: ["SATA", "USB 3.0", "NVMe", "mSATA"],
+                    answer: "NVMe"
+                }
+            ];
+
+            function buildQuiz() {
+                let quizHTML = '';
+                quizQuestions.forEach((q, index) => {
+                    quizHTML += `<div class="mb-6" id="question-${index}">`;
+                    quizHTML += `<p class="font-semibold mb-3">${index + 1}. ${q.question}</p>`;
+                    quizHTML += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">`;
+                    q.options.forEach(option => {
+                        quizHTML += `<button class="quiz-option p-3 rounded-md text-left" data-question="${index}" data-answer="${option}">${option}</button>`;
+                    });
+                    quizHTML += `</div><p class="text-sm mt-2 h-5" id="feedback-${index}"></p></div>`;
+                });
+                quizContainer.innerHTML = quizHTML;
+            }
+
+            quizContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('quiz-option')) {
+                    const questionIndex = e.target.dataset.question;
+                    const selectedAnswer = e.target.dataset.answer;
+                    const correctAnswer = quizQuestions[questionIndex].answer;
+                    const options = document.querySelectorAll(`#question-${questionIndex} .quiz-option`);
+                    const feedbackEl = document.getElementById(`feedback-${questionIndex}`);
+
+                    options.forEach(opt => {
+                        opt.disabled = true; // Deaktiviere alle Optionen nach der Auswahl
+                        if (opt.dataset.answer === correctAnswer) {
+                            opt.classList.add('correct');
+                        } else if (opt === e.target) {
+                            opt.classList.add('incorrect');
+                        }
+                    });
+
+                    if (selectedAnswer === correctAnswer) {
+                        feedbackEl.textContent = 'Korrekt. Ausgezeichnet.';
+                        feedbackEl.style.color = '#10b981';
+                    } else {
+                        feedbackEl.textContent = `Falsch. Die korrekte Antwort ist: ${correctAnswer}.`;
+                        feedbackEl.style.color = '#ef4444';
+                    }
+                }
+            });
+
+            buildQuiz();
+        });
+    </script>
+</body>
+</html>

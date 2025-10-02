@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "name": "Systemintegration", "percentage": 85, "category": "Infra" },
+    { "name": "Server‑Admin", "percentage": 80, "category": "Linux/Windows" },
+    { "name": "DevOps", "percentage": 70, "category": "CI/CD" }
+  ]
+}

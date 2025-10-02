@@ -1,0 +1,108 @@
+backend:
+  name: git-gateway # oder 'github' falls direkt via GitHub OAuth
+  branch: main
+  commit_messages:
+    create: 'feat(cms): create {{collection}} “{{slug}}”'
+    update: 'chore(cms): update {{collection}} “{{slug}}”'
+    delete: 'chore(cms): delete {{collection}} “{{slug}}”'
+    uploadMedia: 'chore(media): upload “{{path}}”'
+    deleteMedia: 'chore(media): delete “{{path}}”'
+local_backend: true
+publish_mode: editorial_workflow
+media_folder: public/media/uploads
+public_folder: /media/uploads
+
+collections:
+  - name: hero
+    label: Hero
+    format: json
+    delete: false
+    editor:
+      preview: false
+    files:
+      - file: src/content/site/hero.json
+        label: Hero Content
+        name: hero
+        fields:
+          - { name: title, label: Titel, widget: string }
+          - { name: subtitle, label: Untertitel, widget: string, required: false }
+          - { name: cta, label: CTA-Text, widget: string, required: false }
+          - { name: media, label: Medien (Bild/Video-URL), widget: string, required: false }
+
+  - name: about
+    label: Über mich
+    delete: false
+    files:
+      - file: src/content/site/about.md
+        label: Über mich Text
+        name: about
+        fields:
+          - { name: title, label: Titel, widget: string }
+          - { name: body, label: Inhalt, widget: markdown }
+
+  - name: services
+    label: Services
+    format: json
+    files:
+      - file: src/content/site/services.json
+        label: Services Liste
+        name: services
+        fields:
+          - label: Services
+            name: items
+            widget: list
+            fields:
+              - { name: title, label: Titel, widget: string }
+              - { name: description, label: Beschreibung, widget: string }
+              - { name: icon, label: Icon (Klasse/Name), widget: string, required: false }
+              - { name: tags, label: Tags, widget: list, required: false }
+
+  - name: skills
+    label: Skills
+    format: json
+    files:
+      - file: src/content/site/skills.json
+        label: Skillliste
+        name: skills
+        fields:
+          - label: Skills
+            name: items
+            widget: list
+            fields:
+              - { name: name, label: Name, widget: string }
+              - { name: percentage, label: Prozent, widget: number, value_type: int, min: 0, max: 100 }
+              - { name: category, label: Kategorie, widget: string, required: false }
+
+  - name: projects
+    label: Projekte
+    folder: src/content/projects
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: title, label: Titel, widget: string }
+      - { name: date, label: Datum, widget: datetime, required: false }
+      - { name: summary, label: Kurzbeschreibung, widget: text }
+      - { name: tags, label: Tags, widget: list, required: false }
+      - { name: heroImage, label: Hero-Bild, widget: image, required: false }
+      - { name: repo, label: Repository-URL, widget: string, required: false }
+      - { name: demo, label: Demo-URL, widget: string, required: false }
+      - { name: body, label: Inhalt, widget: markdown }
+
+  - name: legal
+    label: Rechtliches
+    delete: false
+    files:
+      - file: src/content/legal/impressum.md
+        label: Impressum
+        name: impressum
+        fields:
+          - { name: title, label: Titel, widget: string, default: Impressum }
+          - { name: body, label: Inhalt, widget: markdown }
+      - file: src/content/legal/datenschutz.md
+        label: Datenschutzerklärung
+        name: datenschutz
+        fields:
+          - { name: title, label: Titel, widget: string, default: Datenschutzerklärung }
+          - { name: body, label: Inhalt, widget: markdown }

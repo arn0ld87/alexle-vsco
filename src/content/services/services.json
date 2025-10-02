@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "title": "Systemintegration", "description": "Netzwerke, Server, Container" },
+    { "title": "KI‑Workflows", "description": "Automatisierung & Agenten" },
+    { "title": "DevOps", "description": "CI/CD, Deployment, Monitoring" }
+  ]
+}
