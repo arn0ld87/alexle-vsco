@@ -1,0 +1,36 @@
+---
+const links = [
+  { href: '/', label: 'Start' },
+  { href: '/#services', label: 'Leistungen' },
+  { href: '/#skills', label: 'Kompetenzen' },
+  { href: '/projekte', label: 'Projekte' },
+  { href: '/ki-agenten-lab', label: 'KI-Lab' },
+  { href: '/ueber-mich', label: 'Über mich' },
+  { href: '/kontakt', label: 'Kontakt' }
+];
+---
+<header class="sticky top-0 z-50 border-b border-white/10 bg-gray-950/80 backdrop-blur">
+  <div class="container mx-auto flex items-center justify-between px-4 py-4">
+    <a href="/" class="text-sm font-semibold uppercase tracking-[0.4em] text-blue-400">alexle135</a>
+    <nav aria-label="Hauptnavigation">
+      <ul class="flex items-center gap-4 text-sm font-medium text-gray-300">
+        {links.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <a
+      href="mailto:schneider@alexle135.de"
+      class="hidden rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 md:inline-flex"
+    >
+      Zusammenarbeit starten
+    </a>
+  </div>
+</header>

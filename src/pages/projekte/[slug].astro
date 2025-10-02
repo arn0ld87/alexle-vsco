@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getEntry, getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({ params: { slug: project.slug } }));
+}
+
+const { slug } = Astro.params;
+const project = slug ? await getEntry('projects', slug) : null;
+
+if (!project) {
+  throw new Error(`Projekt mit Slug "${slug}" nicht gefunden.`);
+}
+
+const { Content } = await project.render();
+const { title, summary, tags, heroImage, demo } = project.data;
+---
+<BaseLayout title={`${title} – Projekte`} description={summary}>
+  <main class="container mx-auto px-4 py-16">
+    <nav class="text-sm text-blue-400">
+      <a href="/" class="hover:text-blue-300">Startseite</a>
+      <span class="mx-2 text-gray-500">/</span>
+      <a href="/projekte" class="hover:text-blue-300">Projekte</a>
+      <span class="mx-2 text-gray-500">/</span>
+      <span class="text-gray-300">{title}</span>
+    </nav>
+
+    <header class="mt-8 space-y-6">
+      <div class="space-y-3">
+        <p class="text-sm uppercase tracking-[0.2em] text-blue-400">Projekt</p>
+        <h1 class="text-4xl font-semibold tracking-tight">{title}</h1>
+        <p class="text-lg text-gray-300">{summary}</p>
+      </div>
+      {tags && (
+        <ul class="flex flex-wrap gap-2 text-xs uppercase tracking-wide text-gray-500">
+          {tags.map((tag) => (
+            <li class="rounded bg-white/10 px-3 py-1">{tag}</li>
+          ))}
+        </ul>
+      )}
+      {heroImage && (
+        <img
+          src={`/${heroImage}`}
+          alt=""
+          class="w-full rounded-lg border border-white/10 object-cover"
+          loading="lazy"
+        />
+      )}
+    </header>
+
+    <article class="prose prose-invert mt-12 max-w-none">
+      <Content />
+    </article>
+
+    {demo && (
+      <div class="mt-16">
+        <a
+          href={demo.startsWith('http') ? demo : `/${demo}`}
+          class="inline-flex items-center gap-2 rounded bg-blue-600 px-5 py-3 text-sm font-medium transition hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+        >
+          Demo ansehen
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    )}
+  </main>
+</BaseLayout>

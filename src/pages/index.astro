@@ -1,7 +1,111 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
+import { getEntry, getCollection } from 'astro:content';
+
+const servicesEntry = await getEntry('services', 'services');
+const skillsEntry = await getEntry('skills', 'skills');
+const projects = await getCollection('projects');
+
+const services = servicesEntry.data.items;
+const skills = skillsEntry.data.items;
+const featuredProjects = projects.slice(0, 3);
 ---
 <BaseLayout>
   <Hero />
+  <main class="container mx-auto space-y-20 px-4 py-16">
+    <section id="services" class="space-y-8">
+      <div class="max-w-2xl">
+        <h2 class="text-3xl font-semibold tracking-tight">Leistungen</h2>
+        <p class="mt-2 text-gray-400">
+          Von klassischer Systemintegration bis zu automatisierten KI-Workflows – ich begleite Projekte ganzheitlich.
+        </p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {services.map((service) => (
+          <article class="rounded-lg border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur">
+            <h3 class="text-xl font-medium">{service.title}</h3>
+            <p class="mt-2 text-sm text-gray-300">{service.description}</p>
+            {service.tags && (
+              <ul class="mt-4 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-gray-400">
+                {service.tags.map((tag) => (
+                  <li class="rounded bg-white/10 px-2 py-1" aria-label={`Tag ${tag}`}>
+                    {tag}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section id="skills" class="space-y-8">
+      <div class="max-w-2xl">
+        <h2 class="text-3xl font-semibold tracking-tight">Kompetenzen</h2>
+        <p class="mt-2 text-gray-400">
+          Technik-Schwerpunkte mit Fokus auf Betriebssicherheit, Automatisierung und Monitoring.
+        </p>
+      </div>
+      <div class="grid gap-4 md:grid-cols-2">
+        {skills.map((skill) => (
+          <div class="rounded-lg border border-white/10 bg-white/5 p-4">
+            <div class="flex items-baseline justify-between">
+              <span class="font-medium">{skill.name}</span>
+              <span class="text-sm text-gray-400">{skill.percentage}%</span>
+            </div>
+            {skill.category && <p class="mt-1 text-xs uppercase tracking-wide text-gray-500">{skill.category}</p>}
+            <div class="mt-3 h-1.5 rounded-full bg-white/10" role="presentation">
+              <div class="h-full rounded-full bg-blue-500" style={`width: ${skill.percentage}%`}></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section id="projects" class="space-y-8">
+      <div class="max-w-2xl">
+        <h2 class="text-3xl font-semibold tracking-tight">Ausgewählte Projekte</h2>
+        <p class="mt-2 text-gray-400">
+          Drei Beispiele, wie ich Infrastruktur, Automatisierung und KI-Anwendungen in realen Projekten zusammenbringe.
+        </p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-3">
+        {featuredProjects.map((project) => (
+          <article class="flex h-full flex-col rounded-lg border border-white/10 bg-white/5">
+            {project.data.heroImage && (
+              <img
+                src={`/${project.data.heroImage}`}
+                alt=""
+                class="h-48 w-full rounded-t-lg object-cover"
+                loading="lazy"
+              />
+            )}
+            <div class="flex flex-1 flex-col p-6">
+              <h3 class="text-xl font-medium">{project.data.title}</h3>
+              <p class="mt-3 text-sm text-gray-300">{project.data.summary}</p>
+              {project.data.tags && (
+                <ul class="mt-4 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-gray-500">
+                  {project.data.tags.map((tag) => (
+                    <li class="rounded bg-white/10 px-2 py-1" aria-label={`Tag ${tag}`}>
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div class="mt-auto pt-6">
+                <a
+                  href={`/projekte/${project.slug}/`}
+                  class="inline-flex items-center gap-2 text-sm font-medium text-blue-400 transition hover:text-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+                >
+                  Projekt ansehen
+                  <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
 </BaseLayout>

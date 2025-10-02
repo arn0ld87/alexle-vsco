@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="KI-Agenten-Lab" description="Showcase von KI-Agenten-Workflows und Automatisierung">
+  <main class="container mx-auto px-4 py-16">
+    <header class="max-w-3xl space-y-4">
+      <p class="text-sm uppercase tracking-[0.3em] text-blue-400">KI-Agenten-Lab</p>
+      <h1 class="text-4xl font-semibold tracking-tight">Experimentelle Workflows mit Agenten &amp; Automatisierung</h1>
+      <p class="text-lg text-gray-300">
+        Hier dokumentiere ich Proof-of-Concepts, Diagramme und Erkenntnisse rund um KI-Agenten in produktionsnahen Szenarien.
+      </p>
+    </header>
+
+    <section class="mt-12 grid gap-8 md:grid-cols-3">
+      <article class="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg">
+        <h2 class="text-xl font-semibold">Incident Triage Agent</h2>
+        <p class="mt-3 text-sm text-gray-300">
+          Analysiert Alerts, reichert sie mit Metriken an und schlägt Workarounds vor – inkl. Eskalationslogik.
+        </p>
+        <ul class="mt-4 text-xs uppercase tracking-wide text-gray-500">
+          <li>Stack: GPT-4o mini, OpenTelemetry, Grafana</li>
+          <li>Routing: PagerDuty API &amp; Slack Alerts</li>
+        </ul>
+      </article>
+      <article class="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg">
+        <h2 class="text-xl font-semibold">Onboarding Companion</h2>
+        <p class="mt-3 text-sm text-gray-300">
+          Erstellt Schritt-für-Schritt-Anleitungen aus Confluence &amp; Git-Repos, beantwortet Rückfragen per Chat.
+        </p>
+        <ul class="mt-4 text-xs uppercase tracking-wide text-gray-500">
+          <li>Stack: LangGraph, Azure OpenAI, GitHub API</li>
+          <li>Modus: Retrieval-Augmented Chat + Step Recorder</li>
+        </ul>
+      </article>
+      <article class="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg">
+        <h2 class="text-xl font-semibold">Deployment Co-Pilot</h2>
+        <p class="mt-3 text-sm text-gray-300">
+          Prüft Infrastruktur-Änderungen, generiert Terraform-Plan-Kommentare und überwacht Rollbacks.
+        </p>
+        <ul class="mt-4 text-xs uppercase tracking-wide text-gray-500">
+          <li>Stack: OpenAI API, Terraform Cloud, PagerDuty</li>
+          <li>Observability: Prometheus Rules &amp; Grafana Boards</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="mt-16 rounded-2xl border border-white/10 bg-white/5 p-8">
+      <h2 class="text-2xl font-semibold tracking-tight">Sicherheits- &amp; Ops-Guidelines</h2>
+      <div class="mt-6 grid gap-6 md:grid-cols-2">
+        <ul class="space-y-3 text-sm text-gray-300">
+          <li>🔒 Secrets bleiben in Vault/Key Vault – niemals im Prompt.</li>
+          <li>🧪 Jeder Agent bekommt Staging mit Telemetrie, bevor er produktiv geht.</li>
+          <li>📜 Audit-Logs für jeden Tool-Aufruf (Request, Response, User).</li>
+        </ul>
+        <ul class="space-y-3 text-sm text-gray-300">
+          <li>⏱ Timeouts &amp; Circuit Breaker schützen Services vor Hänger.</li>
+          <li>⚠️ Fallback-Pfade zurück zu menschlichen Operatoren.</li>
+          <li>🧭 Dokumentation &amp; Runbooks werden kontinuierlich aktualisiert.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
