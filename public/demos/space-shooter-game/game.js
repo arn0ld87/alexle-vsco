@@ -635,6 +635,19 @@ function init() {
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
     
+    // Verhindert weiches Skalieren von Pixelgrafiken (crisp sprites)
+    ctx.imageSmoothingEnabled = false;
+    if (ctx.imageSmoothingEnabled !== false) {
+        // Fallbacks für ältere Browser
+        // @ts-ignore
+        ctx.mozImageSmoothingEnabled = false;
+        // @ts-ignore
+        ctx.webkitImageSmoothingEnabled = false;
+        // @ts-ignore
+        ctx.msImageSmoothingEnabled = false;
+    }
+    ctx.imageSmoothingQuality = 'low';
+    
     // Sterne generieren
     for (let i = 0; i < 100; i++) {
         stars.push({
@@ -1066,7 +1079,7 @@ function drawPlayer() {
     
     // Spieler-Schiff
     if (images.playerShip && images.playerShip.complete) {
-        ctx.drawImage(images.playerShip, player.x, player.y, player.width, player.height);
+        ctx.drawImage(images.playerShip, Math.round(player.x), Math.round(player.y), player.width, player.height);
         
         // Powerup-Indikator mit Animation
         if (player.powerup) {
@@ -1098,7 +1111,7 @@ function drawEnemies() {
     enemies.forEach(enemy => {
         const sprite = images[enemy.spriteKey];
         if (sprite && sprite.complete) {
-            ctx.drawImage(sprite, enemy.x, enemy.y, enemy.width, enemy.height);
+            ctx.drawImage(sprite, Math.round(enemy.x), Math.round(enemy.y), enemy.width, enemy.height);
             
             // Health-Bar für Tanks
             if (enemy.type === 'tank' && enemy.health > 1) {
@@ -1143,7 +1156,7 @@ function drawBullets() {
             ctx.shadowBlur = 10;
             ctx.shadowColor = '#00ffff';
             
-            ctx.drawImage(images.bulletPlayer, -bullet.width / 2, -bullet.height / 2, bullet.width, bullet.height);
+            ctx.drawImage(images.bulletPlayer, Math.round(-bullet.width / 2), Math.round(-bullet.height / 2), bullet.width, bullet.height);
             
             ctx.shadowBlur = 0;
             ctx.restore();
