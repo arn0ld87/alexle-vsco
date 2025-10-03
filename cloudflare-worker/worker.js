@@ -108,20 +108,18 @@ export default {
             <script>
               (function() {
                 function receiveMessage(e) {
-                  console.log('Receiving message from opener:', e.origin);
                   window.opener.postMessage(
-                    'authorization:github:success:${JSON.stringify(tokenData)}',
+                    'authorization:github:success:' + JSON.stringify({
+                      token: '${tokenData.access_token}',
+                      provider: 'github'
+                    }),
                     e.origin
                   );
                   window.removeEventListener('message', receiveMessage, false);
-                  setTimeout(function() { window.close(); }, 1000);
                 }
                 window.addEventListener('message', receiveMessage, false);
-                console.log('Sending message to opener');
-                window.opener.postMessage(
-                  'authorizing:github',
-                  '*'
-                );
+                window.opener.postMessage('authorizing:github', '*');
+                setTimeout(function() { window.close(); }, 1000);
               })();
             </script>
           </body>
