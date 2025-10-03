@@ -2,7 +2,7 @@ backend:
   name: github
   repo: arn0ld87/alexle-vsco
   branch: main
-  base_url: https://cms-auth.YOUR-WORKER-SUBDOMAIN.workers.dev
+  base_url: https://cms-auth-alexle135.schneider-95d.workers.dev
   auth_endpoint: /auth
   commit_messages:
     create: 'feat(cms): create {{collection}} "{{slug}}"'
