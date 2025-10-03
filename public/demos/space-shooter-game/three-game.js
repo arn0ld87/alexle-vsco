@@ -59,8 +59,8 @@
     scene.background = textureCube;
   
     // ===== Game Area =====
-    const gameWidth = 20;
-    const gameHeight = 15;
+    const gameWidth = 40;  // Increased from 20 to match larger canvas
+    const gameHeight = 30; // Increased from 15 to match larger canvas
   
   // ===== Game Objects =====
   let player = null;
