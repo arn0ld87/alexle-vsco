@@ -51,9 +51,11 @@ const ogImage = heroImage ? (heroImage.startsWith('/') ? heroImage : `/${heroIma
     {demo && (
       <div class="mt-16">
         <a
-          href={demo.startsWith('http') ? demo : `/${demo}`}
+          href={demo.startsWith('http') ? demo : (demo.startsWith('/') ? demo : `/${demo}`)}
           class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-medium uppercase tracking-[0.25em] transition hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
           data-track-demo="true"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           Demo ansehen
           <span aria-hidden="true">↗</span>
