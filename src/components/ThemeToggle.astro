@@ -61,21 +61,30 @@
     setTheme(newTheme);
   }
 
-  // Init theme
-  initTheme();
+  function setupToggleButton() {
+    const button = document.getElementById('theme-toggle');
+    if (!button) {
+      return;
+    }
 
-  // Add click handler to button
-  const button = document.getElementById('theme-toggle');
-  if (button) {
+    // Avoid registering multiple listeners when Astro swaps pages
+    button.removeEventListener('click', toggleTheme);
     button.addEventListener('click', toggleTheme);
+  }
+
+  function onReady() {
+    initTheme();
+    setupToggleButton();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onReady, { once: true });
+  } else {
+    onReady();
   }
 
   // Re-init after Astro page transitions (if using View Transitions)
   document.addEventListener('astro:after-swap', () => {
-    initTheme();
-    const btn = document.getElementById('theme-toggle');
-    if (btn) {
-      btn.addEventListener('click', toggleTheme);
-    }
+    onReady();
   });
 </script>
