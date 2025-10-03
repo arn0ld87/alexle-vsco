@@ -55,13 +55,17 @@
       ASSET_BASE + `Effects/spaceEffects_${String(i + 1).padStart(3, '0')}.png`
     ),
     sounds: {
-      shoot: ASSET_BASE + 'Audio/laserRetro_001.ogg',
-      explosion: ASSET_BASE + 'Audio/explosionCrunch_000.ogg',
-      explosionAlt: ASSET_BASE + 'Audio/explosionCrunch_002.ogg',
-      powerup: ASSET_BASE + 'Audio/forceField_001.ogg',
-      hit: ASSET_BASE + 'Audio/forceField_000.ogg',
-      menuClick: ASSET_BASE + 'Audio/computerNoise_000.ogg',
-      levelComplete: ASSET_BASE + 'Audio/doorOpen_001.ogg',
+      shoot: 'Sounds-Music/Shots & Explosions/Laser Shot 1.mp3',
+      shootAlt: 'Sounds-Music/Shots & Explosions/Laser Shot 3.mp3',
+      explosion: 'Sounds-Music/Shots & Explosions/Explosion 1.mp3',
+      explosionAlt: 'Sounds-Music/Shots & Explosions/Explosion 2.mp3',
+      powerup: 'Sounds-Music/Score Sounds/Coins 1.mp3',
+      hit: 'Sounds-Music/Blips & Beeps/Blop 1.mp3',
+      menuClick: 'Sounds-Music/Blips & Beeps/Single Bleep.mp3',
+      levelComplete: 'Sounds-Music/Sweeps/Up 5.mp3',
+      gameOver: 'Sounds-Music/Music/Game Over Music 1.mp3',
+      music: 'Sounds-Music/Music/He\'s a plumber (8-bit version).mp3',
+      musicAlt: 'Sounds-Music/Music/Let Me See Ya Bounce.mp3',
     },
   };
 
@@ -107,7 +111,7 @@
 
   // ===== Audio (HTMLAudio, clone-on-play) =====
   const audio = {};
-  const chiptune = createChiptuneLoop();
+  let musicNode = null;
   function loadAudio() {
     for (const [key, url] of Object.entries(paths.sounds)) {
       const a = new Audio();
@@ -127,108 +131,20 @@
       n.play().catch(() => {});
     } catch {}
   }
-  function startMusic(vol = 0.3) {
-    if (!musicEnabled) return;
-    chiptune.start(vol);
+  function startMusic(vol = 0.2) {
+    if (!musicEnabled || !audio.music) return;
+    if (!musicNode) {
+      musicNode = audio.music.cloneNode();
+      musicNode.loop = true;
+      musicNode.volume = vol;
+    }
+    musicNode.play().catch(() => {});
   }
-  function stopMusic() { chiptune.stop(); }
-
-  function createChiptuneLoop() {
-    const melody = [523.25, 0, 784, 0, 659.25, 0, 587.33, 0, 523.25, 0, 659.25, 0, 880, 0, 698.46, 0];
-    const harmony = [392, 0, 523.25, 0, 440, 0, 392, 0, 392, 0, 587.33, 0, 523.25, 0, 440, 0];
-    const bass = [130.81, 0, 196, 0, 174.61, 0, 196, 0, 130.81, 0, 220, 0, 174.61, 0, 196, 0];
-    const stepDuration = 60 / 120 / 2; // 120 BPM, 8tel
-    let context = null;
-    let masterGain = null;
-    let timer = null;
-    let step = 0;
-    const activeVoices = new Set();
-
-    function ensureContext() {
-      if (context) {
-        if (context.state === 'suspended') context.resume();
-        return;
-      }
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) {
-        console.warn('Web Audio API nicht verfügbar – Chiptune-Musik deaktiviert.');
-        return;
-      }
-      context = new AudioCtx();
-      masterGain = context.createGain();
-      masterGain.gain.value = 0;
-      masterGain.connect(context.destination);
-    }
-
-    function trigger(freq, duration, type = 'square', volume = 0.4) {
-      if (!context || !freq) return;
-      const now = context.currentTime;
-      const osc = context.createOscillator();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, now);
-
-      const gain = context.createGain();
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(volume, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-      osc.connect(gain);
-      gain.connect(masterGain);
-
-      const voice = { osc, gain };
-      activeVoices.add(voice);
-
-      osc.start(now);
-      osc.stop(now + duration + 0.02);
-      osc.onended = () => {
-        try { osc.disconnect(); } catch {}
-        try { gain.disconnect(); } catch {}
-        activeVoices.delete(voice);
-      };
-    }
-
-    function playStep() {
-      if (!context) return;
-      const melodyFreq = melody[step % melody.length];
-      const harmonyFreq = harmony[step % harmony.length];
-      const bassFreq = bass[step % bass.length];
-      trigger(melodyFreq, stepDuration * 0.9, 'square', 0.6);
-      trigger(harmonyFreq, stepDuration * 0.9, 'triangle', 0.4);
-      trigger(bassFreq, stepDuration, 'square', 0.3);
-      if (step % 4 === 0) {
-        trigger(110, stepDuration * 0.4, 'sawtooth', 0.25);
-      }
-      step++;
-    }
-
-    return {
-      start(volume = 0.25) {
-        ensureContext();
-        if (!context) return;
-        if (masterGain) {
-          const now = context.currentTime;
-          masterGain.gain.cancelScheduledValues(now);
-          masterGain.gain.setTargetAtTime(volume, now, 0.1);
-        }
-        if (timer) return;
-        step = 0;
-        playStep();
-        timer = setInterval(playStep, stepDuration * 1000);
-      },
-      stop() {
-        if (!context) return;
-        if (timer) {
-          clearInterval(timer);
-          timer = null;
-        }
-        const now = context.currentTime;
-        masterGain.gain.setTargetAtTime(0.0001, now, 0.1);
-        activeVoices.forEach(({ osc }) => {
-          try { osc.stop(now); } catch {}
-        });
-        activeVoices.clear();
-      }
-    };
+  function stopMusic() { 
+    if (musicNode) { 
+      musicNode.pause(); 
+      musicNode.currentTime = 0; 
+    } 
   }
 
   // ===== Game State =====
@@ -645,7 +561,17 @@
       `Trefferquote: ${state.stats.accuracy}%`,
       `Powerups gesammelt: ${state.stats.powerupsCollected}`,
     ].join('\n');
-    hideAllMenus(); gameOverMenu.visible = true; stopMusic(); playSound('explosionAlt', 0.6); state.screenShake = 20;
+    hideAllMenus(); gameOverMenu.visible = true; stopMusic(); 
+    playSound('explosionAlt', 0.6);
+    // Game Over Musik abspielen
+    if (soundsEnabled && audio.gameOver) {
+      try {
+        const gameOverSound = audio.gameOver.cloneNode();
+        gameOverSound.volume = 0.3;
+        gameOverSound.play().catch(() => {});
+      } catch {}
+    }
+    state.screenShake = 20;
     saveHighscore();
     if (player) player.visible = false;
   }
