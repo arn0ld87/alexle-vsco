@@ -12,9 +12,11 @@
         score: 0,
         lives: 3,
         level: 1,
-        gameState: 'playing', // playing, bossfight, gameover
+        gameState: 'playing', // playing, bossfight, gameover, paused
         powerup: null, // e.g., 'laser'
         powerupTimer: 0,
+        isPaused: false,
+        animationId: null,
       };
     // ===== Scene Setup =====
     const scene = new THREE.Scene();
@@ -243,7 +245,13 @@
 
   // ===== Render Loop =====
   function animate() {
-    requestAnimationFrame(animate);
+    state.animationId = requestAnimationFrame(animate);
+    
+    // Skip game logic if paused
+    if (state.isPaused) {
+      renderer.render(scene, camera);
+      return;
+    }
 
     // Shooting Logic
     if (keys[' '] && player) {
@@ -340,6 +348,7 @@
     // Collision Detection
     const bulletBox = new THREE.Box3();
     const enemyBox = new THREE.Box3();
+    const playerBox = new THREE.Box3();
     // Laser damage
     if (laserBeam && laserBeam.visible) {
       const laserBox = new THREE.Box3().setFromObject(laserBeam);
@@ -359,6 +368,35 @@
         if (laserBox.intersectsBox(bossBox)) {
           boss.health -= 0.5;
           updateBossHUD();
+        }
+      }
+    }
+
+    // Player-Enemy Collision
+    if (player && state.gameState === 'playing') {
+      playerBox.setFromObject(player);
+      for (let j = enemies.length - 1; j >= 0; j--) {
+        const enemy = enemies[j];
+        enemyBox.setFromObject(enemy);
+        if (playerBox.intersectsBox(enemyBox)) {
+          createExplosion(player.position);
+          if (explosionSound.isPlaying) explosionSound.stop();
+          explosionSound.play();
+          state.lives--;
+          updateHUD();
+          
+          // Remove the enemy that hit the player
+          scene.remove(enemy);
+          enemies.splice(j, 1);
+          
+          // Check for game over
+          if (state.lives <= 0) {
+            state.gameState = 'gameover';
+            if (window.showGameOver) {
+              window.showGameOver(state.score);
+            }
+            return; // Stop the game loop
+          }
         }
       }
     }
@@ -459,6 +497,63 @@
     renderer.setSize(appContainer.clientWidth, appContainer.clientHeight);
   }
   window.addEventListener('resize', onWindowResize, false);
+
+  // ===== Game Control Functions =====
+  function pause() {
+    state.isPaused = true;
+  }
+  
+  function resume() {
+    state.isPaused = false;
+  }
+  
+  function restart() {
+    // Reset game state
+    state.score = 0;
+    state.lives = 3;
+    state.level = 1;
+    state.gameState = 'playing';
+    state.powerup = null;
+    state.powerupTimer = 0;
+    state.isPaused = false;
+    
+    // Clear all game objects
+    enemies.forEach(enemy => scene.remove(enemy));
+    bullets.forEach(bullet => scene.remove(bullet));
+    particles.forEach(particle => scene.remove(particle));
+    powerups.forEach(powerup => scene.remove(powerup));
+    
+    enemies.length = 0;
+    bullets.length = 0;
+    particles.length = 0;
+    powerups.length = 0;
+    
+    // Remove boss if exists
+    if (boss) {
+      scene.remove(boss);
+      boss = null;
+      bossHudEl.style.display = 'none';
+    }
+    
+    // Reset player position
+    if (player) {
+      player.position.set(0, 0, 0);
+    }
+    
+    // Restart spawning
+    if (spawnInterval) clearInterval(spawnInterval);
+    adjustSpawning();
+    
+    // Update HUD
+    updateHUD();
+  }
+  
+  // Expose game control functions globally
+  window.gameInstance = {
+    pause: pause,
+    resume: resume,
+    restart: restart
+  };
 
   // Start Game
   updateHUD();

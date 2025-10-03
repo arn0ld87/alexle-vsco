@@ -126,18 +126,48 @@
 </head>
 <body>
   <a href="/" style="position: fixed; left: 16px; top: 16px; text-decoration: none; color: #fff; font-size: 12px;">← HOME</a>
-  <div id="character-selection" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; position: absolute; top: 0; left: 0; background: #0a0e27; z-index: 1000;">
-    <h1>Wähle deinen Charakter</h1>
+  <!-- Start Menu -->
+  <div id="start-menu" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; position: absolute; top: 0; left: 0; background: #0a0e27; z-index: 1000;">
+    <h1 style="color: #00ffff; text-shadow: 2px 2px #000000; margin-bottom: 30px;">COSMIC DEFENDER</h1>
+    <div style="text-align: center; color: #ffff00; margin-bottom: 40px;">
+      <h2>Steuerung:</h2>
+      <p>Pfeiltasten: Bewegen</p>
+      <p>Leertaste: Schießen</p>
+      <p>ESC: Pause</p>
+    </div>
+    <button onclick="showCharacterSelection()" style="background: #00ffff; color: #0a0e27; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px;">SPIEL STARTEN</button>
+  </div>
+
+  <!-- Character Selection -->
+  <div id="character-selection" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; position: absolute; top: 0; left: 0; background: #0a0e27; z-index: 1000;">
+    <h1 style="color: #00ffff; text-shadow: 2px 2px #000000;">Wähle deinen Charakter</h1>
     <div style="display: flex; gap: 50px; margin-top: 50px;">
       <div style="text-align: center; cursor: pointer;" onclick="selectCharacter('/avatars/alex-skin.png')">
         <img src="/avatars/alex-skin.png" alt="Alex" style="width: 150px; height: 150px; border: 4px solid #00ffff; border-radius: 10px;">
-        <h2>Alex</h2>
+        <h2 style="color: #ffff00;">Alex</h2>
       </div>
       <div style="text-align: center; cursor: pointer;" onclick="selectCharacter('/avatars/micha-skin.png')">
         <img src="/avatars/micha-skin.png" alt="Micha" style="width: 150px; height: 150px; border: 4px solid #00ffff; border-radius: 10px;">
-        <h2>Micha</h2>
+        <h2 style="color: #ffff00;">Micha</h2>
       </div>
     </div>
+    <button onclick="showStartMenu()" style="background: #ff0000; color: #fff; border: none; padding: 10px 20px; font-family: 'Press Start 2P', monospace; font-size: 12px; cursor: pointer; border-radius: 5px; margin-top: 30px;">ZURÜCK</button>
+  </div>
+
+  <!-- Pause Menu -->
+  <div id="pause-menu" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; position: absolute; top: 0; left: 0; background: rgba(10,14,39,0.9); z-index: 1000;">
+    <h1 style="color: #ffff00; text-shadow: 2px 2px #000000; margin-bottom: 30px;">PAUSE</h1>
+    <button onclick="resumeGame()" style="background: #00ffff; color: #0a0e27; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px; margin: 10px;">WEITERSPIELEN</button>
+    <button onclick="restartGame()" style="background: #ff0000; color: #fff; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px; margin: 10px;">NEU STARTEN</button>
+    <button onclick="showStartMenu()" style="background: #666; color: #fff; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px; margin: 10px;">HAUPTMENÜ</button>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="game-over-screen" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; position: absolute; top: 0; left: 0; background: rgba(10,14,39,0.95); z-index: 1000;">
+    <h1 style="color: #ff0000; text-shadow: 2px 2px #000000; margin-bottom: 20px;">GAME OVER</h1>
+    <div id="final-score" style="color: #ffff00; font-size: 18px; margin-bottom: 30px;">PUNKTE: 0</div>
+    <button onclick="restartGame()" style="background: #00ffff; color: #0a0e27; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px; margin: 10px;">NOCHMAL SPIELEN</button>
+    <button onclick="showStartMenu()" style="background: #666; color: #fff; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px; margin: 10px;">HAUPTMENÜ</button>
   </div>
 
   <div id="app" style="display: none;">
@@ -164,16 +194,85 @@
 
   <script>
     let selectedPlayerSkin = '';
+    let gameInstance = null;
+    
+    function showStartMenu() {
+      hideAllMenus();
+      document.getElementById('start-menu').style.display = 'flex';
+    }
+    
+    function showCharacterSelection() {
+      hideAllMenus();
+      document.getElementById('character-selection').style.display = 'flex';
+    }
+    
+    function hideAllMenus() {
+      document.getElementById('start-menu').style.display = 'none';
+      document.getElementById('character-selection').style.display = 'none';
+      document.getElementById('pause-menu').style.display = 'none';
+      document.getElementById('game-over-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'none';
+    }
+    
     function selectCharacter(skinPath) {
       selectedPlayerSkin = skinPath;
-      document.getElementById('character-selection').style.display = 'none';
+      // Make skin available globally for the game script
+      window.selectedPlayerSkin = skinPath;
+      hideAllMenus();
       document.getElementById('app').style.display = 'block';
       // Dynamically load the game script after selection
       const gameScript = document.createElement('script');
       gameScript.src = '/demos/space-shooter-game/three-game.js?v=20251003';
       document.body.appendChild(gameScript);
     }
+    
+    function pauseGame() {
+      if (window.gameInstance && window.gameInstance.pause) {
+        window.gameInstance.pause();
+        hideAllMenus();
+        document.getElementById('pause-menu').style.display = 'flex';
+      }
+    }
+    
+    function resumeGame() {
+      if (window.gameInstance && window.gameInstance.resume) {
+        window.gameInstance.resume();
+        hideAllMenus();
+        document.getElementById('app').style.display = 'block';
+      }
+    }
+    
+    function restartGame() {
+      if (window.gameInstance && window.gameInstance.restart) {
+        window.gameInstance.restart();
+        hideAllMenus();
+        document.getElementById('app').style.display = 'block';
+      }
+    }
+    
+    function showGameOver(finalScore) {
+      hideAllMenus();
+      document.getElementById('final-score').textContent = `PUNKTE: ${finalScore}`;
+      document.getElementById('game-over-screen').style.display = 'flex';
+    }
+    
+    // Make functions globally available
+    window.showGameOver = showGameOver;
+    window.pauseGame = pauseGame;
+    
+    // ESC key handler for pause
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (document.getElementById('app').style.display === 'block') {
+          pauseGame();
+        } else if (document.getElementById('pause-menu').style.display === 'flex') {
+          resumeGame();
+        }
+      }
+    });
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </html>
+
