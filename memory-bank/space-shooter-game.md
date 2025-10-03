@@ -133,7 +133,7 @@ public/demos/space-shooter-game/
 - Zusätzliche Powerups und Waffen-Upgrades (optional)
 
 ## Update Log
-### Version 2.0 (2024-12-19)
+### Version 2.0 (2025-10-03)
 - **Komplette Neuentwicklung** des gesamten Games
 - Retro-Arcade Design mit Neon-Ästhetik
 - Vollständiges Menü-System implementiert
