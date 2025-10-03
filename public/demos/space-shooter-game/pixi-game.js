@@ -22,7 +22,7 @@
   PIXI.BaseTexture.defaultOptions.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
   // ===== Assets =====
-  const ASSET_BASE = '../space-shooter-game/assets/';
+  const ASSET_BASE = '../space-shooter-canvas/assets/';
   const paths = {
     background: ASSET_BASE + 'Enjl-Starry Space Background/background_1.png',
     player: ASSET_BASE + 'Ships/spaceShips_001.png',
