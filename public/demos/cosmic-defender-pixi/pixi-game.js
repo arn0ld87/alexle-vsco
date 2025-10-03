@@ -435,6 +435,12 @@
     }
   }
 
+  function createFloatingText(x, y, text, color = 0xffff00) {
+    const t = new PIXI.Text(text, { fontFamily: 'Press Start 2P', fontSize: 12, fill: color });
+    t.anchor.set(0.5);
+    t.x = x; t.y = y; t.life = 60; fxLayer.addChild(t);
+  }
+
   // ===== Game Loop =====
   app.ticker.add((delta) => {
     // Screen shake
@@ -454,6 +460,8 @@
       if (c instanceof PIXI.Graphics && c.life) {
         c.x += c.vx; c.y += c.vy; c.vy += 0.1; c.life--; c.alpha = c.life/30;
         if (c.life<=0) { fxLayer.removeChild(c); }
+      } else if (c instanceof PIXI.Text && c.life) {
+        c.y -= 1; c.life--; c.alpha = c.life/60; if (c.life<=0) { fxLayer.removeChild(c); c.destroy(); }
       }
     }
 
@@ -464,6 +472,27 @@
       if (keys['ArrowRight']) player.x = Math.min(app.screen.width - player.width, player.x + 5*delta);
       if (keys['ArrowUp']) player.y = Math.max(0, player.y - 5*delta);
       if (keys['ArrowDown']) player.y = Math.min(app.screen.height - player.height, player.y + 5*delta);
+
+      // Powerup visual indicator
+      if (player.powerup) {
+        const pulseSize = 2 + Math.sin(state.frame * 0.2) * 2;
+        if (!player.powerupBorder) {
+          player.powerupBorder = new PIXI.Graphics();
+          camera.addChild(player.powerupBorder);
+        }
+        player.powerupBorder.clear();
+        player.powerupBorder.lineStyle(2, 0xffff00, 1);
+        player.powerupBorder.drawRect(player.x - pulseSize, player.y - pulseSize, player.width + pulseSize*2, player.height + pulseSize*2);
+        
+        // Powerup timer bar
+        const timerWidth = player.width;
+        const timerPercent = player.powerupTimer / 300;
+        player.powerupBorder.beginFill(0x000000, 0.5).drawRect(player.x, player.y - 8, timerWidth, 4).endFill();
+        player.powerupBorder.beginFill(0xffff00, 1).drawRect(player.x, player.y - 8, timerWidth * timerPercent, 4).endFill();
+      } else if (player.powerupBorder) {
+        camera.removeChild(player.powerupBorder);
+        player.powerupBorder = null;
+      }
 
       // Bullets
       for (let i=bullets.length-1;i>=0;i--) {
@@ -477,13 +506,31 @@
         const e = enemies[i];
         if (e.type==='zigzag'){ e.zigzagTimer += 0.1*delta; e.x += Math.sin(e.zigzagTimer)*3; }
         e.y += e.speed*delta;
+        
+        // Tank health bar
+        if (e.type==='tank' && e.health > 1) {
+          if (!e.healthBar) {
+            e.healthBar = new PIXI.Graphics();
+            camera.addChild(e.healthBar);
+          }
+          e.healthBar.clear();
+          e.healthBar.lineStyle(1, 0x00ff00, 1);
+          e.healthBar.beginFill(0xff0000, 1).drawRect(e.x, e.y - 8, e.width, 4).endFill();
+          e.healthBar.beginFill(0x00ff00, 1).drawRect(e.x, e.y - 8, (e.width / 3) * e.health, 4).endFill();
+        }
+        
         // Collision with player
         if (hit(e, player)) {
-          state.health -= 10; playSound('hit', 0.5); createExplosion(e.x+e.width/2, e.y+e.height/2); camera.removeChild(e); enemies.splice(i,1);
+          state.health -= 10; playSound('hit', 0.5); createExplosion(e.x+e.width/2, e.y+e.height/2); 
+          if (e.healthBar) { camera.removeChild(e.healthBar); }
+          camera.removeChild(e); enemies.splice(i,1);
           if (state.health <= 0) { state.lives--; if (state.lives<=0) gameOver(); else state.health = 100; }
           updateHud();
         }
-        if (e.y > app.screen.height + 60) { camera.removeChild(e); enemies.splice(i,1); }
+        if (e.y > app.screen.height + 60) { 
+          if (e.healthBar) { camera.removeChild(e.healthBar); }
+          camera.removeChild(e); enemies.splice(i,1); 
+        }
       }
 
       // Bullet vs enemy
@@ -500,7 +547,9 @@
               state.score += bonus; state.stats.enemiesDestroyed++;
               playSound(Math.random()<0.5?'explosion':'explosionAlt', 0.5);
               createExplosion(e.x+e.width/2, e.y+e.height/2);
+              createFloatingText(e.x+e.width/2, e.y, `+${bonus}`, state.combo>5?0xffff00:0x00ffff);
               if (Math.random()<0.15) spawnPowerup(e.x+e.width/2, e.y+e.height/2);
+              if (e.healthBar) { camera.removeChild(e.healthBar); }
               camera.removeChild(e); enemies.splice(j,1);
               updateHud();
             }
@@ -511,10 +560,21 @@
 
       // Powerups
       for (let i=powerups.length-1;i>=0;i--) {
-        const p = powerups[i]; p.y += p.speed*delta;
+        const p = powerups[i]; 
+        p.y += p.speed*delta;
+        // Pulsing effect
+        const pulseScale = 1 + Math.sin(state.frame * 0.1) * 0.15;
+        p.scale.set(pulseScale);
+        // Rotation
+        p.rotation += 0.05 * delta;
+        
         if (hit(p, player)) {
           playSound('powerup', 0.5); state.stats.powerupsCollected++;
           state.flashEffect = 15;
+          const names = { shield:'SHIELD!', rapid:'RAPID FIRE!', triple:'TRIPLE SHOT!', health:'+1 LIFE!' };
+          const colors = { shield:0x00ffff, rapid:0xffff00, triple:0xff00ff, health:0x00ff00 };
+          createFloatingText(player.x+player.width/2, player.y, names[p.type], colors[p.type]);
+          
           if (p.type==='shield'){ state.health = 100; }
           if (p.type==='rapid'){ state.shootDelay = 100; player.powerup='rapid'; player.powerupTimer=300; }
           if (p.type==='triple'){ player.powerup='triple'; player.powerupTimer=300; }
