@@ -177,23 +177,38 @@
   }
 
   // Load models and start game
-  loader.load('assets/space-kit/Models/GLTF format/ship_player.gltf', (gltf) => {
+  loader.load('assets/space-kit/Models/GLTF format/craft_speederA.glb', (gltf) => {
     player = gltf.scene;
     player.scale.set(0.5, 0.5, 0.5);
     player.rotation.x = Math.PI / 2;
     scene.add(player);
 
-    loader.load('assets/space-kit/Models/GLTF format/ship_enemy_01.gltf', (gltf) => {
+    // Load and apply selected player skin
+    if (window.selectedPlayerSkin) {
+      const textureLoader = new THREE.TextureLoader();
+      textureLoader.load(window.selectedPlayerSkin, (texture) => {
+        player.traverse((child) => {
+          if (child.isMesh && child.material) {
+            // Assuming the player model uses a MeshStandardMaterial or similar
+            // that can accept a map texture.
+            child.material.map = texture;
+            child.material.needsUpdate = true;
+          }
+        });
+      });
+    }
+
+    loader.load('assets/space-kit/Models/GLTF format/craft_miner.glb', (gltf) => {
       enemyModel = gltf.scene;
       enemyModel.scale.set(0.4, 0.4, 0.4);
       enemyModel.rotation.x = Math.PI / 2;
 
-      loader.load('assets/space-kit/Models/GLTF format/ship_boss.gltf', (gltf) => {
+      loader.load('assets/space-kit/Models/GLTF format/craft_cargoB.glb', (gltf) => {
         bossModel = gltf.scene;
         bossModel.scale.set(1, 1, 1);
         bossModel.rotation.x = Math.PI / 2;
         
-        loader.load('assets/space-kit/Models/GLTF format/ship_enemy_02.gltf', (gltf) => {
+        loader.load('assets/space-kit/Models/GLTF format/craft_speederD.glb', (gltf) => {
           enemyModel2 = gltf.scene;
           enemyModel2.scale.set(0.4, 0.4, 0.4);
           enemyModel2.rotation.x = Math.PI / 2;
