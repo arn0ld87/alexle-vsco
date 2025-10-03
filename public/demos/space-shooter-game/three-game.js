@@ -24,8 +24,12 @@
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     
     renderer.setSize(appContainer.clientWidth, appContainer.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
     appContainer.appendChild(renderer.domElement);
+    
+    // Ensure canvas fills the container
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
   
     // ===== Audio =====
     const listener = new THREE.AudioListener();
