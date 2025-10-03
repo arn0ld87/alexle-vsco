@@ -44,7 +44,7 @@ const CONFIG = {
         },
         effects: {
             explosion: 'space-shooter-extension/PNG/Sprites/Effects/',
-            background: 'Foozle_2DS0015_Void_EnvironmentPack/Backgrounds/PNGs/Condesed/background_1.png'
+            background: 'Enjl-Starry Space Background/background_1.png'
         },
         sounds: {
             shoot: 'sci-fi-sounds/Audio/laserRetro_001.ogg',
