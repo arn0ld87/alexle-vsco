@@ -60,19 +60,26 @@ function extractThumbnail(item: any) {
     return imgMatch2[1];
   }
   
-  // 6. Default Thumbnail basierend auf Quelle
-  const defaultThumbnails: Record<string, string> = {
-    'Heise': '/media/alex-gemini.png',
-    'Golem': '/media/alex-gemini.png',
-    'TechCrunch AI': '/media/alex-gemini.png',
-    'OpenAI Blog': '/media/alex-gemini.png',
-    'ZDNet AI': '/media/alex-gemini.png',
-    'MIT Technology Review': '/media/alex-gemini.png',
-    'VentureBeat': '/media/alex-gemini.png',
-    'Wired': '/media/alex-gemini.png'
-  };
+  // 6. Zufälliges Thumbnail aus dem thumbnails Ordner
+  const thumbnailOptions = [
+    '/media/ki1.png',
+    '/media/ki2.png', 
+    '/media/ki3.png',
+    '/media/ki4.png',
+    '/media/ki5.png',
+    '/media/ki6.png',
+    '/media/ki7.png',
+    '/media/ki8.png'
+  ];
   
-  return defaultThumbnails[item.source] || '/media/default-news.png';
+  // Verwende einen Hash des Titels für konsistente Zuweisung
+  const titleHash = item.title ? item.title.split('').reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0) : Math.random();
+  
+  const thumbnailIndex = Math.abs(titleHash) % thumbnailOptions.length;
+  return thumbnailOptions[thumbnailIndex];
 }
 
 function categorizeArticle(text: string) {

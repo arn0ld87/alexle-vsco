@@ -185,7 +185,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           
           ${article.thumbnail ? `
             <div class="mb-4">
-              <img src="${article.thumbnail}" alt="${article.title}" class="w-full h-32 object-cover rounded-lg" onerror="this.src='/media/default-news.png'">
+              <img src="${article.thumbnail}" alt="${article.title}" class="w-full h-32 object-cover rounded-lg">
             </div>
           ` : ''}
           
@@ -238,8 +238,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       return `vor ${diffInDays}d`;
     }
     
-    // Open article in new tab
-    function openArticle(url) {
+    // Open article in new tab (global function)
+    window.openArticle = function(url) {
       window.open(url, '_blank');
     }
     
@@ -247,8 +247,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     document.addEventListener('DOMContentLoaded', () => {
       loadKINews();
       
-      // Refresh data every 5 minutes
-      setInterval(loadKINews, 5 * 60 * 1000);
+      // Refresh data every 8 hours
+      setInterval(loadKINews, 8 * 60 * 60 * 1000);
     });
   </script>
 </BaseLayout>
