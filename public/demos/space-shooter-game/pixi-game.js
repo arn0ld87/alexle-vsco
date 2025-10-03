@@ -25,12 +25,17 @@
   const ASSET_BASE = '../space-shooter-canvas/assets/';
   const paths = {
     background: ASSET_BASE + 'Enjl-Starry Space Background/background_1.png',
-    player: ASSET_BASE + 'Ships/spaceShips_001.png',
+    players: [
+      ASSET_BASE + 'Ships/spaceShips_001.png',  // Default
+      ASSET_BASE + 'Ships/player_blue.png',     // Blauer Held
+      ASSET_BASE + 'Ships/player_red.png',      // Roter Held
+    ],
     enemies: {
       basic: ASSET_BASE + 'Enemies/enemyBlack1.png',
       fast: ASSET_BASE + 'Enemies/enemyBlue2.png',
       tank: ASSET_BASE + 'Enemies/enemyRed3.png',
       zigzag: ASSET_BASE + 'Enemies/enemyGreen4.png',
+      shooter: ASSET_BASE + 'Enemies/enemyBlack5.png', // Neuer Typ: schießt zurück
     },
     bullets: {
       player: ASSET_BASE + 'Lasers/laserBlue01.png',
@@ -60,11 +65,14 @@
   // Preload - Einzeln laden statt bulk-object für bessere Fehlerbehandlung
   const assetUrls = {
     background: paths.background,
-    player: paths.player,
+    player0: paths.players[0],
+    player1: paths.players[1],
+    player2: paths.players[2],
     enemyBasic: paths.enemies.basic,
     enemyFast: paths.enemies.fast,
     enemyTank: paths.enemies.tank,
     enemyZigzag: paths.enemies.zigzag,
+    enemyShooter: paths.enemies.shooter,
     bulletPlayer: paths.bullets.player,
     bulletEnemy: paths.bullets.enemy,
     powerupShield: paths.powerups.shield,
@@ -127,8 +135,9 @@
 
   // ===== Game State =====
   const state = {
-    gameState: 'menu', // 'menu'|'name'|'playing'|'paused'|'gameover'|'highscores'|'levelcomplete'
+    gameState: 'menu', // 'menu'|'name'|'character'|'playing'|'paused'|'gameover'|'highscores'|'levelcomplete'
     playerName: '',
+    selectedCharacter: 0, // Index des gewählten Charakters (0-2)
     score: 0,
     level: 1,
     lives: 3,
@@ -173,14 +182,7 @@
   });
 
   // ===== Player =====
-  const player = new PIXI.Sprite(textures.player);
-  player.width = 50; player.height = 50;
-  player.x = app.screen.width / 2 - 25;
-  player.y = app.screen.height - 80;
-  player.roundPixels = true;
-  player.powerup = null;
-  player.powerupTimer = 0;
-  camera.addChild(player);
+  let player = null; // Wird nach Charakterwahl erstellt
 
   // ===== Groups =====
   const enemies = [];
@@ -300,7 +302,7 @@
   const namePrompt = new PIXI.Text('Gib deinen Namen ein:', { fontFamily: 'Press Start 2P', fontSize: 11, fill: 0xffffff }); namePrompt.anchor.set(0.5); namePrompt.y = -60; nameMenu.addChild(namePrompt);
   const inputBg = new PIXI.Graphics(); inputBg.lineStyle(2, 0x00ffff).beginFill(0x000000, 0.7).drawRoundedRect(-150, -20, 300, 45, 6).endFill(); inputBg.y = -10; nameMenu.addChild(inputBg);
   const nameText = new PIXI.Text('', { fontFamily: 'Press Start 2P', fontSize: 16, fill: 0x00ffff }); nameText.anchor.set(0.5); nameText.y = 0; nameMenu.addChild(nameText);
-  const goBtn = makeButton("LOS GEHT'S!", () => startGame()); goBtn.y = 60; goBtn.x = -150; nameMenu.addChild(goBtn);
+  const goBtn = makeButton("LOS GEHT'S!", () => showCharacterSelect()); goBtn.y = 60; goBtn.x = -150; nameMenu.addChild(goBtn);
   const backBtn = makeButton('ZURÜCK', () => backToMain()); backBtn.y = 120; backBtn.x = -150; nameMenu.addChild(backBtn);
 
   const pauseMenu = new PIXI.Container(); uiLayer.addChild(pauseMenu); pauseMenu.visible = false; pauseMenu.position.set(center.x, center.y);
@@ -328,9 +330,50 @@
   const hsList = new PIXI.Text('', { fontFamily: 'Press Start 2P', fontSize: 10, fill: 0xffff00 }); hsList.anchor.set(0.5, 0); hsList.y = -90; highscoreMenu.addChild(hsList);
   const hsBack = makeButton('ZURÜCK', () => backToMain()); hsBack.y = 110; hsBack.x = -130; highscoreMenu.addChild(hsBack);
 
-  function hideAllMenus() { mainMenu.visible = nameMenu.visible = pauseMenu.visible = gameOverMenu.visible = levelCompleteMenu.visible = highscoreMenu.visible = false; }
+  // Character Select Menu
+  const characterMenu = new PIXI.Container(); uiLayer.addChild(characterMenu); characterMenu.visible = false; characterMenu.position.set(center.x, center.y);
+  characterMenu.addChild(makePanel(500, 400));
+  const charTitle = new PIXI.Text('WÄHLE DEINEN HELDEN', { fontFamily: 'Press Start 2P', fontSize: 18, fill: 0x00ffff, dropShadow: true }); charTitle.anchor.set(0.5); charTitle.y = -140; characterMenu.addChild(charTitle);
+  
+  const charSprites = [];
+  const charNames = ['STANDARD', 'BLAUER HELD', 'ROTER HELD'];
+  const charColors = [0xffffff, 0x00aaff, 0xff4444];
+  
+  for (let i = 0; i < 3; i++) {
+    const charBtn = new PIXI.Container();
+    charBtn.x = -180 + i * 180; charBtn.y = 0;
+    
+    const frame = new PIXI.Graphics();
+    frame.lineStyle(3, charColors[i], 1).beginFill(0x000000, 0.3).drawRoundedRect(-60, -80, 120, 140, 8).endFill();
+    charBtn.addChild(frame);
+    
+    const sprite = new PIXI.Sprite(textures[`player${i}`]);
+    sprite.width = 60; sprite.height = 60; sprite.anchor.set(0.5); sprite.y = -20;
+    charBtn.addChild(sprite);
+    charSprites.push(sprite);
+    
+    const label = new PIXI.Text(charNames[i], { fontFamily: 'Press Start 2P', fontSize: 8, fill: charColors[i] });
+    label.anchor.set(0.5); label.y = 40;
+    charBtn.addChild(label);
+    
+    charBtn.interactive = true; charBtn.eventMode = 'static';
+    const btnIndex = i;
+    charBtn.on('pointertap', () => { state.selectedCharacter = btnIndex; playSound('menuClick', 0.4); startGame(); });
+    charBtn.on('pointerover', () => { charBtn.scale.set(1.1); });
+    charBtn.on('pointerout', () => { charBtn.scale.set(1.0); });
+    
+    characterMenu.addChild(charBtn);
+  }
+  
+  const charBackBtn = makeButton('ZURÜCK', () => { state.gameState = 'name'; hideAllMenus(); nameMenu.visible = true; }); charBackBtn.y = 130; charBackBtn.x = -150; characterMenu.addChild(charBackBtn);
+
+  function hideAllMenus() { mainMenu.visible = nameMenu.visible = pauseMenu.visible = gameOverMenu.visible = levelCompleteMenu.visible = highscoreMenu.visible = characterMenu.visible = false; }
   function showMainMenu() { state.gameState = 'menu'; hideAllMenus(); mainMenu.visible = true; }
   function showNameInput() { state.gameState = 'name'; hideAllMenus(); nameMenu.visible = true; }
+  function showCharacterSelect() { 
+    if (!state.playerName) return;
+    state.gameState = 'character'; hideAllMenus(); characterMenu.visible = true; playSound('menuClick', 0.4); 
+  }
 
   function backToMain() { state.gameState = 'menu'; hideAllMenus(); mainMenu.visible = true; stopMusic(); playSound('menuClick', 0.4); }
 
@@ -413,20 +456,21 @@
 
   // ===== Enemies / Bullets / Powerups =====
   function spawnEnemy() {
-    const types = ['basic', 'fast', 'tank', 'zigzag'];
-    const weights = [50, 30, 15, 5 + state.level * 2];
+    const types = ['basic', 'fast', 'tank', 'zigzag', 'shooter'];
+    const weights = [40, 25, 15, 10, 10 + state.level * 2]; // Shooter häufiger bei höherem Level
     const total = weights.reduce((a,b)=>a+b,0);
     let r = Math.random() * total, type = 'basic';
     for (let i=0;i<types.length;i++){ if (r < weights[i]) { type = types[i]; break; } r -= weights[i]; }
 
-    const texKey = { basic:'enemyBasic', fast:'enemyFast', tank:'enemyTank', zigzag:'enemyZigzag' }[type];
+    const texKey = { basic:'enemyBasic', fast:'enemyFast', tank:'enemyTank', zigzag:'enemyZigzag', shooter:'enemyShooter' }[type];
     const s = new PIXI.Sprite(textures[texKey]);
-    s.width = 50; s.height = 50; s.roundPixels = true; s.type = type; s.health = 1; s.zigzagTimer = 0;
+    s.width = 50; s.height = 50; s.roundPixels = true; s.type = type; s.health = 1; s.zigzagTimer = 0; s.shootTimer = 0;
     s.x = Math.random() * (app.screen.width - s.width);
     s.y = -50; s.speed = 2 + state.level * 0.3;
     if (type==='fast'){ s.speed*=1.8; s.width=40; s.height=40; }
     if (type==='tank'){ s.speed*=0.6; s.health=3; s.width=60; s.height=60; }
     if (type==='zigzag'){ s.width=45; s.height=45; }
+    if (type==='shooter'){ s.width=48; s.height=48; s.shootTimer = Math.random() * 120 + 60; } // Schießt alle 2-3 Sek
     camera.addChild(s); enemies.push(s);
   }
 
@@ -524,8 +568,20 @@
       // Bullets
       for (let i=bullets.length-1;i>=0;i--) {
         const b = bullets[i];
-        b.y += b.speed*delta; if (b.angleRad) b.x += Math.sin(b.angleRad)*8*delta;
-        if (b.y < -40) { camera.removeChild(b); bullets.splice(i,1); }
+        if (b.type === 'enemy') {
+          // Enemy-Bullets nach unten
+          b.y += b.speed*delta;
+          if (player && hit(b, player)) {
+            state.health -= 5; playSound('hit', 0.4); camera.removeChild(b); bullets.splice(i,1);
+            if (state.health <= 0) { state.lives--; if (state.lives<=0) gameOver(); else state.health = 100; }
+            updateHud();
+          }
+          if (b.y > app.screen.height + 40) { camera.removeChild(b); bullets.splice(i,1); }
+        } else {
+          // Player-Bullets nach oben
+          b.y += b.speed*delta; if (b.angleRad) b.x += Math.sin(b.angleRad)*8*delta;
+          if (b.y < -40) { camera.removeChild(b); bullets.splice(i,1); }
+        }
       }
 
       // Enemies
@@ -533,6 +589,18 @@
         const e = enemies[i];
         if (e.type==='zigzag'){ e.zigzagTimer += 0.1*delta; e.x += Math.sin(e.zigzagTimer)*3; }
         e.y += e.speed*delta;
+        
+        // Shooter-Enemy schießt
+        if (e.type==='shooter' && e.y > 50 && e.y < app.screen.height - 100) {
+          e.shootTimer -= delta;
+          if (e.shootTimer <= 0) {
+            e.shootTimer = 120 + Math.random() * 60; // Schießt alle 2-3 Sek
+            const eb = new PIXI.Sprite(textures.bulletEnemy);
+            eb.width = 8; eb.height = 20; eb.x = e.x + e.width/2 - 4; eb.y = e.y + e.height; eb.speed = 4; eb.type = 'enemy'; eb.roundPixels = true;
+            camera.addChild(eb); bullets.push(eb);
+            playSound('shoot', 0.3);
+          }
+        }
         
         // Tank health bar
         if (e.type==='tank' && e.health > 1) {
