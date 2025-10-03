@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cosmic Defender (PixiJS) – WebGL Demo</title>
-  <meta name="description" content="Cosmic Defender Port auf PixiJS/WebGL für scharfe, stabile Sprite-Darstellung" />
+  <title>Cosmic Defender (3D) – Three.js Demo</title>
+  <meta name="description" content="Cosmic Defender in 3D, built with Three.js" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     html, body {
@@ -54,17 +54,102 @@
       font-size: 10px;
       text-align: center;
     }
+    .mobile-controls {
+      display: none; /* Hidden by default */
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-sizing: border-box;
+      z-index: 100;
+    }
+    .mobile-controls .btn {
+      width: 80px;
+      height: 80px;
+      background: rgba(0, 255, 255, 0.3);
+      border: 2px solid rgba(0, 255, 255, 0.7);
+      border-radius: 50%;
+      color: white;
+      font-size: 24px;
+      line-height: 80px;
+      text-align: center;
+      user-select: none;
+    }
+    .mobile-controls .fire {
+      width: 100px;
+      height: 100px;
+      line-height: 100px;
+      font-size: 30px;
+    }
+    /* Show only on touch devices */
+    @media (hover: none) and (pointer: coarse) {
+      .mobile-controls {
+        display: flex;
+      }
+      .hint {
+        display: none; /* Hide keyboard hint on mobile */
+      }
+    }
+    .hud {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      color: #00ffff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      text-shadow: 2px 2px #000000;
+      z-index: 100;
+    }
+    .hud > div {
+      margin-bottom: 5px;
+    }
+    #boss-hud {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50%;
+      height: 20px;
+      border: 2px solid #ff0000;
+      background-color: #330000;
+      z-index: 100;
+    }
+    #boss-health {
+      width: 100%;
+      height: 100%;
+      background-color: #ff0000;
+      transition: width 0.2s ease-out;
+    }
   </style>
 </head>
 <body>
   <a href="/" style="position: fixed; left: 16px; top: 16px; text-decoration: none; color: #fff; font-size: 12px;">← HOME</a>
-  <a href="/demos/space-shooter-canvas/" style="position: fixed; left: 16px; top: 40px; text-decoration: none; color: #888; font-size: 10px;">Canvas-Version</a>
   <div id="app">
-    <div class="badge">alexle135.de<br/><span style="font-size:8px">COSMIC DEFENDER (PixiJS)</span></div>
-    <div class="hint">Pfeiltasten bewegen • Leertaste schießen • N = Musik • M = Sound • Alex vs. Micha im Menü!</div>
+    <div class="badge">alexle135.de<br/><span style="font-size:8px">COSMIC DEFENDER (3D)</span></div>
+    <div class="hint">Pfeiltasten bewegen • Leertaste schießen</div>
+
+    <div class="hud">
+      <div id="score">PUNKTE: 0</div>
+      <div id="lives">LEBEN: 3</div>
+      <div id="level">LEVEL: 1</div>
+    </div>
+
+    <div id="boss-hud" style="display: none;">
+      <div id="boss-health"></div>
+    </div>
+
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.4.0/pixi.min.js" crossorigin="anonymous"></script>
-  <script src="./pixi-game.js"></script>
+  <div class="mobile-controls">
+    <div id="move-left" class="btn">◀</div>
+    <div id="fire" class="btn fire">🔥</div>
+    <div id="move-right" class="btn">▶</div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="./three-game.js?v=20251003"></script>
 </body>
 </html>
