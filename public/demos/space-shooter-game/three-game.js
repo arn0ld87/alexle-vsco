@@ -21,6 +21,11 @@
     // ===== Scene Setup =====
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, appContainer.clientWidth / appContainer.clientHeight, 0.1, 1000);
+    
+    // ✅ CRITICAL FIX: Position camera to see the game
+    camera.position.set(0, 15, 20);
+    camera.lookAt(0, 0, 0);
+    
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     
     renderer.setSize(appContainer.clientWidth, appContainer.clientHeight);
@@ -73,7 +78,10 @@
   const bullets = [];
   const particles = [];
   const powerups = [];
-  const loader = new THREE.GLTFLoader();
+  
+  // ✅ CRITICAL FIX: Check if GLTFLoader is available
+  const loader = window.THREE && THREE.GLTFLoader ? new THREE.GLTFLoader() : null;
+  
   const playerSpeed = 0.2;
   const bulletSpeed = 0.5;
   
@@ -185,8 +193,27 @@
     setInterval(spawnPowerup, 15000); // Spawn powerup every 15 seconds
   }
 
-  // Load models and start game
-  loader.load('assets/space-kit/Models/GLTF format/craft_speederA.glb', (gltf) => {
+  // ===== Fallback: Create simple geometric objects if models don't load =====
+  function createSimplePlayer() {
+    const geometry = new THREE.ConeGeometry(0.5, 1.5, 3);
+    const material = new THREE.MeshStandardMaterial({ color: 0x00ff00, emissive: 0x00ff00, emissiveIntensity: 0.3 });
+    player = new THREE.Mesh(geometry, material);
+    player.rotation.x = Math.PI;
+    player.position.set(0, 0, 0);
+    scene.add(player);
+  }
+
+  function createSimpleEnemyModel() {
+    const geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+    const material = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 0.3 });
+    const enemy = new THREE.Mesh(geometry, material);
+    enemy.rotation.x = Math.PI / 2;
+    return enemy;
+  }
+
+  // Load models and start game (with fallback)
+  if (loader) {
+    loader.load('assets/space-kit/Models/GLTF format/craft_speederA.glb', (gltf) => {
     player = gltf.scene;
     player.scale.set(0.5, 0.5, 0.5);
     player.rotation.x = Math.PI / 2;
@@ -227,9 +254,20 @@
     });
   }, undefined, (error) => {
     console.error('Model loading error:', error);
-    player = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ color: 0x00ff00 }));
-    scene.add(player);
+    // Fallback to simple geometry
+    createSimplePlayer();
+    enemyModel = createSimpleEnemyModel();
+    enemyModel2 = createSimpleEnemyModel();
+    startGameSpawning();
   });
+  } else {
+    // GLTFLoader not available, use simple geometry
+    console.warn('GLTFLoader not available, using simple geometry');
+    createSimplePlayer();
+    enemyModel = createSimpleEnemyModel();
+    enemyModel2 = createSimpleEnemyModel();
+    startGameSpawning();
+  }
 
   // ===== Input Controller =====
   class InputController {
@@ -666,12 +704,6 @@
       }
       if (input.state.right) {
         player.position.x = Math.min(gameWidth / 2, player.position.x + playerSpeed);
-      }
-      if (keys['ArrowUp']) {
-        player.position.z = Math.max(-gameHeight / 2 + player.scale.z / 2, player.position.z - playerSpeed);
-      }
-      if (keys['ArrowDown']) {
-        player.position.z = Math.min(gameHeight / 2 - player.scale.z / 2, player.position.z + playerSpeed);
       }
     }
 
