@@ -484,10 +484,10 @@
         player.position.x = Math.min(gameWidth / 2, player.position.x + playerSpeed);
       }
       if (keys['ArrowUp']) {
-        player.position.z = Math.max(-gameHeight / 2, player.position.z - playerSpeed);
+        player.position.z = Math.max(-gameHeight / 2 + player.scale.z / 2, player.position.z - playerSpeed);
       }
       if (keys['ArrowDown']) {
-        player.position.z = Math.min(gameHeight / 2, player.position.z + playerSpeed);
+        player.position.z = Math.min(gameHeight / 2 - player.scale.z / 2, player.position.z + playerSpeed);
       }
     }
 
