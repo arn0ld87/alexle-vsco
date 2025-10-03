@@ -60,42 +60,10 @@
       font-size: 10px;
       text-align: center;
     }
-    .mobile-controls {
-      display: none; /* Hidden by default */
-      position: fixed;
-      bottom: 20px;
-      left: 0;
-      width: 100%;
-      justify-content: space-between;
-      padding: 0 20px;
-      box-sizing: border-box;
-      z-index: 100;
-    }
-    .mobile-controls .btn {
-      width: 80px;
-      height: 80px;
-      background: rgba(0, 255, 255, 0.3);
-      border: 2px solid rgba(0, 255, 255, 0.7);
-      border-radius: 50%;
-      color: white;
-      font-size: 24px;
-      line-height: 80px;
-      text-align: center;
-      user-select: none;
-    }
-    .mobile-controls .fire {
-      width: 100px;
-      height: 100px;
-      line-height: 100px;
-      font-size: 30px;
-    }
-    /* Show only on touch devices */
+    /* Hide keyboard hint on mobile */
     @media (hover: none) and (pointer: coarse) {
-      .mobile-controls {
-        display: flex;
-      }
       .hint {
-        display: none; /* Hide keyboard hint on mobile */
+        display: none;
       }
     }
     .hud {
@@ -140,8 +108,8 @@
     <p style="color: #fff; font-size: 12px; margin-bottom: 30px;"><a href="https://alexle135.de" target="_blank" style="color: #00ffff; text-decoration: none;">alexle135.de</a></p>
     <div style="text-align: center; color: #ffff00; margin-bottom: 40px;">
       <h2>Steuerung:</h2>
-      <p>Pfeiltasten: Bewegen</p>
-      <p>Leertaste: Schießen</p>
+      <p>Left/Right: Move</p>
+      <p>Space: Fire</p>
       <p>ESC: Pause</p>
     </div>
     <button onclick="showCharacterSelection()" style="background: #00ffff; color: #0a0e27; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px;">SPIEL STARTEN</button>
@@ -181,7 +149,7 @@
 
   <div id="app" style="display: none;">
     <div class="badge">alexle135.de<br/><span style="font-size:8px">COSMIC DEFENDER (3D)</span></div>
-    <div class="hint">Pfeiltasten bewegen • Leertaste schießen</div>
+    <div class="hint">Left/Right: Move • Space: Fire</div>
 
     <div class="hud">
       <div id="score">PUNKTE: 0</div>
@@ -193,12 +161,6 @@
       <div id="boss-health"></div>
     </div>
 
-  </div>
-
-  <div class="mobile-controls">
-    <div id="move-left" class="btn">◀</div>
-    <div id="fire" class="btn fire">🔥</div>
-    <div id="move-right" class="btn">▶</div>
   </div>
 
   <script>

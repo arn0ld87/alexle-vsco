@@ -76,7 +76,10 @@
   const loader = new THREE.GLTFLoader();
   const playerSpeed = 0.2;
   const bulletSpeed = 0.5;
-  state.lastShotTime = 0;
+  
+  // Fire rate limiting
+  const FIRE_INTERVAL_MS = 200;
+  let lastShotAt = 0;
 
   // ===== HUD =====
   function updateHUD() {
@@ -228,24 +231,202 @@
     scene.add(player);
   });
 
-  // ===== Input =====
-  const keys = {};
-  window.addEventListener('keydown', (e) => {
-    keys[e.key] = true;
-  });
-  window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+  // ===== Input Controller =====
+  class InputController {
+    constructor() {
+      this.state = {
+        left: false,
+        right: false,
+        fire: false
+      };
+      this.enabled = true;
+      this.mobileControls = null;
+      this.setupKeyboard();
+      this.setupMobile();
+      this.setupVisibilityHandlers();
+    }
 
-  // Mobile Controls
-  const leftBtn = document.getElementById('move-left');
-  const rightBtn = document.getElementById('move-right');
-  const fireBtn = document.getElementById('fire');
+    setupKeyboard() {
+      const preventKeys = [' ', 'ArrowLeft', 'ArrowRight'];
+      
+      window.addEventListener('keydown', (e) => {
+        if (!this.enabled) return;
+        
+        // Prevent scrolling on Space and Arrow keys
+        if (preventKeys.includes(e.key)) {
+          e.preventDefault();
+        }
+        
+        if (e.key === 'ArrowLeft') this.state.left = true;
+        if (e.key === 'ArrowRight') this.state.right = true;
+        if (e.key === ' ') this.state.fire = true;
+      });
 
-  leftBtn.addEventListener('touchstart', () => { keys['ArrowLeft'] = true; }, { passive: true });
-  leftBtn.addEventListener('touchend', () => { keys['ArrowLeft'] = false; });
-  rightBtn.addEventListener('touchstart', () => { keys['ArrowRight'] = true; }, { passive: true });
-  rightBtn.addEventListener('touchend', () => { keys['ArrowRight'] = false; });
-  fireBtn.addEventListener('touchstart', () => { keys[' '] = true; }, { passive: true });
-  fireBtn.addEventListener('touchend', () => { keys[' '] = false; });
+      window.addEventListener('keyup', (e) => {
+        if (e.key === 'ArrowLeft') this.state.left = false;
+        if (e.key === 'ArrowRight') this.state.right = false;
+        if (e.key === ' ') this.state.fire = false;
+      });
+    }
+
+    setupMobile() {
+      // Only create on touch devices
+      const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      if (!isTouchDevice) return;
+
+      // Inject CSS
+      const style = document.createElement('style');
+      style.id = 'mobile-controls-style';
+      style.textContent = `
+        #mobile-controls-container {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 120px;
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+          z-index: 100;
+          padding: env(safe-area-inset-bottom, 0) env(safe-area-inset-right, 0) 0 env(safe-area-inset-left, 0);
+          pointer-events: none;
+        }
+        .mobile-control-btn {
+          width: 30%;
+          height: 90px;
+          background: rgba(0, 255, 255, 0.2);
+          border: 3px solid rgba(0, 255, 255, 0.6);
+          border-radius: 12px;
+          color: #00ffff;
+          font-family: 'Press Start 2P', monospace;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          user-select: none;
+          touch-action: none;
+          pointer-events: auto;
+          transition: all 0.1s ease;
+        }
+        .mobile-control-btn.pressed {
+          background: rgba(0, 255, 255, 0.5);
+          border-color: rgba(0, 255, 255, 1);
+          transform: scale(0.95);
+        }
+        .mobile-control-btn:active {
+          background: rgba(0, 255, 255, 0.5);
+        }
+      `;
+      document.head.appendChild(style);
+
+      // Create controls
+      const container = document.createElement('div');
+      container.id = 'mobile-controls-container';
+
+      const leftBtn = document.createElement('button');
+      leftBtn.className = 'mobile-control-btn';
+      leftBtn.textContent = '◀';
+      leftBtn.setAttribute('aria-label', 'Move Left');
+      leftBtn.setAttribute('aria-pressed', 'false');
+
+      const fireBtn = document.createElement('button');
+      fireBtn.className = 'mobile-control-btn';
+      fireBtn.textContent = '🔥';
+      fireBtn.setAttribute('aria-label', 'Fire');
+      fireBtn.setAttribute('aria-pressed', 'false');
+
+      const rightBtn = document.createElement('button');
+      rightBtn.className = 'mobile-control-btn';
+      rightBtn.textContent = '▶';
+      rightBtn.setAttribute('aria-label', 'Move Right');
+      rightBtn.setAttribute('aria-pressed', 'false');
+
+      container.appendChild(leftBtn);
+      container.appendChild(fireBtn);
+      container.appendChild(rightBtn);
+      document.body.appendChild(container);
+
+      this.mobileControls = { container, leftBtn, fireBtn, rightBtn };
+
+      // Setup pointer events for multi-touch support
+      this.setupPointerEvents(leftBtn, 'left');
+      this.setupPointerEvents(rightBtn, 'right');
+      this.setupPointerEvents(fireBtn, 'fire');
+    }
+
+    setupPointerEvents(button, action) {
+      const updateState = (pressed) => {
+        if (!this.enabled) return;
+        this.state[action] = pressed;
+        button.classList.toggle('pressed', pressed);
+        button.setAttribute('aria-pressed', pressed.toString());
+      };
+
+      button.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        updateState(true);
+      }, { passive: false });
+
+      button.addEventListener('pointerup', (e) => {
+        e.preventDefault();
+        updateState(false);
+      }, { passive: false });
+
+      button.addEventListener('pointercancel', (e) => {
+        e.preventDefault();
+        updateState(false);
+      }, { passive: false });
+
+      button.addEventListener('pointerleave', (e) => {
+        e.preventDefault();
+        updateState(false);
+      }, { passive: false });
+    }
+
+    setupVisibilityHandlers() {
+      // Reset input on visibility change or blur
+      const resetInput = () => {
+        this.state.left = false;
+        this.state.right = false;
+        this.state.fire = false;
+        if (this.mobileControls) {
+          [this.mobileControls.leftBtn, this.mobileControls.rightBtn, this.mobileControls.fireBtn].forEach(btn => {
+            btn.classList.remove('pressed');
+            btn.setAttribute('aria-pressed', 'false');
+          });
+        }
+      };
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) resetInput();
+      });
+
+      window.addEventListener('blur', resetInput);
+    }
+
+    attach() {
+      this.enabled = true;
+      if (this.mobileControls) {
+        this.mobileControls.container.style.display = 'flex';
+      }
+    }
+
+    detach() {
+      this.enabled = false;
+      this.state.left = false;
+      this.state.right = false;
+      this.state.fire = false;
+      if (this.mobileControls) {
+        this.mobileControls.container.style.display = 'none';
+        [this.mobileControls.leftBtn, this.mobileControls.rightBtn, this.mobileControls.fireBtn].forEach(btn => {
+          btn.classList.remove('pressed');
+          btn.setAttribute('aria-pressed', 'false');
+        });
+      }
+    }
+  }
+
+  const input = new InputController();
 
   // ===== Render Loop =====
   function animate() {
@@ -257,9 +438,10 @@
       return;
     }
 
-    // Shooting Logic
-    if (keys[' '] && player) {
+    // Shooting Logic with rate limiting
+    if (input.state.fire && player && state.gameState === 'playing') {
       if (state.powerup === 'laser') {
+        // Laser powerup: continuous beam
         if (!laserBeam) {
           const beamGeometry = new THREE.CylinderGeometry(0.1, 0.1, gameHeight * 2, 8);
           const beamMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.7 });
@@ -270,9 +452,11 @@
         laserBeam.position.copy(player.position);
         laserBeam.position.z -= gameHeight; // Position it in front
       } else {
-        if (Date.now() > state.lastShotTime + 250) {
+        // Regular shooting with rate limit
+        const now = Date.now();
+        if (now - lastShotAt >= FIRE_INTERVAL_MS) {
           shoot();
-          state.lastShotTime = Date.now();
+          lastShotAt = now;
         }
       }
     } else {
@@ -475,12 +659,12 @@
       }
     }
 
-    // Player Movement
-    if (player) {
-      if (keys['ArrowLeft']) {
+    // Player Movement - Horizontal only, clamped to game bounds
+    if (player && state.gameState === 'playing') {
+      if (input.state.left) {
         player.position.x = Math.max(-gameWidth / 2, player.position.x - playerSpeed);
       }
-      if (keys['ArrowRight']) {
+      if (input.state.right) {
         player.position.x = Math.min(gameWidth / 2, player.position.x + playerSpeed);
       }
       if (keys['ArrowUp']) {
@@ -505,10 +689,12 @@
   // ===== Game Control Functions =====
   function pause() {
     state.isPaused = true;
+    input.detach();
   }
   
   function resume() {
     state.isPaused = false;
+    input.attach();
   }
   
   function restart() {
@@ -550,6 +736,9 @@
     
     // Update HUD
     updateHUD();
+    
+    // Re-enable input
+    input.attach();
   }
   
   // Expose game control functions globally
