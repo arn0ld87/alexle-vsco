@@ -31,28 +31,45 @@ const kiKeywords = [
 
 function extractThumbnail(item: any) {
   // Versuche verschiedene Methoden für Thumbnail-Extraktion
+  
+  // 1. Enclosure (RSS Standard)
   if (item.enclosure?.type?.startsWith('image/')) {
     return item.enclosure.url;
   }
   
+  // 2. Media Content (Media RSS)
   if (item['media:content']?.[0]?.['$']?.url) {
     return item['media:content'][0]['$'].url;
   }
   
-  // Fallback: Suche nach Bildern im Content
+  // 3. Media Thumbnail (Media RSS)
+  if (item['media:thumbnail']?.['$']?.url) {
+    return item['media:thumbnail']['$'].url;
+  }
+  
+  // 4. Suche nach Bildern im Content
   const content = item.content || item.contentSnippet || '';
   const imgMatch = content.match(/<img[^>]+src="([^"]+)"/i);
   if (imgMatch) {
     return imgMatch[1];
   }
   
-  // Default Thumbnail basierend auf Quelle
+  // 5. Suche nach Bildern mit verschiedenen Attributen
+  const imgMatch2 = content.match(/<img[^>]+src='([^']+)'/i);
+  if (imgMatch2) {
+    return imgMatch2[1];
+  }
+  
+  // 6. Default Thumbnail basierend auf Quelle
   const defaultThumbnails: Record<string, string> = {
-    'Heise': '/media/heise-logo.png',
-    'Golem': '/media/golem-logo.png',
-    'TechCrunch AI': '/media/techcrunch-logo.png',
-    'OpenAI Blog': '/media/openai-logo.png',
-    'Google AI Blog': '/media/google-logo.png'
+    'Heise': '/media/alex-gemini.png',
+    'Golem': '/media/alex-gemini.png',
+    'TechCrunch AI': '/media/alex-gemini.png',
+    'OpenAI Blog': '/media/alex-gemini.png',
+    'ZDNet AI': '/media/alex-gemini.png',
+    'MIT Technology Review': '/media/alex-gemini.png',
+    'VentureBeat': '/media/alex-gemini.png',
+    'Wired': '/media/alex-gemini.png'
   };
   
   return defaultThumbnails[item.source] || '/media/default-news.png';
