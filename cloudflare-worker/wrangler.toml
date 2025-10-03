@@ -1,0 +1,9 @@
+name = "cms-auth-alexle135"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Environment Variables (werden über Cloudflare Dashboard gesetzt)
+# Diese Variablen NICHT hier eintragen, sondern im Dashboard!
+[vars]
+# GITHUB_CLIENT_ID = "wird im Dashboard gesetzt"
+# GITHUB_CLIENT_SECRET = "wird im Dashboard gesetzt"
