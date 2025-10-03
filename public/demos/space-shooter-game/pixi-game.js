@@ -51,7 +51,7 @@
       explosionAlt: ASSET_BASE + 'Audio/explosionCrunch_002.ogg',
       powerup: ASSET_BASE + 'Audio/forceField_001.ogg',
       hit: ASSET_BASE + 'Audio/forceField_000.ogg',
-      music: ASSET_BASE + 'Audio/spaceEngineLow_004.ogg',
+      music: ASSET_BASE + 'Audio/engineCircular_003.ogg',
       menuClick: ASSET_BASE + 'Audio/computerNoise_000.ogg',
       levelComplete: ASSET_BASE + 'Audio/doorOpen_001.ogg',
     },
@@ -202,6 +202,7 @@
   const scoreLabel = makeLabel('PUNKTE: 0'); scoreLabel.y = 14; hudLeft.addChild(scoreLabel);
   const levelLabel = makeLabel('LEVEL: 1'); levelLabel.y = 28; hudLeft.addChild(levelLabel);
   const livesLabel = makeLabel('LEBEN: 3'); livesLabel.y = 42; hudLeft.addChild(livesLabel);
+  const progressLabel = makeLabel('FORTSCHRITT: 0%', 8, 0xffff00); progressLabel.y = 56; hudLeft.addChild(progressLabel);
 
   const brand1 = makeLabel('alexle135.de', 8, 0xffff00); hudRight.addChild(brand1);
   const brand2 = makeLabel('COSMIC DEFENDER', 6, 0xffff00); brand2.y = 12; hudRight.addChild(brand2);
@@ -231,10 +232,15 @@
     progressBar.clear();
     progressBar.lineStyle(2, 0xffff00, 1);
     progressBar.beginFill(0x333333, 1).drawRect(x, py, w, h).endFill();
-    const p = Math.min(1, ((state.score % state.targetScore) / state.targetScore));
+    const p = Math.min(1, (state.score / (state.level * state.targetScore)));
     const pf = new PIXI.Graphics();
     pf.beginFill(0x00ffff).drawRect(0, 0, p * w, h).endFill();
     progressBar.addChild(pf); pf.x = x; pf.y = py;
+    
+    // Progress-Label darüber
+    const labelText = new PIXI.Text(`${Math.floor(p * 100)}%`, { fontFamily: 'Press Start 2P', fontSize: 8, fill: 0xffffff });
+    labelText.x = x + w / 2 - labelText.width / 2; labelText.y = py - 12;
+    progressBar.addChild(labelText);
   }
 
   function updateHud() {
@@ -242,6 +248,8 @@
     scoreLabel.text = `PUNKTE: ${state.score}`;
     levelLabel.text = `LEVEL: ${state.level}`;
     livesLabel.text = `LEBEN: ${state.lives}`;
+    const levelProgressPercent = Math.floor(Math.min(100, (state.score / (state.level * state.targetScore)) * 100));
+    progressLabel.text = `FORTSCHRITT: ${levelProgressPercent}%`;
     soundToggle.text = `${soundsEnabled ? '🔊' : '🔇'} SOUND`;
     musicToggle.text = `${musicEnabled ? '🎵' : '🔇'} MUSIK`;
     drawBars();
@@ -257,14 +265,15 @@
   function makeButton(label, onClick) {
     const c = new PIXI.Container();
     const g = new PIXI.Graphics();
-    g.beginFill(0x00ffff).drawRoundedRect(0, 0, 260, 40, 6).endFill();
+    g.beginFill(0x00ffff).drawRoundedRect(0, 0, 300, 45, 6).endFill();
     g.tint = 0x00aaff;
-    const t = new PIXI.Text(label, { fontFamily: 'Press Start 2P', fontSize: 12, fill: 0x000000 });
-    t.x = 130 - t.width / 2; t.y = 10;
+    const t = new PIXI.Text(label, { fontFamily: 'Press Start 2P', fontSize: 13, fill: 0x000000 });
+    t.anchor.set(0.5);
+    t.x = 150; t.y = 22;
     c.addChild(g, t);
     c.interactive = true; c.eventMode = 'static';
     c.on('pointertap', () => { playSound('menuClick', 0.4); onClick(); });
-    c.on('pointerover', () => { c.scale.set(1.03); });
+    c.on('pointerover', () => { c.scale.set(1.05); });
     c.on('pointerout', () => { c.scale.set(1.0); });
     return c;
   }
@@ -278,19 +287,21 @@
   const center = { x: app.screen.width/2, y: app.screen.height/2 };
 
   const mainMenu = new PIXI.Container(); uiLayer.addChild(mainMenu); mainMenu.visible = false; mainMenu.position.set(center.x, center.y);
-  mainMenu.addChild(makePanel());
-  const title = new PIXI.Text('COSMIC\nDEFENDER', { fontFamily: 'Press Start 2P', fontSize: 28, fill: 0x00ffff, align: 'center' }); title.anchor.set(0.5); title.y = -100; mainMenu.addChild(title);
-  const startBtn = makeButton('SPIEL STARTEN', () => showNameInput()); startBtn.y = -10; startBtn.x = -130; mainMenu.addChild(startBtn);
-  const hsBtn = makeButton('HIGHSCORES', () => showHighscores()); hsBtn.y = 50; hsBtn.x = -130; mainMenu.addChild(hsBtn);
+  mainMenu.addChild(makePanel(450, 400));
+  const title = new PIXI.Text('COSMIC\nDEFENDER', { fontFamily: 'Press Start 2P', fontSize: 32, fill: 0x00ffff, align: 'center', dropShadow: true, dropShadowDistance: 2, dropShadowColor: '#004444' }); title.anchor.set(0.5); title.y = -120; mainMenu.addChild(title);
+  const subtitle = new PIXI.Text('Verteidige die Galaxie!', { fontFamily: 'Press Start 2P', fontSize: 10, fill: 0xffffff }); subtitle.anchor.set(0.5); subtitle.y = -40; mainMenu.addChild(subtitle);
+  const startBtn = makeButton('SPIEL STARTEN', () => showNameInput()); startBtn.y = 20; startBtn.x = -150; mainMenu.addChild(startBtn);
+  const hsBtn = makeButton('HIGHSCORES', () => showHighscores()); hsBtn.y = 80; hsBtn.x = -150; mainMenu.addChild(hsBtn);
+  const credits = new PIXI.Text('Entwickelt von Alexander Schneider\nalexle135.de', { fontFamily: 'Press Start 2P', fontSize: 7, fill: 0xffff00, align: 'center' }); credits.anchor.set(0.5); credits.y = 150; mainMenu.addChild(credits);
 
   const nameMenu = new PIXI.Container(); uiLayer.addChild(nameMenu); nameMenu.visible = false; nameMenu.position.set(center.x, center.y);
-  nameMenu.addChild(makePanel());
-  const nameTitle = new PIXI.Text('WILLKOMMEN, PILOT!', { fontFamily: 'Press Start 2P', fontSize: 20, fill: 0xff00ff }); nameTitle.anchor.set(0.5); nameTitle.y = -100; nameMenu.addChild(nameTitle);
-  const namePrompt = new PIXI.Text('Gib deinen Namen ein:', { fontFamily: 'Press Start 2P', fontSize: 12, fill: 0xffffff }); namePrompt.anchor.set(0.5); namePrompt.y = -50; nameMenu.addChild(namePrompt);
-  const inputBg = new PIXI.Graphics(); inputBg.lineStyle(2, 0x00ffff).beginFill(0x000000, 0.5).drawRoundedRect(-150, -20, 300, 40, 6).endFill(); inputBg.y = -10; nameMenu.addChild(inputBg);
-  const nameText = new PIXI.Text('', { fontFamily: 'Press Start 2P', fontSize: 14, fill: 0x00ffff }); nameText.anchor.set(0.5); nameText.y = -10; nameMenu.addChild(nameText);
-  const goBtn = makeButton("LOS GEHT'S!", () => startGame()); goBtn.y = 50; goBtn.x = -130; nameMenu.addChild(goBtn);
-  const backBtn = makeButton('ZURÜCK', () => backToMain()); backBtn.y = 110; backBtn.x = -130; nameMenu.addChild(backBtn);
+  nameMenu.addChild(makePanel(450, 350));
+  const nameTitle = new PIXI.Text('WILLKOMMEN, PILOT!', { fontFamily: 'Press Start 2P', fontSize: 18, fill: 0xff00ff, dropShadow: true }); nameTitle.anchor.set(0.5); nameTitle.y = -120; nameMenu.addChild(nameTitle);
+  const namePrompt = new PIXI.Text('Gib deinen Namen ein:', { fontFamily: 'Press Start 2P', fontSize: 11, fill: 0xffffff }); namePrompt.anchor.set(0.5); namePrompt.y = -60; nameMenu.addChild(namePrompt);
+  const inputBg = new PIXI.Graphics(); inputBg.lineStyle(2, 0x00ffff).beginFill(0x000000, 0.7).drawRoundedRect(-150, -20, 300, 45, 6).endFill(); inputBg.y = -10; nameMenu.addChild(inputBg);
+  const nameText = new PIXI.Text('', { fontFamily: 'Press Start 2P', fontSize: 16, fill: 0x00ffff }); nameText.anchor.set(0.5); nameText.y = 0; nameMenu.addChild(nameText);
+  const goBtn = makeButton("LOS GEHT'S!", () => startGame()); goBtn.y = 60; goBtn.x = -150; nameMenu.addChild(goBtn);
+  const backBtn = makeButton('ZURÜCK', () => backToMain()); backBtn.y = 120; backBtn.x = -150; nameMenu.addChild(backBtn);
 
   const pauseMenu = new PIXI.Container(); uiLayer.addChild(pauseMenu); pauseMenu.visible = false; pauseMenu.position.set(center.x, center.y);
   pauseMenu.addChild(makePanel());
