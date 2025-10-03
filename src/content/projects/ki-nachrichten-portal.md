@@ -5,41 +5,42 @@ tags:
   - KI
   - Automation
 heroImage: "/media/ki_nachrichten_new.png"
-demo: "/demos/ki-news/"
+demo: "/ki-nachrichten-demo/"
 ---
 
 ## Überblick
-Eine kuratierte Sammlung aktueller KI-Nachrichten, die automatisch aktualisiert wird. Ziel ist ein schneller Überblick über Machine-Learning-Trends und relevante Entwicklungen in der KI-Branche.
+Ein einfaches Tool, das automatisch die neuesten KI-Nachrichten aus verschiedenen RSS-Feeds sammelt und übersichtlich darstellt. Fokus auf deutsche Artikel mit schönen Thumbnails für eine bessere Benutzererfahrung.
 
 ## Problem
-Das alte News-Widget musste täglich manuell gepflegt werden und lieferte häufig veraltete oder irrelevante Quellen. Die Content-Qualität war inkonsistent und die Aktualisierung zeitaufwendig.
+Manuelle Sammlung von KI-Nachrichten ist zeitaufwendig und führt zu veralteten oder irrelevanten Inhalten. Es fehlte eine zentrale Quelle für aktuelle KI-Entwicklungen.
 
 ## Rolle & Verantwortlichkeiten
-Konzeption, technische Umsetzung der Datenerfassung, KI-Klassifikation sowie Gestaltung der responsiven Oberfläche.
+Konzeption, Entwicklung des RSS-Scrapers, Frontend-Integration und Deployment der Demo-Anwendung.
 
 ## Lösung & Vorgehen
-- **Automatisierte Feeds** via RSS + OpenAI-Tagging für Content-Klassifikation
-- **Content-Pipeline** mit Cron-basiertem Scraper und Qualitätsprüfroutinen
-- **Review-Step** im CMS, bevor Inhalte live gehen
-- **Trend-Analyse** mit Sentiment-Detection und Keyword-Extraktion
+- **RSS-Scraping**: Node.js Script mit rss-parser für automatische Datenerfassung
+- **Content-Filterung**: Keyword-basierte Filterung für KI-relevante Artikel
+- **Thumbnail-Extraktion**: Automatische Bild-Extraktion aus Artikeln
+- **Deutsche Priorität**: Bevorzugung deutscher Quellen (Heise, Golem, Computerwoche)
+- **Live-Updates**: Automatische Aktualisierung alle 6 Stunden
 
 ## Architektur & Tools
-- **Scheduler**: GitHub Actions (täglich um 6:00 Uhr)
-- **Scraping**: Node.js Script mit Cheerio & Puppeteer für dynamische Inhalte
-- **KI-Klassifikation**: OpenAI API für Content-Tagging und Relevanz-Scoring
-- **Frontend**: Astro mit Content Collections für statische Generierung
-- **Monitoring**: Custom Analytics für Click-Rates und Engagement-Metriken
+- **Backend**: Node.js + Express.js für API-Server
+- **RSS-Parser**: rss-parser für Feed-Abfrage
+- **Frontend**: Vanilla JavaScript mit Fetch API
+- **Datenquellen**: 10+ RSS-Feeds (deutsche + internationale KI-Quellen)
+- **Deployment**: Lokaler Server mit automatischem Scraping
 
 ## Ergebnisse & Kennzahlen
-- **Automatisierung**: 95% der Inhalte werden ohne manuellen Eingriff verarbeitet
-- **Content-Qualität**: 92% relevante Artikel (vs. 65% manuell kuratiert)
-- **Performance**: Ladezeit < 1.2s, Lighthouse Score 98/100
-- **Engagement**: 40% höhere Click-Rates durch bessere Relevanz
-- **Zeitersparnis**: 8h/Woche weniger manuelle Content-Pflege
-- **Trend-Früherkennung**: 3-5 Tage frühere Identifikation relevanter Entwicklungen
+- **Automatisierung**: 100% automatische Datenerfassung ohne manuellen Eingriff
+- **Content-Vielfalt**: 10+ RSS-Feeds mit deutschen und internationalen Quellen
+- **Performance**: Ladezeit < 1.2s, Live-Updates alle 5 Minuten
+- **Deutsche Priorität**: Bevorzugung deutscher Artikel für bessere Lokalisierung
+- **Thumbnail-Qualität**: Automatische Bild-Extraktion für visuelle Attraktivität
+- **Echtzeit-Daten**: Aktuelle Artikel mit Zeitstempel und Quellen-Angabe
 
 ## Technische Highlights
-- **Multi-Source Aggregation**: 15+ RSS-Feeds von führenden KI-Publikationen
-- **Intelligent Filtering**: ML-basierte Duplikatserkennung und Spam-Filter
+- **Multi-Source Aggregation**: RSS-Feeds von Heise, Golem, TechCrunch, OpenAI, etc.
+- **Intelligent Filtering**: Keyword-basierte KI-Relevanz-Filterung
 - **Responsive Design**: Optimiert für Desktop, Tablet und Mobile
-- **SEO-Optimierung**: Automatische Meta-Tags und Schema.org Markup
+- **Fallback-System**: Graceful Degradation bei API-Ausfällen

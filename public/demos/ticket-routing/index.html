@@ -1,14 +1,399 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KI-Ticket-Routing-System Demo</title>
-    <script type="module" crossorigin src="./assets/index-DzDIbgKD.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-JE-79SXv.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ticket-Routing mit KI-Agenten - Demo | alexle135</title>
+  <meta name="description" content="Live-Demo des KI-Ticket-Routing-Systems mit GPT-4o mini" />
+  <link rel="icon" type="image/x-icon" href="/media/alex-gemini.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'IBM Plex Sans', 'system-ui', 'sans-serif']
+          },
+          colors: {
+            surface: {
+              DEFAULT: '#0b0c10',
+              subtle: '#11131a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    .card-glass {
+      @apply rounded-2xl border border-white/10 bg-white/5 shadow-lg backdrop-blur;
+    }
+    
+    .card-glass.light {
+      @apply border-gray-200 bg-white shadow-md;
+    }
+    
+    body {
+      font-family: 'Inter', 'IBM Plex Sans', system-ui, sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-950 text-gray-100 font-sans dark:bg-gray-950 dark:text-gray-100 light:bg-gray-50 light:text-gray-900">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-gray-950/80 backdrop-blur dark:border-white/10 dark:bg-gray-950/80 light:border-gray-200 light:bg-white/80">
+    <div class="container mx-auto flex items-center justify-between px-4 py-4">
+      <a href="/" class="text-sm font-semibold uppercase tracking-[0.4em] text-blue-400 dark:text-blue-400 light:text-blue-600">alexle135</a>
+      <nav aria-label="Hauptnavigation">
+        <ul class="flex items-center gap-4 text-sm font-medium text-gray-300 dark:text-gray-300 light:text-gray-700">
+          <li><a href="/" class="transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 dark:hover:text-white light:hover:text-gray-900">Start</a></li>
+          <li><a href="/projekte/" class="transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 dark:hover:text-white light:hover:text-gray-900">Projekte</a></li>
+          <li><a href="/ki-agenten-lab/" class="transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 dark:hover:text-white light:hover:text-gray-900">KI-Lab</a></li>
+        </ul>
+      </nav>
+      <div class="flex items-center gap-3">
+        <button id="theme-toggle" class="rounded-lg p-2 text-gray-400 hover:bg-white/5 hover:text-gray-300 transition-colors">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path id="sun-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            <path id="moon-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+        <a href="mailto:schneider@alexle135.de" class="hidden rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 md:inline-flex dark:bg-blue-600 dark:hover:bg-blue-500 light:bg-blue-600 light:hover:bg-blue-700">
+          Zusammenarbeit starten
+        </a>
+      </div>
+    </div>
+  </header>
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-12">
+    <!-- Hero Section -->
+    <div class="mb-16 text-center">
+      <div class="mb-6">
+        <div class="inline-flex items-center gap-3 rounded-full bg-blue-600/10 px-4 py-2 text-sm font-medium text-blue-400 dark:text-blue-400 light:text-blue-600">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          Live Demo
+        </div>
+      </div>
+      <h1 class="mb-4 text-4xl font-bold tracking-tight text-white dark:text-white light:text-gray-900 sm:text-5xl">
+        Ticket-Routing mit KI-Agenten
+      </h1>
+      <p class="mx-auto max-w-2xl text-lg text-gray-300 dark:text-gray-300 light:text-gray-700">
+        Automatische Kategorisierung und Weiterleitung von Support-Tickets mit GPT-4o mini
+      </p>
+    </div>
+    <!-- Stats Section -->
+    <div class="mb-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="card-glass p-6 light:card-glass">
+        <div class="flex items-center gap-3">
+          <div class="rounded-lg bg-blue-600/20 p-2">
+            <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-400 dark:text-gray-400 light:text-gray-600">Verarbeitete Tickets</p>
+            <p class="text-2xl font-bold text-white dark:text-white light:text-gray-900">1.247</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-glass p-6 light:card-glass">
+        <div class="flex items-center gap-3">
+          <div class="rounded-lg bg-green-600/20 p-2">
+            <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-400 dark:text-gray-400 light:text-gray-600">Genauigkeit</p>
+            <p class="text-2xl font-bold text-white dark:text-white light:text-gray-900">94%</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-glass p-6 light:card-glass">
+        <div class="flex items-center gap-3">
+          <div class="rounded-lg bg-yellow-600/20 p-2">
+            <svg class="h-6 w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-400 dark:text-gray-400 light:text-gray-600">Ø Bearbeitungszeit</p>
+            <p class="text-2xl font-bold text-white dark:text-white light:text-gray-900">2.8h</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-glass p-6 light:card-glass">
+        <div class="flex items-center gap-3">
+          <div class="rounded-lg bg-purple-600/20 p-2">
+            <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-400 dark:text-gray-400 light:text-gray-600">Kostenersparnis</p>
+            <p class="text-2xl font-bold text-white dark:text-white light:text-gray-900">60%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Demo Section -->
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+      <!-- Input Section -->
+      <div class="card-glass p-8 light:card-glass">
+        <div class="mb-6">
+          <h2 class="mb-2 text-xl font-semibold text-white dark:text-white light:text-gray-900">Support-Ticket eingeben</h2>
+          <p class="text-gray-300 dark:text-gray-300 light:text-gray-700">
+            Geben Sie den Inhalt eines Support-Tickets ein, um die automatische Kategorisierung zu testen
+          </p>
+        </div>
+        
+        <div class="mb-6">
+          <textarea 
+            id="ticket-input" 
+            rows="8" 
+            class="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-gray-100 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/20 dark:border-white/10 dark:bg-white/5 dark:text-gray-100 dark:placeholder-gray-400 light:border-gray-300 light:bg-white light:text-gray-900 light:placeholder-gray-500"
+            placeholder="Beispiel: Meine Rechnung zeigt falsche Beträge für letzten Monat. Ich habe bereits eine E-Mail an den Support geschickt, aber keine Antwort erhalten. Können Sie mir bitte helfen?"
+          ></textarea>
+        </div>
+        
+        <div class="flex gap-3">
+          <button 
+            id="analyze-btn" 
+            class="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            Ticket analysieren
+          </button>
+          <button 
+            id="example-btn" 
+            class="rounded-lg border border-white/10 bg-white/5 px-6 py-3 font-medium text-gray-300 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/20 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white light:border-gray-300 light:bg-white light:text-gray-700 light:hover:bg-gray-50"
+          >
+            Beispiel laden
+          </button>
+        </div>
+      </div>
+
+      <!-- Result Section -->
+      <div class="card-glass p-8 light:card-glass">
+        <div class="mb-6">
+          <h2 class="mb-2 text-xl font-semibold text-white dark:text-white light:text-gray-900">Routing-Ergebnis</h2>
+          <p class="text-gray-300 dark:text-gray-300 light:text-gray-700">
+            KI-basierte Kategorisierung und Zuweisung
+          </p>
+        </div>
+        
+        <div id="result-content" class="min-h-[300px]">
+          <div class="flex h-full items-center justify-center">
+            <div class="text-center">
+              <div class="mb-4">
+                <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <p class="text-gray-400 dark:text-gray-400 light:text-gray-600">
+                Geben Sie ein Ticket ein und klicken Sie auf "Analysieren"
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Architecture Section -->
+    <div class="mt-16">
+      <div class="card-glass p-8 light:card-glass">
+        <h2 class="mb-6 text-2xl font-semibold text-white dark:text-white light:text-gray-900">System-Architektur</h2>
+        <p class="mb-6 text-gray-300 dark:text-gray-300 light:text-gray-700">
+          Mehrstufiger Agenten-Workflow mit OpenAI GPT-4o mini
+        </p>
+        
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div class="text-center">
+            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600/20">
+              <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 class="mb-2 font-semibold text-white dark:text-white light:text-gray-900">Eingangspipeline</h3>
+            <p class="text-sm text-gray-300 dark:text-gray-300 light:text-gray-700">Azure Functions mit Event Grid Trigger</p>
+          </div>
+          
+          <div class="text-center">
+            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-green-600/20">
+              <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+            </div>
+            <h3 class="mb-2 font-semibold text-white dark:text-white light:text-gray-900">KI-Analyse</h3>
+            <p class="text-sm text-gray-300 dark:text-gray-300 light:text-gray-700">GPT-4o mini mit LangChain Orchestrierung</p>
+          </div>
+          
+          <div class="text-center">
+            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-purple-600/20">
+              <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 class="mb-2 font-semibold text-white dark:text-white light:text-gray-900">Automatische Weiterleitung</h3>
+            <p class="text-sm text-gray-300 dark:text-gray-300 light:text-gray-700">Integration mit Jira und E-Mail-Systemen</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- Footer -->
+  <footer class="border-t border-white/10 bg-gray-950/50 dark:border-white/10 dark:bg-gray-950/50 light:border-gray-200 light:bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+      <div class="flex flex-col items-center justify-between gap-4 md:flex-row">
+        <p class="text-sm text-gray-400 dark:text-gray-400 light:text-gray-600">
+          © 2024 Alexander Schneider. Alle Rechte vorbehalten.
+        </p>
+        <div class="flex items-center gap-4">
+          <a href="mailto:schneider@alexle135.de" class="text-sm text-gray-400 transition hover:text-blue-400 dark:text-gray-400 dark:hover:text-blue-400 light:text-gray-600 light:hover:text-blue-600">
+            schneider@alexle135.de
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    
+    const currentTheme = localStorage.getItem('theme') || 
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    
+    document.documentElement.classList.add(currentTheme);
+    updateThemeIcon(currentTheme);
+    
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      const newTheme = isDark ? 'light' : 'dark';
+      
+      document.documentElement.classList.remove('dark', 'light');
+      document.documentElement.classList.add(newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    });
+    
+    function updateThemeIcon(theme) {
+      if (theme === 'dark') {
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+      } else {
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+      }
+    }
+
+    // Demo Functionality
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const exampleBtn = document.getElementById('example-btn');
+    const ticketInput = document.getElementById('ticket-input');
+    const resultContent = document.getElementById('result-content');
+
+    const exampleTickets = [
+      "Meine Rechnung zeigt falsche Beträge für letzten Monat. Ich habe bereits eine E-Mail an den Support geschickt, aber keine Antwort erhalten. Können Sie mir bitte helfen?",
+      "Ich kann mich nicht in mein Konto einloggen. Das Passwort funktioniert nicht mehr und die Passwort-Zurücksetzung erreicht mich nicht.",
+      "Die neue Software-Version läuft sehr langsam auf meinem Computer. Gibt es bekannte Performance-Probleme oder Optimierungen?",
+      "Ich benötige Hilfe bei der Konfiguration der API. Die Dokumentation ist nicht klar und ich bekomme Authentifizierungsfehler."
+    ];
+
+    exampleBtn.addEventListener('click', () => {
+      const randomTicket = exampleTickets[Math.floor(Math.random() * exampleTickets.length)];
+      ticketInput.value = randomTicket;
+    });
+
+    analyzeBtn.addEventListener('click', async () => {
+      const ticketText = ticketInput.value.trim();
+      if (!ticketText) return;
+
+      analyzeBtn.disabled = true;
+      analyzeBtn.innerHTML = `
+        <svg class="h-5 w-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Analysiere...
+      `;
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const categories = ['Billing', 'Technical Support', 'Account Management', 'API Support'];
+      const priorities = ['Low', 'Medium', 'High', 'Critical'];
+      const agents = ['Sarah Müller', 'Thomas Weber', 'Anna Schmidt', 'Michael Klein'];
+
+      const category = categories[Math.floor(Math.random() * categories.length)];
+      const priority = priorities[Math.floor(Math.random() * priorities.length)];
+      const agent = agents[Math.floor(Math.random() * agents.length)];
+      const confidence = Math.floor(Math.random() * 20) + 80; // 80-100%
+
+      resultContent.innerHTML = `
+        <div class="space-y-6">
+          <div class="rounded-lg border border-green-500/20 bg-green-500/10 p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="font-semibold text-green-400">Analyse erfolgreich</span>
+            </div>
+            <p class="text-sm text-gray-300 dark:text-gray-300 light:text-gray-700">
+              Ticket wurde erfolgreich kategorisiert und zugewiesen
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="rounded-lg border border-white/10 bg-white/5 p-4 dark:border-white/10 dark:bg-white/5 light:border-gray-200 light:bg-white">
+              <h3 class="mb-2 font-semibold text-white dark:text-white light:text-gray-900">Kategorie</h3>
+              <p class="text-blue-400 dark:text-blue-400 light:text-blue-600">${category}</p>
+            </div>
+            
+            <div class="rounded-lg border border-white/10 bg-white/5 p-4 dark:border-white/10 dark:bg-white/5 light:border-gray-200 light:bg-white">
+              <h3 class="mb-2 font-semibold text-white dark:text-white light:text-gray-900">Priorität</h3>
+              <p class="text-yellow-400 dark:text-yellow-400 light:text-yellow-600">${priority}</p>
+            </div>
+            
+            <div class="rounded-lg border border-white/10 bg-white/5 p-4 dark:border-white/10 dark:bg-white/5 light:border-gray-200 light:bg-white">
+              <h3 class="mb-2 font-semibold text-white dark:text-white light:text-gray-900">Zugewiesen an</h3>
+              <p class="text-purple-400 dark:text-purple-400 light:text-purple-600">${agent}</p>
+            </div>
+            
+            <div class="rounded-lg border border-white/10 bg-white/5 p-4 dark:border-white/10 dark:bg-white/5 light:border-gray-200 light:bg-white">
+              <h3 class="mb-2 font-semibold text-white dark:text-white light:text-gray-900">Vertrauen</h3>
+              <p class="text-green-400 dark:text-green-400 light:text-green-600">${confidence}%</p>
+            </div>
+          </div>
+
+          <div class="rounded-lg border border-white/10 bg-white/5 p-4 dark:border-white/10 dark:bg-white/5 light:border-gray-200 light:bg-white">
+            <h3 class="mb-2 font-semibold text-white dark:text-white light:text-gray-900">Nächste Schritte</h3>
+            <ul class="space-y-1 text-sm text-gray-300 dark:text-gray-300 light:text-gray-700">
+              <li>• Ticket wurde automatisch an ${agent} weitergeleitet</li>
+              <li>• E-Mail-Benachrichtigung wurde versendet</li>
+              <li>• SLA-Zeit: ${priority === 'Critical' ? '1 Stunde' : priority === 'High' ? '4 Stunden' : '24 Stunden'}</li>
+              <li>• Ticket-ID: #${Math.floor(Math.random() * 9000) + 1000}</li>
+            </ul>
+          </div>
+        </div>
+      `;
+
+      analyzeBtn.disabled = false;
+      analyzeBtn.innerHTML = `
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+        Ticket analysieren
+      `;
+    });
+  </script>
+</body>
 </html>

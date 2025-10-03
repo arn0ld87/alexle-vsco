@@ -6,7 +6,7 @@ tags:
   - Agenten
   - DevOps
 heroImage: "/media/ticketrouting_new.png"
-demo: "/demos/ticket-routing/"
+demo: "/demos/ticket-routing/index.html"
 ---
 
 ## Problem

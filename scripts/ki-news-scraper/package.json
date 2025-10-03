@@ -1,0 +1,15 @@
+{
+  "name": "ki-news-scraper",
+  "version": "1.0.0",
+  "description": "RSS Scraper für KI-Nachrichten Demo",
+  "main": "scraper.js",
+  "scripts": {
+    "scrape": "node scraper.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "rss-parser": "^3.13.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}

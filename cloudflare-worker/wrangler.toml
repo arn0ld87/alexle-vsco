@@ -1,9 +1,17 @@
-name = "cms-auth-alexle135"
+name = "alexle135-homepage"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
+# Astro Static Site mit API-Endpoints
+[build]
+command = "pnpm build"
+
+# Routes für die Domain
+routes = [
+  { pattern = "alexle135.de/*", zone_name = "alexle135.de" },
+  { pattern = "www.alexle135.de/*", zone_name = "alexle135.de" }
+]
+
 # Environment Variables (werden über Cloudflare Dashboard gesetzt)
-# Diese Variablen NICHT hier eintragen, sondern im Dashboard!
 [vars]
-# GITHUB_CLIENT_ID = "wird im Dashboard gesetzt"
-# GITHUB_CLIENT_SECRET = "wird im Dashboard gesetzt"
+# RSS_FEED_CACHE_TTL = "300"  # 5 Minuten Cache für RSS-Feeds
