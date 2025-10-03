@@ -3,7 +3,7 @@ module.exports = {
   content: [
     './src/**/*.{astro,html,js,ts,jsx,tsx,md,mdx}'
   ],
-  darkMode: 'class',
+  darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     extend: {
       fontFamily: {

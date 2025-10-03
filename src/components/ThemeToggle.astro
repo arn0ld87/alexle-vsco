@@ -5,7 +5,7 @@
   id="theme-toggle"
   type="button"
   aria-label="Theme wechseln"
-  class="rounded-lg p-2 text-gray-400 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white light:text-gray-600 light:hover:bg-gray-200 light:hover:text-gray-900"
+  class="rounded-lg p-2 text-gray-400 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
 >
   <svg id="theme-icon-dark" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
     <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
@@ -20,12 +20,16 @@
   const DARK = 'dark';
   const LIGHT = 'light';
 
-  function setTheme(theme: string) {
+  function setTheme(theme) {
     const root = document.documentElement;
     const isDark = theme === DARK;
 
+    // Remove all theme classes
     root.classList.remove(DARK, LIGHT);
     root.classList.add(theme);
+    
+    // Also set data-theme attribute for better CSS targeting
+    root.setAttribute('data-theme', theme);
 
     const darkIcon = document.getElementById('theme-icon-dark');
     const lightIcon = document.getElementById('theme-icon-light');
