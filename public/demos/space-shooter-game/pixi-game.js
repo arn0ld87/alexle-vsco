@@ -57,8 +57,8 @@
     },
   };
 
-  // Preload
-  const textures = await PIXI.Assets.load({
+  // Preload - Einzeln laden statt bulk-object für bessere Fehlerbehandlung
+  const assetUrls = {
     background: paths.background,
     player: paths.player,
     enemyBasic: paths.enemies.basic,
@@ -71,10 +71,26 @@
     powerupRapid: paths.powerups.rapid,
     powerupTriple: paths.powerups.triple,
     powerupHealth: paths.powerups.health,
-    ...Object.fromEntries(paths.effects.map((p, i) => [
-      `explosion${i + 1}`, p,
-    ])),
+  };
+  
+  // Explosions einzeln
+  for (let i = 1; i <= 8; i++) {
+    assetUrls[`explosion${i}`] = paths.effects[i - 1];
+  }
+  
+  // Lade alle Assets
+  const texturePromises = Object.entries(assetUrls).map(async ([key, url]) => {
+    try {
+      const texture = await PIXI.Assets.load(url);
+      return [key, texture];
+    } catch (err) {
+      console.error(`Failed to load ${key} from ${url}:`, err);
+      return [key, PIXI.Texture.WHITE]; // Fallback
+    }
   });
+  
+  const textureEntries = await Promise.all(texturePromises);
+  const textures = Object.fromEntries(textureEntries);
 
   // ===== Audio (HTMLAudio, clone-on-play) =====
   const audio = {};
