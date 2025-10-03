@@ -5,7 +5,7 @@ tags:
   - JavaScript
   - Game Dev
 heroImage: "/media/spaceshooter.png"
-demo: "space-shooter.html"
+demo: "/demos/space-shooter-game/"
 ---
 ## Überblick
 Ein kleines Arcade-Spiel im Browser, umgesetzt mit HTML5 Canvas und Vanilla JavaScript. Fokus lag auf Spiellogik, Animationen und Kollisionsabfragen.

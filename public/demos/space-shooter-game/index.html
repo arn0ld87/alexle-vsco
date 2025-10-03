@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Defender – Space Shooter von Alexander Schneider</title>
+    <meta name="description" content="Ein modernes HTML5 Space Shooter Game mit professionellen Sprites und Sound-Effekten">
+    <meta name="author" content="Alexander Schneider">
+    <link rel="canonical" href="https://alexle135.de/demos/space-shooter-game/" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Startseite",
+          "item": "https://alexle135.de/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Projekte",
+          "item": "https://alexle135.de/projekte/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Space Shooter Game",
+          "item": "https://alexle135.de/projekte/space-shooter-game/"
+        }
+      ]
+    }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0e27;
+            font-family: 'Press Start 2P', monospace;
+            color: #fff;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #gameContainer {
+            position: relative;
+        }
+        
+        #gameCanvas {
+            border: 4px solid #00ffff;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.5),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            background: #000;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        
+        /* Menü-Styling */
+        .menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(10, 14, 39, 0.95);
+            padding: 40px;
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            display: none;
+            z-index: 10;
+            min-width: 400px;
+        }
+        
+        .menu.active {
+            display: block;
+        }
+        
+        .menu h1 {
+            font-size: 28px;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        
+        .menu h2 {
+            font-size: 20px;
+            color: #ff00ff;
+            margin-bottom: 20px;
+        }
+        
+        .menu p {
+            font-size: 10px;
+            color: #fff;
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+        
+        .author-credit {
+            font-size: 8px;
+            color: #00ffff;
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+        
+        .domain-credit {
+            font-size: 10px;
+            color: #ffff00;
+            margin-top: 10px;
+        }
+        
+        .menu-button {
+            background: linear-gradient(180deg, #00ffff 0%, #0088ff 100%);
+            border: none;
+            color: #000;
+            padding: 15px 40px;
+            font-size: 14px;
+            font-family: 'Press Start 2P', monospace;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 0 #006666;
+        }
+        
+        .menu-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #006666;
+        }
+        
+        .menu-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #006666;
+        }
+        
+        /* Name-Input */
+        .name-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            font-size: 14px;
+            font-family: 'Press Start 2P', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            text-align: center;
+            margin: 20px auto;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        
+        /* HUD */
+        .hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 10px;
+            color: #00ffff;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+            z-index: 5;
+            background: rgba(10, 14, 39, 0.8);
+            padding: 10px;
+            border: 2px solid #00ffff;
+            border-radius: 5px;
+        }
+        
+        .hud div {
+            margin: 5px 0;
+        }
+        
+        .hud-right {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 8px;
+            color: #ffff00;
+            text-shadow: 0 0 5px rgba(255, 255, 0, 0.8);
+            z-index: 5;
+            background: rgba(10, 14, 39, 0.8);
+            padding: 8px;
+            border: 2px solid #ffff00;
+            border-radius: 5px;
+            text-align: right;
+        }
+        
+        /* Zurück-Button */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 0, 255, 0.8);
+            border: 2px solid #ff00ff;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 10px;
+            font-family: 'Press Start 2P', monospace;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            z-index: 15;
+        }
+        
+        .back-button:hover {
+            background: #ff00ff;
+            transform: scale(1.05);
+        }
+        
+        /* Health & Progress Bars */
+        .health-bar, .progress-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            height: 20px;
+            background: #333;
+            border: 2px solid #00ffff;
+            z-index: 5;
+        }
+        
+        .progress-bar {
+            bottom: 50px;
+            border-color: #ffff00;
+        }
+        
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #ffff00, #ff0000);
+            transition: width 0.3s;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffff00, #00ffff);
+            transition: width 0.3s;
+        }
+        
+        .bar-label {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            font-size: 8px;
+            color: #fff;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+        }
+        
+        /* Highscore-Liste */
+        .highscore-list {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .highscore-entry {
+            margin: 8px 0;
+            color: #ffff00;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .highscore-entry:nth-child(1) {
+            color: #FFD700;
+            font-size: 12px;
+        }
+        
+        .highscore-entry:nth-child(2) {
+            color: #C0C0C0;
+        }
+        
+        .highscore-entry:nth-child(3) {
+            color: #CD7F32;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <a href="/" class="back-button">← HOME</a>
+        
+        <!-- HUD Links -->
+        <div class="hud">
+            <div>SPIELER: <span id="playerNameDisplay">---</span></div>
+            <div>PUNKTE: <span id="scoreDisplay">0</span></div>
+            <div>LEVEL: <span id="levelDisplay">1</span></div>
+            <div>LEBEN: <span id="livesDisplay">3</span></div>
+        </div>
+        
+        <!-- Combo Display (Mitte Oben) -->
+        <div id="comboDisplay" style="display: none; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); text-align: center; z-index: 5;">
+            <div style="font-size: 20px; color: #ffff00; text-shadow: 0 0 10px rgba(255, 255, 0, 0.8); font-family: 'Press Start 2P', monospace;">
+                COMBO: <span id="comboCount">0</span>
+            </div>
+            <div style="font-size: 14px; color: #00ffff; margin-top: 5px; font-family: 'Press Start 2P', monospace;">
+                <span id="comboMultiplier">1.0x</span>
+            </div>
+        </div>
+        
+        <!-- HUD Rechts (Branding) -->
+        <div class="hud-right">
+            <div>alexle135.de</div>
+            <div style="margin-top: 5px; font-size: 6px;">COSMIC DEFENDER</div>
+            <div style="margin-top: 10px; font-size: 8px; cursor: pointer; user-select: none;" 
+                 onclick="toggleSound()" title="Sound an/aus (Taste: M)">
+                <span id="soundIcon">🔊</span> SOUND
+            </div>
+            <div style="margin-top: 5px; font-size: 8px; cursor: pointer; user-select: none;" 
+                 onclick="toggleMusic()" title="Musik an/aus (Taste: N)">
+                <span id="musicIcon">🎵</span> MUSIK
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <!-- Health Bar -->
+        <div class="health-bar">
+            <div class="bar-label">GESUNDHEIT</div>
+            <div class="health-fill" id="healthFill" style="width: 100%"></div>
+        </div>
+        
+        <!-- Level Progress Bar -->
+        <div class="progress-bar">
+            <div class="bar-label">LEVEL-FORTSCHRITT</div>
+            <div class="progress-fill" id="levelProgressFill" style="width: 0%"></div>
+        </div>
+        
+        <!-- Hauptmenü -->
+        <div id="mainMenu" class="menu">
+            <h1>COSMIC<br>DEFENDER</h1>
+            <p>Verteidige die Galaxie gegen<br>außerirdische Invasoren!</p>
+            <button class="menu-button" onclick="showNameInput()">SPIEL STARTEN</button>
+            <button class="menu-button" onclick="showHighscores()">HIGHSCORES</button>
+            <p style="margin-top: 30px; font-size: 9px;">
+                <strong>Steuerung:</strong><br>
+                PFEILTASTEN - Bewegen<br>
+                LEERTASTE - Schießen<br>
+                P / ESC - Pause<br>
+                M - Sound an/aus<br>
+                N - Musik an/aus
+            </p>
+            <div class="author-credit">
+                Entwickelt von<br>Alexander Schneider
+            </div>
+            <div class="domain-credit">
+                alexle135.de
+            </div>
+        </div>
+        
+        <!-- Name-Eingabe -->
+        <div id="nameInputMenu" class="menu">
+            <h2>WILLKOMMEN, PILOT!</h2>
+            <p>Gib deinen Namen ein:</p>
+            <input type="text" id="playerNameInput" class="name-input" maxlength="20" placeholder="DEIN NAME">
+            <br>
+            <button class="menu-button" onclick="startGameWithName()">LOS GEHT'S!</button>
+            <button class="menu-button" onclick="backToMain()">ZURÜCK</button>
+        </div>
+        
+        <!-- Pause-Menü -->
+        <div id="pauseMenu" class="menu">
+            <h2>PAUSIERT</h2>
+            <button class="menu-button" onclick="resumeGame()">WEITERSPIELEN</button>
+            <button class="menu-button" onclick="backToMain()">HAUPTMENÜ</button>
+        </div>
+        
+        <!-- Game Over -->
+        <div id="gameOverMenu" class="menu">
+            <h2>GAME OVER</h2>
+            <p style="font-size: 12px; color: #ff00ff; margin: 20px 0;">
+                PILOT: <span id="finalPlayerName">---</span>
+            </p>
+            <p>ENDPUNKTZAHL: <span id="finalScore" style="color: #ffff00;">0</span></p>
+            <p>ERREICHTES LEVEL: <span id="finalLevel" style="color: #00ffff;">1</span></p>
+            <p style="margin-top: 20px; font-size: 10px; color: #00ff00;">
+                MAX COMBO: <span id="finalCombo">0</span>x
+            </p>
+            
+            <!-- Stats -->
+            <div style="margin-top: 20px; padding: 15px; background: rgba(0, 0, 0, 0.3); border: 1px solid #00ffff; font-size: 8px; text-align: left;">
+                <div style="text-align: center; margin-bottom: 10px; color: #00ffff; font-size: 10px;">STATISTIKEN</div>
+                <div style="margin: 5px 0;">Gegner zerstört: <span id="finalEnemies" style="float: right; color: #ffff00;">0</span></div>
+                <div style="margin: 5px 0;">Trefferquote: <span id="finalAccuracy" style="float: right; color: #00ff00;">0%</span></div>
+                <div style="margin: 5px 0;">Powerups gesammelt: <span id="finalPowerups" style="float: right; color: #ff00ff;">0</span></div>
+            </div>
+            
+            <button class="menu-button" onclick="showNameInput()" style="margin-top: 20px;">NOCHMAL SPIELEN</button>
+            <button class="menu-button" onclick="backToMain()">HAUPTMENÜ</button>
+        </div>
+        
+        <!-- Highscores -->
+        <div id="highscoreMenu" class="menu">
+            <h2>HIGHSCORES</h2>
+            <p style="font-size: 8px; margin-bottom: 10px;">Die besten Piloten der Galaxie</p>
+            <div class="highscore-list" id="highscoreList"></div>
+            <button class="menu-button" onclick="backToMain()">ZURÜCK</button>
+        </div>
+        
+        <!-- Level Complete -->
+        <div id="levelCompleteMenu" class="menu">
+            <h2>LEVEL ABGESCHLOSSEN!</h2>
+            <p>BONUS: <span id="levelBonus" style="color: #ffff00;">0</span> PUNKTE</p>
+            <button class="menu-button" onclick="nextLevel()">NÄCHSTES LEVEL</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
