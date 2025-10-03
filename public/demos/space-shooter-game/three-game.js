@@ -64,10 +64,16 @@
     });
   
     // ===== Lighting & Skybox =====
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    // ✅ VISIBILITY FIX: Increased lighting for better ship visibility
+    scene.add(new THREE.AmbientLight(0xffffff, 1.2)); // Increased from 0.6 to 1.2
+    const dirLight = new THREE.DirectionalLight(0xffffff, 2.0); // Increased from 1 to 2.0
     dirLight.position.set(5, 10, 7.5);
     scene.add(dirLight);
+    
+    // Add additional point light for better visibility
+    const pointLight = new THREE.PointLight(0xffffff, 1.5, 100);
+    pointLight.position.set(0, 10, 10);
+    scene.add(pointLight);
   
     const cubeTextureLoader = new THREE.CubeTextureLoader();
     cubeTextureLoader.setPath('assets/skybox/');
@@ -135,8 +141,13 @@
     if (shootSound.isPlaying) shootSound.stop();
     shootSound.play();
 
-    const bulletGeometry = new THREE.SphereGeometry(0.1, 8, 8);
-    const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+    // ✅ VISIBILITY FIX: Larger, brighter bullets
+    const bulletGeometry = new THREE.SphereGeometry(0.3, 8, 8); // Increased from 0.1 to 0.3
+    const bulletMaterial = new THREE.MeshBasicMaterial({ 
+      color: 0x00ffff,
+      emissive: 0x00ffff,
+      emissiveIntensity: 1.0
+    });
     const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
     bullet.position.copy(player.position);
     bullet.position.z -= 0.5;
@@ -180,8 +191,15 @@
   }
 
   function spawnPowerup() {
-    const powerupGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-    const powerupMaterial = new THREE.MeshStandardMaterial({ color: 0xff00ff, emissive: 0xff00ff, emissiveIntensity: 0.5 });
+    // ✅ VISIBILITY FIX: Larger, brighter powerups
+    const powerupGeometry = new THREE.BoxGeometry(1.2, 1.2, 1.2); // Increased from 0.5
+    const powerupMaterial = new THREE.MeshStandardMaterial({ 
+      color: 0xff00ff, 
+      emissive: 0xff00ff, 
+      emissiveIntensity: 1.0, // Increased from 0.5
+      metalness: 0.5,
+      roughness: 0.3
+    });
     const powerup = new THREE.Mesh(powerupGeometry, powerupMaterial);
 
     powerup.userData = { type: 'laser' };
@@ -206,17 +224,31 @@
 
   // ===== Fallback: Create simple geometric objects if models don't load =====
   function createSimplePlayer() {
-    const geometry = new THREE.ConeGeometry(0.5, 1.5, 3);
-    const material = new THREE.MeshStandardMaterial({ color: 0x00ff00, emissive: 0x00ff00, emissiveIntensity: 0.3 });
+    // ✅ VISIBILITY FIX: Larger and brighter fallback geometry
+    const geometry = new THREE.ConeGeometry(1.5, 3.0, 3); // Increased from 0.5, 1.5
+    const material = new THREE.MeshStandardMaterial({ 
+      color: 0x00ff00, 
+      emissive: 0x00ff00, 
+      emissiveIntensity: 0.8, // Increased from 0.3
+      metalness: 0.3,
+      roughness: 0.4
+    });
     player = new THREE.Mesh(geometry, material);
     player.rotation.x = Math.PI;
-    player.position.set(0, 0, 0);
+    player.position.set(0, 0, 5); // Moved forward (was 0, 0, 0)
     scene.add(player);
   }
 
   function createSimpleEnemyModel() {
-    const geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-    const material = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 0.3 });
+    // ✅ VISIBILITY FIX: Larger and brighter fallback geometry
+    const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5); // Increased from 0.8
+    const material = new THREE.MeshStandardMaterial({ 
+      color: 0xff0000, 
+      emissive: 0xff0000, 
+      emissiveIntensity: 0.8, // Increased from 0.3
+      metalness: 0.3,
+      roughness: 0.4
+    });
     const enemy = new THREE.Mesh(geometry, material);
     enemy.rotation.x = Math.PI / 2;
     return enemy;
@@ -229,8 +261,24 @@
       // Success callback
       (gltf) => {
         player = gltf.scene;
-        player.scale.set(0.5, 0.5, 0.5);
+        
+        // ✅ VISIBILITY FIX: Larger scale and better positioning
+        player.scale.set(2.5, 2.5, 2.5); // Increased from 0.5 to 2.5 (5x larger)
         player.rotation.x = Math.PI / 2;
+        player.position.set(0, 0, 5); // Moved forward from origin
+        
+        // ✅ VISIBILITY FIX: Enhance materials for better visibility
+        player.traverse((child) => {
+          if (child.isMesh && child.material) {
+            // Make materials brighter and more visible
+            child.material.emissive = new THREE.Color(0x0088ff);
+            child.material.emissiveIntensity = 0.4;
+            child.material.metalness = 0.3;
+            child.material.roughness = 0.5;
+            child.material.needsUpdate = true;
+          }
+        });
+        
         scene.add(player);
 
         // Load and apply selected player skin
@@ -250,18 +298,58 @@
 
         loader.load('assets/space-kit/Models/GLTF format/craft_miner.glb', (gltf) => {
           enemyModel = gltf.scene;
-          enemyModel.scale.set(0.4, 0.4, 0.4);
+          
+          // ✅ VISIBILITY FIX: Larger enemy ships
+          enemyModel.scale.set(2.0, 2.0, 2.0); // Increased from 0.4 to 2.0 (5x larger)
           enemyModel.rotation.x = Math.PI / 2;
+          
+          // ✅ VISIBILITY FIX: Enhance enemy materials
+          enemyModel.traverse((child) => {
+            if (child.isMesh && child.material) {
+              child.material.emissive = new THREE.Color(0xff0000);
+              child.material.emissiveIntensity = 0.5;
+              child.material.metalness = 0.3;
+              child.material.roughness = 0.5;
+              child.material.needsUpdate = true;
+            }
+          });
 
           loader.load('assets/space-kit/Models/GLTF format/craft_cargoB.glb', (gltf) => {
             bossModel = gltf.scene;
-            bossModel.scale.set(1, 1, 1);
+            
+            // ✅ VISIBILITY FIX: Larger boss
+            bossModel.scale.set(4.0, 4.0, 4.0); // Increased from 1 to 4
             bossModel.rotation.x = Math.PI / 2;
+            
+            // ✅ VISIBILITY FIX: Enhance boss materials
+            bossModel.traverse((child) => {
+              if (child.isMesh && child.material) {
+                child.material.emissive = new THREE.Color(0xff6600);
+                child.material.emissiveIntensity = 0.6;
+                child.material.metalness = 0.4;
+                child.material.roughness = 0.4;
+                child.material.needsUpdate = true;
+              }
+            });
             
             loader.load('assets/space-kit/Models/GLTF format/craft_speederD.glb', (gltf) => {
               enemyModel2 = gltf.scene;
-              enemyModel2.scale.set(0.4, 0.4, 0.4);
+              
+              // ✅ VISIBILITY FIX: Larger enemy variant
+              enemyModel2.scale.set(2.0, 2.0, 2.0); // Increased from 0.4 to 2.0
               enemyModel2.rotation.x = Math.PI / 2;
+              
+              // ✅ VISIBILITY FIX: Enhance materials
+              enemyModel2.traverse((child) => {
+                if (child.isMesh && child.material) {
+                  child.material.emissive = new THREE.Color(0xff4400);
+                  child.material.emissiveIntensity = 0.5;
+                  child.material.metalness = 0.3;
+                  child.material.roughness = 0.5;
+                  child.material.needsUpdate = true;
+                }
+              });
+              
               startGameSpawning();
             }, undefined, (error) => {
               console.error('Failed to load enemy model 2, using simple geometry:', error);
@@ -271,7 +359,7 @@
           }, undefined, (error) => {
             console.error('Failed to load boss model, using simple geometry:', error);
             bossModel = createSimpleEnemyModel();
-            bossModel.scale.set(2, 2, 2);
+            bossModel.scale.set(4, 4, 4); // Larger fallback boss
             startGameSpawning();
           });
         }, undefined, (error) => {
