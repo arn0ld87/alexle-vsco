@@ -30,6 +30,10 @@
       ASSET_BASE + 'Ships/player_blue.png',     // Blauer Held
       ASSET_BASE + 'Ships/player_red.png',      // Roter Held
     ],
+    avatars: [
+      '/avatars/alex-skin.png',  // Alex Avatar
+      '/avatars/micha-skin.png', // Micha Avatar
+    ],
     enemies: {
       basic: ASSET_BASE + 'Enemies/enemyBlack1.png',
       fast: ASSET_BASE + 'Enemies/enemyBlue2.png',
@@ -68,6 +72,8 @@
     player0: paths.players[0],
     player1: paths.players[1],
     player2: paths.players[2],
+    avatarAlex: paths.avatars[0],
+    avatarMicha: paths.avatars[1],
     enemyBasic: paths.enemies.basic,
     enemyFast: paths.enemies.fast,
     enemyTank: paths.enemies.tank,
@@ -330,42 +336,63 @@
   const hsList = new PIXI.Text('', { fontFamily: 'Press Start 2P', fontSize: 10, fill: 0xffff00 }); hsList.anchor.set(0.5, 0); hsList.y = -90; highscoreMenu.addChild(hsList);
   const hsBack = makeButton('ZURÜCK', () => backToMain()); hsBack.y = 110; hsBack.x = -130; highscoreMenu.addChild(hsBack);
 
-  // Character Select Menu
+  // Character Select Menu - Avatar Auswahl
   const characterMenu = new PIXI.Container(); uiLayer.addChild(characterMenu); characterMenu.visible = false; characterMenu.position.set(center.x, center.y);
-  characterMenu.addChild(makePanel(500, 400));
-  const charTitle = new PIXI.Text('WÄHLE DEINEN HELDEN', { fontFamily: 'Press Start 2P', fontSize: 18, fill: 0x00ffff, dropShadow: true }); charTitle.anchor.set(0.5); charTitle.y = -140; characterMenu.addChild(charTitle);
+  characterMenu.addChild(makePanel(550, 450));
+  const charTitle = new PIXI.Text('WÄHLE DEINEN AVATAR', { fontFamily: 'Press Start 2P', fontSize: 18, fill: 0x00ffff, dropShadow: true }); charTitle.anchor.set(0.5); charTitle.y = -160; characterMenu.addChild(charTitle);
   
   const charSprites = [];
-  const charNames = ['STANDARD', 'BLAUER HELD', 'ROTER HELD'];
-  const charColors = [0xffffff, 0x00aaff, 0xff4444];
+  const avatarData = [
+    { name: 'ALEX', texture: 'avatarAlex', color: 0x00ff88, ship: 0 },
+    { name: 'MICHA', texture: 'avatarMicha', color: 0xff8800, ship: 1 }
+  ];
   
-  for (let i = 0; i < 3; i++) {
+  // Beide Avatare nebeneinander anzeigen
+  for (let i = 0; i < 2; i++) {
     const charBtn = new PIXI.Container();
-    charBtn.x = -180 + i * 180; charBtn.y = 0;
+    charBtn.x = -120 + i * 240; // Nebeneinander positionieren
+    charBtn.y = -20;
     
+    // Rahmen mit Farbe des Avatars
     const frame = new PIXI.Graphics();
-    frame.lineStyle(3, charColors[i], 1).beginFill(0x000000, 0.3).drawRoundedRect(-60, -80, 120, 140, 8).endFill();
+    frame.lineStyle(4, avatarData[i].color, 1).beginFill(0x000000, 0.5).drawRoundedRect(-80, -100, 160, 200, 12).endFill();
     charBtn.addChild(frame);
     
-    const sprite = new PIXI.Sprite(textures[`player${i}`]);
-    sprite.width = 60; sprite.height = 60; sprite.anchor.set(0.5); sprite.y = -20;
+    // Avatar-Bild (größer anzeigen)
+    const sprite = new PIXI.Sprite(textures[avatarData[i].texture]);
+    sprite.width = 128; 
+    sprite.height = 128; 
+    sprite.anchor.set(0.5); 
+    sprite.y = -20;
     charBtn.addChild(sprite);
     charSprites.push(sprite);
     
-    const label = new PIXI.Text(charNames[i], { fontFamily: 'Press Start 2P', fontSize: 8, fill: charColors[i] });
-    label.anchor.set(0.5); label.y = 40;
+    // Name-Label
+    const label = new PIXI.Text(avatarData[i].name, { fontFamily: 'Press Start 2P', fontSize: 12, fill: avatarData[i].color, dropShadow: true });
+    label.anchor.set(0.5); label.y = 70;
     charBtn.addChild(label);
     
+    // Interaktivität
     charBtn.interactive = true; charBtn.eventMode = 'static';
     const btnIndex = i;
-    charBtn.on('pointertap', () => { state.selectedCharacter = btnIndex; playSound('menuClick', 0.4); startGame(); });
-    charBtn.on('pointerover', () => { charBtn.scale.set(1.1); });
-    charBtn.on('pointerout', () => { charBtn.scale.set(1.0); });
+    charBtn.on('pointertap', () => { 
+      state.selectedCharacter = avatarData[btnIndex].ship; 
+      playSound('menuClick', 0.4); 
+      startGame(); 
+    });
+    charBtn.on('pointerover', () => { 
+      charBtn.scale.set(1.08);
+      frame.tint = 0xffffff;
+    });
+    charBtn.on('pointerout', () => { 
+      charBtn.scale.set(1.0);
+      frame.tint = 0xffffff;
+    });
     
     characterMenu.addChild(charBtn);
   }
   
-  const charBackBtn = makeButton('ZURÜCK', () => { state.gameState = 'name'; hideAllMenus(); nameMenu.visible = true; }); charBackBtn.y = 130; charBackBtn.x = -150; characterMenu.addChild(charBackBtn);
+  const charBackBtn = makeButton('ZURÜCK', () => { state.gameState = 'name'; hideAllMenus(); nameMenu.visible = true; }); charBackBtn.y = 160; charBackBtn.x = -150; characterMenu.addChild(charBackBtn);
 
   function hideAllMenus() { mainMenu.visible = nameMenu.visible = pauseMenu.visible = gameOverMenu.visible = levelCompleteMenu.visible = highscoreMenu.visible = characterMenu.visible = false; }
   function showMainMenu() { state.gameState = 'menu'; hideAllMenus(); mainMenu.visible = true; }
