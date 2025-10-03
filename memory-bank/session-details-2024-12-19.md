@@ -65,3 +65,4 @@ font-family: 'Inter', 'IBM Plex Sans', system-ui, sans-serif;
 - Responsive Design getestet
 - Cross-Browser Kompatibilität berücksichtigt
 - Performance-Optimierungen implementiert
+

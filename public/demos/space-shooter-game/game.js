@@ -24,37 +24,37 @@ const CONFIG = {
         basePath: './assets/',
         // Asset-Pfade für einfache Austauschbarkeit
         player: {
-            ship: 'space-shooter-extension/PNG/Sprites/Ships/spaceShips_001.png'
+            ship: 'Ships/spaceShips_001.png'
         },
         enemies: {
-            basic: 'space-shooter-redux/PNG/Enemies/enemyBlack1.png',
-            fast: 'space-shooter-redux/PNG/Enemies/enemyBlue2.png',
-            tank: 'space-shooter-redux/PNG/Enemies/enemyRed3.png',
-            zigzag: 'space-shooter-redux/PNG/Enemies/enemyGreen4.png'
+            basic: 'Enemies/enemyBlack1.png',
+            fast: 'Enemies/enemyBlue2.png',
+            tank: 'Enemies/enemyRed3.png',
+            zigzag: 'Enemies/enemyGreen4.png'
         },
         bullets: {
-            player: 'space-shooter-redux/PNG/Lasers/laserBlue01.png',
-            enemy: 'space-shooter-redux/PNG/Lasers/laserRed01.png'
+            player: 'Lasers/laserBlue01.png',
+            enemy: 'Lasers/laserRed01.png'
         },
         powerups: {
-            shield: 'space-shooter-redux/PNG/Power-ups/shield_gold.png',
-            rapid: 'space-shooter-redux/PNG/Power-ups/bolt_gold.png',
-            triple: 'space-shooter-redux/PNG/Power-ups/star_gold.png',
-            health: 'space-shooter-redux/PNG/Power-ups/pill_red.png'
+            shield: 'Power-ups/shield_gold.png',
+            rapid: 'Power-ups/bolt_gold.png',
+            triple: 'Power-ups/star_gold.png',
+            health: 'Power-ups/pill_red.png'
         },
         effects: {
-            explosion: 'space-shooter-extension/PNG/Sprites/Effects/',
+            explosion: 'Effects/',
             background: 'Enjl-Starry Space Background/background_1.png'
         },
         sounds: {
-            shoot: 'sci-fi-sounds/Audio/laserRetro_001.ogg',
-            explosion: 'sci-fi-sounds/Audio/explosionCrunch_000.ogg',
-            explosionAlt: 'sci-fi-sounds/Audio/explosionCrunch_002.ogg',
-            powerup: 'sci-fi-sounds/Audio/forceField_001.ogg',
-            hit: 'sci-fi-sounds/Audio/forceField_000.ogg',
-            music: 'sci-fi-sounds/Audio/spaceEngineLow_004.ogg',
-            menuClick: 'sci-fi-sounds/Audio/computerNoise_000.ogg',
-            levelComplete: 'sci-fi-sounds/Audio/doorOpen_001.ogg'
+            shoot: 'Audio/laserRetro_001.ogg',
+            explosion: 'Audio/explosionCrunch_000.ogg',
+            explosionAlt: 'Audio/explosionCrunch_002.ogg',
+            powerup: 'Audio/forceField_001.ogg',
+            hit: 'Audio/forceField_000.ogg',
+            music: 'Audio/spaceEngineLow_004.ogg',
+            menuClick: 'Audio/computerNoise_000.ogg',
+            levelComplete: 'Audio/doorOpen_001.ogg'
         }
     }
 };
@@ -141,7 +141,7 @@ function loadAssets() {
         const num = i.toString().padStart(3, '0');
         assetList.push({ 
             key: `explosion${i}`, 
-            path: `space-shooter-extension/PNG/Sprites/Effects/spaceEffects_${num}.png` 
+            path: `Effects/spaceEffects_${num}.png` 
         });
     }
     

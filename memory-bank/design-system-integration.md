@@ -41,3 +41,4 @@
 3. Konsistente Farbpalette verwenden
 4. Glassmorphism-Effekte für moderne Optik
 5. Responsive Design mit Tailwind-Breakpoints
+

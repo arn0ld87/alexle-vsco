@@ -145,3 +145,4 @@ public/demos/space-shooter-game/
 - Partikel-Effekte für Explosionen
 - Crisp Pixel-Art Rendering
 - ~500 Zeilen optimiertes JavaScript
+
