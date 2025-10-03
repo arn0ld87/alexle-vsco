@@ -7,6 +7,17 @@
     const bossHudEl = document.getElementById('boss-hud');
     const bossHealthEl = document.getElementById('boss-health');
   
+  // ✅ FIX: Check if critical DOM elements exist before continuing
+  if (!appContainer) {
+    console.error('Critical Error: #app container not found. Game cannot initialize.');
+    return;
+  }
+  
+  if (!scoreEl || !livesEl || !levelEl) {
+    console.error('Critical Error: HUD elements not found. Game cannot initialize.');
+    return;
+  }
+  
     // ===== Game State =====
       const state = {
         score: 0,
@@ -213,53 +224,75 @@
 
   // Load models and start game (with fallback)
   if (loader) {
-    loader.load('assets/space-kit/Models/GLTF format/craft_speederA.glb', (gltf) => {
-    player = gltf.scene;
-    player.scale.set(0.5, 0.5, 0.5);
-    player.rotation.x = Math.PI / 2;
-    scene.add(player);
+    loader.load(
+      'assets/space-kit/Models/GLTF format/craft_speederA.glb',
+      // Success callback
+      (gltf) => {
+        player = gltf.scene;
+        player.scale.set(0.5, 0.5, 0.5);
+        player.rotation.x = Math.PI / 2;
+        scene.add(player);
 
-    // Load and apply selected player skin
-    if (window.selectedPlayerSkin) {
-      const textureLoader = new THREE.TextureLoader();
-      textureLoader.load(window.selectedPlayerSkin, (texture) => {
-        player.traverse((child) => {
-          if (child.isMesh && child.material) {
-            // Assuming the player model uses a MeshStandardMaterial or similar
-            // that can accept a map texture.
-            child.material.map = texture;
-            child.material.needsUpdate = true;
-          }
-        });
-      });
-    }
+        // Load and apply selected player skin
+        if (window.selectedPlayerSkin) {
+          const textureLoader = new THREE.TextureLoader();
+          textureLoader.load(window.selectedPlayerSkin, (texture) => {
+            player.traverse((child) => {
+              if (child.isMesh && child.material) {
+                // Assuming the player model uses a MeshStandardMaterial or similar
+                // that can accept a map texture.
+                child.material.map = texture;
+                child.material.needsUpdate = true;
+              }
+            });
+          });
+        }
 
-    loader.load('assets/space-kit/Models/GLTF format/craft_miner.glb', (gltf) => {
-      enemyModel = gltf.scene;
-      enemyModel.scale.set(0.4, 0.4, 0.4);
-      enemyModel.rotation.x = Math.PI / 2;
+        loader.load('assets/space-kit/Models/GLTF format/craft_miner.glb', (gltf) => {
+          enemyModel = gltf.scene;
+          enemyModel.scale.set(0.4, 0.4, 0.4);
+          enemyModel.rotation.x = Math.PI / 2;
 
-      loader.load('assets/space-kit/Models/GLTF format/craft_cargoB.glb', (gltf) => {
-        bossModel = gltf.scene;
-        bossModel.scale.set(1, 1, 1);
-        bossModel.rotation.x = Math.PI / 2;
-        
-        loader.load('assets/space-kit/Models/GLTF format/craft_speederD.glb', (gltf) => {
-          enemyModel2 = gltf.scene;
-          enemyModel2.scale.set(0.4, 0.4, 0.4);
-          enemyModel2.rotation.x = Math.PI / 2;
+          loader.load('assets/space-kit/Models/GLTF format/craft_cargoB.glb', (gltf) => {
+            bossModel = gltf.scene;
+            bossModel.scale.set(1, 1, 1);
+            bossModel.rotation.x = Math.PI / 2;
+            
+            loader.load('assets/space-kit/Models/GLTF format/craft_speederD.glb', (gltf) => {
+              enemyModel2 = gltf.scene;
+              enemyModel2.scale.set(0.4, 0.4, 0.4);
+              enemyModel2.rotation.x = Math.PI / 2;
+              startGameSpawning();
+            }, undefined, (error) => {
+              console.error('Failed to load enemy model 2, using simple geometry:', error);
+              enemyModel2 = createSimpleEnemyModel();
+              startGameSpawning();
+            });
+          }, undefined, (error) => {
+            console.error('Failed to load boss model, using simple geometry:', error);
+            bossModel = createSimpleEnemyModel();
+            bossModel.scale.set(2, 2, 2);
+            startGameSpawning();
+          });
+        }, undefined, (error) => {
+          console.error('Failed to load enemy model, using simple geometry:', error);
+          enemyModel = createSimpleEnemyModel();
+          enemyModel2 = createSimpleEnemyModel();
           startGameSpawning();
         });
-      });
-    });
-  }, undefined, (error) => {
-    console.error('Model loading error:', error);
-    // Fallback to simple geometry
-    createSimplePlayer();
-    enemyModel = createSimpleEnemyModel();
-    enemyModel2 = createSimpleEnemyModel();
-    startGameSpawning();
-  });
+      },
+      // Progress callback
+      undefined,
+      // Error callback
+      (error) => {
+        console.error('Failed to load player model, using simple geometry:', error);
+        // Fallback to simple geometry
+        createSimplePlayer();
+        enemyModel = createSimpleEnemyModel();
+        enemyModel2 = createSimpleEnemyModel();
+        startGameSpawning();
+      }
+    );
   } else {
     // GLTFLoader not available, use simple geometry
     console.warn('GLTFLoader not available, using simple geometry');
@@ -393,6 +426,12 @@
     }
 
     setupPointerEvents(button, action) {
+      // ✅ FIX: Check if button exists before adding listeners
+      if (!button) {
+        console.warn(`setupPointerEvents: button is null for action "${action}"`);
+        return;
+      }
+
       const updateState = (pressed) => {
         if (!this.enabled) return;
         this.state[action] = pressed;
