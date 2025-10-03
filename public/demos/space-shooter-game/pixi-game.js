@@ -60,7 +60,6 @@
       explosionAlt: ASSET_BASE + 'Audio/explosionCrunch_002.ogg',
       powerup: ASSET_BASE + 'Audio/forceField_001.ogg',
       hit: ASSET_BASE + 'Audio/forceField_000.ogg',
-      music: ASSET_BASE + 'Audio/engineCircular_003.ogg',
       menuClick: ASSET_BASE + 'Audio/computerNoise_000.ogg',
       levelComplete: ASSET_BASE + 'Audio/doorOpen_001.ogg',
     },
@@ -108,6 +107,7 @@
 
   // ===== Audio (HTMLAudio, clone-on-play) =====
   const audio = {};
+  const chiptune = createChiptuneLoop();
   function loadAudio() {
     for (const [key, url] of Object.entries(paths.sounds)) {
       const a = new Audio();
@@ -119,7 +119,6 @@
   loadAudio();
   let soundsEnabled = true;
   let musicEnabled = true;
-  let musicNode = null;
   function playSound(key, vol = 0.5) {
     if (!soundsEnabled || !audio[key]) return;
     try {
@@ -130,14 +129,107 @@
   }
   function startMusic(vol = 0.3) {
     if (!musicEnabled) return;
-    if (!musicNode) {
-      musicNode = audio.music.cloneNode();
-      musicNode.loop = true;
-      musicNode.volume = vol;
-    }
-    musicNode.play().catch(() => {});
+    chiptune.start(vol);
   }
-  function stopMusic() { if (musicNode) { musicNode.pause(); musicNode.currentTime = 0; } }
+  function stopMusic() { chiptune.stop(); }
+
+  function createChiptuneLoop() {
+    const melody = [523.25, 0, 784, 0, 659.25, 0, 587.33, 0, 523.25, 0, 659.25, 0, 880, 0, 698.46, 0];
+    const harmony = [392, 0, 523.25, 0, 440, 0, 392, 0, 392, 0, 587.33, 0, 523.25, 0, 440, 0];
+    const bass = [130.81, 0, 196, 0, 174.61, 0, 196, 0, 130.81, 0, 220, 0, 174.61, 0, 196, 0];
+    const stepDuration = 60 / 120 / 2; // 120 BPM, 8tel
+    let context = null;
+    let masterGain = null;
+    let timer = null;
+    let step = 0;
+    const activeVoices = new Set();
+
+    function ensureContext() {
+      if (context) {
+        if (context.state === 'suspended') context.resume();
+        return;
+      }
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) {
+        console.warn('Web Audio API nicht verfügbar – Chiptune-Musik deaktiviert.');
+        return;
+      }
+      context = new AudioCtx();
+      masterGain = context.createGain();
+      masterGain.gain.value = 0;
+      masterGain.connect(context.destination);
+    }
+
+    function trigger(freq, duration, type = 'square', volume = 0.4) {
+      if (!context || !freq) return;
+      const now = context.currentTime;
+      const osc = context.createOscillator();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+
+      const gain = context.createGain();
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      const voice = { osc, gain };
+      activeVoices.add(voice);
+
+      osc.start(now);
+      osc.stop(now + duration + 0.02);
+      osc.onended = () => {
+        try { osc.disconnect(); } catch {}
+        try { gain.disconnect(); } catch {}
+        activeVoices.delete(voice);
+      };
+    }
+
+    function playStep() {
+      if (!context) return;
+      const melodyFreq = melody[step % melody.length];
+      const harmonyFreq = harmony[step % harmony.length];
+      const bassFreq = bass[step % bass.length];
+      trigger(melodyFreq, stepDuration * 0.9, 'square', 0.6);
+      trigger(harmonyFreq, stepDuration * 0.9, 'triangle', 0.4);
+      trigger(bassFreq, stepDuration, 'square', 0.3);
+      if (step % 4 === 0) {
+        trigger(110, stepDuration * 0.4, 'sawtooth', 0.25);
+      }
+      step++;
+    }
+
+    return {
+      start(volume = 0.25) {
+        ensureContext();
+        if (!context) return;
+        if (masterGain) {
+          const now = context.currentTime;
+          masterGain.gain.cancelScheduledValues(now);
+          masterGain.gain.setTargetAtTime(volume, now, 0.1);
+        }
+        if (timer) return;
+        step = 0;
+        playStep();
+        timer = setInterval(playStep, stepDuration * 1000);
+      },
+      stop() {
+        if (!context) return;
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+        const now = context.currentTime;
+        masterGain.gain.setTargetAtTime(0.0001, now, 0.1);
+        activeVoices.forEach(({ osc }) => {
+          try { osc.stop(now); } catch {}
+        });
+        activeVoices.clear();
+      }
+    };
+  }
 
   // ===== Game State =====
   const state = {
@@ -147,6 +239,7 @@
     score: 0,
     level: 1,
     lives: 3,
+    maxHealth: 100,
     health: 100,
     targetScore: 1000,
     combo: 0,
@@ -157,10 +250,38 @@
     frame: 0,
     lastShot: 0,
     shootDelay: 250,
+    baseShootDelay: 250,
     levelTransition: 0,
     flashEffect: 0,
     screenShake: 0,
   };
+
+  const characters = [
+    {
+      id: 'alex',
+      name: 'ALEX',
+      avatarTexture: 'avatarAlex',
+      shipTexture: 'player1',
+      accent: 0x00ff88,
+      description: 'Schnelle Allround-Pilotin mit erhöhter Feuerrate.',
+      shootDelay: 200,
+      speed: 5.5,
+      maxHealth: 100,
+      lives: 3,
+    },
+    {
+      id: 'micha',
+      name: 'MICHA',
+      avatarTexture: 'avatarMicha',
+      shipTexture: 'player2',
+      accent: 0xff8800,
+      description: 'Tankiger Captain mit zusätzlicher Schildenergie.',
+      shootDelay: 280,
+      speed: 4.2,
+      maxHealth: 130,
+      lives: 4,
+    },
+  ];
 
   // ===== Stage Layers =====
   const world = new PIXI.Container();
@@ -189,6 +310,33 @@
 
   // ===== Player =====
   let player = null; // Wird nach Charakterwahl erstellt
+
+  function preparePlayerSprite() {
+    const character = characters[state.selectedCharacter] || characters[0];
+    const textureKey = character.shipTexture || 'player0';
+    const texture = textures[textureKey] || textures.player0;
+
+    if (!player) {
+      player = new PIXI.Sprite(texture);
+      camera.addChild(player);
+    } else {
+      player.texture = texture;
+    }
+
+    player.width = 54;
+    player.height = 54;
+    if (character.maxHealth > 120) {
+      player.width = 60;
+      player.height = 60;
+    }
+    player.roundPixels = true;
+    player.speed = character.speed;
+    player.tint = 0xffffff;
+    player.accentColor = character.accent || 0xffff00;
+    player.visible = false;
+    player.powerup = null;
+    player.powerupTimer = 0;
+  }
 
   // ===== Groups =====
   const enemies = [];
@@ -229,7 +377,8 @@
     healthBar.clear();
     healthBar.lineStyle(2, 0x00ffff, 1);
     healthBar.beginFill(0x333333, 1).drawRect(x, y, w, h).endFill();
-    const hw = Math.max(0, Math.min(1, state.health / 100)) * w;
+    const maxHealth = Math.max(1, state.maxHealth || 1);
+    const hw = Math.max(0, Math.min(1, state.health / maxHealth)) * w;
     const grad = new PIXI.Graphics();
     grad.beginFill(0x00ff00).drawRect(0, 0, hw, h).endFill();
     // gradient via tint not trivial in Graphics; keep solid for now
@@ -252,7 +401,9 @@
   }
 
   function updateHud() {
-    playerLabel.text = `SPIELER: ${state.playerName || '---'}`;
+    const activeCharacter = characters[state.selectedCharacter] || characters[0];
+    const characterSuffix = state.playerName ? ` (${activeCharacter?.name || ''})` : '';
+    playerLabel.text = `SPIELER: ${state.playerName || '---'}${characterSuffix}`;
     scoreLabel.text = `PUNKTE: ${state.score}`;
     levelLabel.text = `LEVEL: ${state.level}`;
     livesLabel.text = `LEBEN: ${state.lives}`;
@@ -338,71 +489,95 @@
 
   // Character Select Menu - Avatar Auswahl
   const characterMenu = new PIXI.Container(); uiLayer.addChild(characterMenu); characterMenu.visible = false; characterMenu.position.set(center.x, center.y);
-  characterMenu.addChild(makePanel(550, 450));
-  const charTitle = new PIXI.Text('WÄHLE DEINEN AVATAR', { fontFamily: 'Press Start 2P', fontSize: 18, fill: 0x00ffff, dropShadow: true }); charTitle.anchor.set(0.5); charTitle.y = -160; characterMenu.addChild(charTitle);
-  
+  characterMenu.addChild(makePanel(580, 470));
+  const charTitle = new PIXI.Text('WÄHLE DEIN TEAM', { fontFamily: 'Press Start 2P', fontSize: 18, fill: 0x00ffff, dropShadow: true }); charTitle.anchor.set(0.5); charTitle.y = -180; characterMenu.addChild(charTitle);
+
+  const charButtons = [];
+  const charFrames = [];
   const charSprites = [];
-  const avatarData = [
-    { name: 'ALEX', texture: 'avatarAlex', color: 0x00ff88, ship: 0 },
-    { name: 'MICHA', texture: 'avatarMicha', color: 0xff8800, ship: 1 }
-  ];
-  
-  // Beide Avatare nebeneinander anzeigen
-  for (let i = 0; i < 2; i++) {
+
+  const charInfo = new PIXI.Text('', { fontFamily: 'Press Start 2P', fontSize: 10, fill: 0xffffff, align: 'center', wordWrap: true, wordWrapWidth: 420 });
+  charInfo.anchor.set(0.5);
+  charInfo.y = 120;
+  characterMenu.addChild(charInfo);
+
+  characters.forEach((character, i) => {
     const charBtn = new PIXI.Container();
-    charBtn.x = -120 + i * 240; // Nebeneinander positionieren
-    charBtn.y = -20;
-    
-    // Rahmen mit Farbe des Avatars
+    charBtn.x = -160 + i * 320;
+    charBtn.y = -10;
+
     const frame = new PIXI.Graphics();
-    frame.lineStyle(4, avatarData[i].color, 1).beginFill(0x000000, 0.5).drawRoundedRect(-80, -100, 160, 200, 12).endFill();
+    frame.lineStyle(4, character.accent, 1).beginFill(0x000000, 0.6).drawRoundedRect(-90, -110, 180, 220, 14).endFill();
     charBtn.addChild(frame);
-    
-    // Avatar-Bild (größer anzeigen)
-    const sprite = new PIXI.Sprite(textures[avatarData[i].texture]);
-    sprite.width = 128; 
-    sprite.height = 128; 
-    sprite.anchor.set(0.5); 
-    sprite.y = -20;
+
+    const sprite = new PIXI.Sprite(textures[character.avatarTexture]);
+    sprite.width = 140;
+    sprite.height = 140;
+    sprite.anchor.set(0.5);
+    sprite.y = -10;
     charBtn.addChild(sprite);
     charSprites.push(sprite);
-    
-    // Name-Label
-    const label = new PIXI.Text(avatarData[i].name, { fontFamily: 'Press Start 2P', fontSize: 12, fill: avatarData[i].color, dropShadow: true });
-    label.anchor.set(0.5); label.y = 70;
+
+    const label = new PIXI.Text(character.name, { fontFamily: 'Press Start 2P', fontSize: 12, fill: character.accent, dropShadow: true });
+    label.anchor.set(0.5); label.y = 80;
     charBtn.addChild(label);
-    
-    // Interaktivität
+
     charBtn.interactive = true; charBtn.eventMode = 'static';
-    const btnIndex = i;
-    charBtn.on('pointertap', () => { 
-      state.selectedCharacter = avatarData[btnIndex].ship; 
-      playSound('menuClick', 0.4); 
-      startGame(); 
+    charBtn.on('pointertap', () => {
+      selectCharacter(i);
     });
-    charBtn.on('pointerover', () => { 
-      charBtn.scale.set(1.08);
-      frame.tint = 0xffffff;
+    charBtn.on('pointerover', () => {
+      charBtn.scale.set(1.06);
     });
-    charBtn.on('pointerout', () => { 
+    charBtn.on('pointerout', () => {
       charBtn.scale.set(1.0);
-      frame.tint = 0xffffff;
     });
-    
+
+    charButtons.push(charBtn);
+    charFrames.push(frame);
     characterMenu.addChild(charBtn);
+  });
+
+  const charBackBtn = makeButton('ZURÜCK', () => { state.gameState = 'name'; hideAllMenus(); nameMenu.visible = true; }); charBackBtn.y = 180; charBackBtn.x = -160; characterMenu.addChild(charBackBtn);
+  const charConfirmBtn = makeButton('START', () => startGame()); charConfirmBtn.y = 180; charConfirmBtn.x = 80; characterMenu.addChild(charConfirmBtn);
+
+  function selectCharacter(index) {
+    state.selectedCharacter = index;
+    playSound('menuClick', 0.35);
+    charButtons.forEach((btn, i) => {
+      const isActive = i === index;
+      btn.alpha = isActive ? 1 : 0.6;
+      charFrames[i].tint = isActive ? 0xffffff : characters[i].accent;
+      charSprites[i].tint = isActive ? 0xffffff : 0xcccccc;
+    });
+    const current = characters[index];
+    charInfo.text = `${current.name} – ${current.description}\nGeschwindigkeit: ${current.speed.toFixed(1)} | Leben: ${current.lives} | Schild: ${current.maxHealth}`;
+    charInfo.style.fill = current.accent;
+    const label = charConfirmBtn.children.find((child) => child instanceof PIXI.Text);
+    if (label) label.text = `START MIT ${current.name}`;
   }
-  
-  const charBackBtn = makeButton('ZURÜCK', () => { state.gameState = 'name'; hideAllMenus(); nameMenu.visible = true; }); charBackBtn.y = 160; charBackBtn.x = -150; characterMenu.addChild(charBackBtn);
+
+  selectCharacter(state.selectedCharacter);
 
   function hideAllMenus() { mainMenu.visible = nameMenu.visible = pauseMenu.visible = gameOverMenu.visible = levelCompleteMenu.visible = highscoreMenu.visible = characterMenu.visible = false; }
-  function showMainMenu() { state.gameState = 'menu'; hideAllMenus(); mainMenu.visible = true; }
-  function showNameInput() { state.gameState = 'name'; hideAllMenus(); nameMenu.visible = true; }
-  function showCharacterSelect() { 
-    if (!state.playerName) return;
-    state.gameState = 'character'; hideAllMenus(); characterMenu.visible = true; playSound('menuClick', 0.4); 
+  function showMainMenu() { state.gameState = 'menu'; hideAllMenus(); mainMenu.visible = true; if (player) player.visible = false; }
+  function showNameInput() { state.gameState = 'name'; hideAllMenus(); nameMenu.visible = true; nameText.text = state.playerName; }
+  function showCharacterSelect() {
+    state.playerName = state.playerName.trim().toUpperCase();
+    if (!state.playerName) { state.playerName = ''; nameText.text = ''; return; }
+    nameText.text = state.playerName;
+    state.gameState = 'character'; hideAllMenus(); characterMenu.visible = true; playSound('menuClick', 0.4);
+    selectCharacter(state.selectedCharacter || 0);
   }
 
-  function backToMain() { state.gameState = 'menu'; hideAllMenus(); mainMenu.visible = true; stopMusic(); playSound('menuClick', 0.4); }
+  function backToMain() {
+    state.gameState = 'menu';
+    hideAllMenus();
+    mainMenu.visible = true;
+    stopMusic();
+    if (player) player.visible = false;
+    playSound('menuClick', 0.4);
+  }
 
   function showHighscores() {
     const highscores = JSON.parse(localStorage.getItem('cosmicDefenderHighscores') || '[]');
@@ -417,11 +592,16 @@
   // Name input via keyboard into Pixi text
   window.addEventListener('keydown', (e) => {
     if (state.gameState !== 'name') return;
-    if (e.key === 'Enter') { startGame(); return; }
-    if (e.key === 'Backspace') { state.playerName = state.playerName.slice(0, -1); nameText.text = state.playerName; return; }
+    if (e.key === 'Enter') { e.preventDefault(); showCharacterSelect(); return; }
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      state.playerName = state.playerName.slice(0, -1);
+      nameText.text = state.playerName;
+      return;
+    }
     if (e.key.length === 1 && state.playerName.length < 20) {
-      state.playerName += e.key;
-      nameText.text = state.playerName.toUpperCase();
+      state.playerName = (state.playerName + e.key).toUpperCase();
+      nameText.text = state.playerName;
     }
   });
 
@@ -434,17 +614,24 @@
 
   function startGame() {
     if (!state.playerName) return;
+    preparePlayerSprite();
+    const character = characters[state.selectedCharacter] || characters[0];
     state.gameState = 'playing';
-    state.score = 0; state.level = 1; state.lives = 3; state.health = 100; state.targetScore = 1000;
-    state.combo = 0; state.comboTimer = 0; state.maxCombo = 0; state.comboMultiplier = 1;
+    state.score = 0; state.level = 1; state.lives = character.lives; state.maxHealth = character.maxHealth; state.health = state.maxHealth; state.targetScore = 1000;
+    state.combo = 0; state.comboTimer = 0; state.maxCombo = 0; state.comboMultiplier = 1; state.lastShot = 0;
+    state.baseShootDelay = character.shootDelay;
+    state.shootDelay = state.baseShootDelay;
     state.stats = { enemiesDestroyed: 0, shotsFired: 0, powerupsCollected: 0, accuracy: 0, totalDamage: 0 };
-    player.x = app.screen.width / 2 - 25; player.y = app.screen.height - 80; player.powerup = null; player.powerupTimer = 0;
+    player.x = app.screen.width / 2 - player.width / 2; player.y = app.screen.height - 90;
+    player.powerup = null; player.powerupTimer = 0;
+    if (player.powerupBorder) { camera.removeChild(player.powerupBorder); player.powerupBorder = null; }
+    player.visible = true;
     enemies.splice(0, enemies.length); bullets.splice(0, bullets.length); powerups.splice(0, powerups.length);
     hideAllMenus(); updateHud(); startMusic(); state.levelTransition = 60;
   }
 
-  function pauseGame() { if (state.gameState === 'playing') { state.gameState = 'paused'; hideAllMenus(); pauseMenu.visible = true; playSound('menuClick', 0.4); if (musicNode) musicNode.pause(); } }
-  function resumeGame() { state.gameState = 'playing'; hideAllMenus(); playSound('menuClick', 0.4); if (musicEnabled && musicNode) musicNode.play(); }
+  function pauseGame() { if (state.gameState === 'playing') { state.gameState = 'paused'; hideAllMenus(); pauseMenu.visible = true; playSound('menuClick', 0.4); stopMusic(); } }
+  function resumeGame() { state.gameState = 'playing'; hideAllMenus(); playSound('menuClick', 0.4); if (musicEnabled) startMusic(); }
 
   function gameOver() {
     state.gameState = 'gameover';
@@ -460,10 +647,11 @@
     ].join('\n');
     hideAllMenus(); gameOverMenu.visible = true; stopMusic(); playSound('explosionAlt', 0.6); state.screenShake = 20;
     saveHighscore();
+    if (player) player.visible = false;
   }
 
   function nextLevel() {
-    state.level++; state.targetScore = state.level * 1000; state.health = Math.min(100, state.health + 20);
+    state.level++; state.targetScore = state.level * 1000; state.health = Math.min(state.maxHealth, state.health + Math.round(state.maxHealth * 0.2));
     enemies.splice(0, enemies.length); bullets.splice(0, bullets.length); powerups.splice(0, powerups.length);
     hideAllMenus(); state.gameState = 'playing'; updateHud(); playSound('levelComplete', 0.5); state.levelTransition = 60; state.flashEffect = 30;
   }
@@ -505,10 +693,10 @@
     if (performance.now() - state.lastShot < state.shootDelay) return;
     state.lastShot = performance.now(); state.stats.shotsFired++; playSound('shoot', 0.5);
 
-    const mkBullet = (xOff=20, angle=0) => {
+    const mkBullet = (xOff = player.width / 2 - 5, angle = 0) => {
       const b = new PIXI.Sprite(textures.bulletPlayer); b.width=10; b.height=30; b.x = player.x + xOff; b.y = player.y; b.speed = -8; b.angleRad = angle; b.roundPixels = true; camera.addChild(b); bullets.push(b);
     };
-    if (player.powerup === 'triple') { mkBullet(20, 0); mkBullet(10, -0.2); mkBullet(30, 0.2); } else { mkBullet(); }
+    if (player.powerup === 'triple') { mkBullet(player.width / 2 - 5, 0); mkBullet(player.width / 2 - 15, -0.2); mkBullet(player.width / 2 + 5, 0.2); } else { mkBullet(); }
   }
 
   function spawnPowerup(x, y) {
@@ -566,10 +754,11 @@
     if (state.gameState === 'playing') {
       state.frame++;
       // Move player
-      if (keys['ArrowLeft']) player.x = Math.max(0, player.x - 5*delta);
-      if (keys['ArrowRight']) player.x = Math.min(app.screen.width - player.width, player.x + 5*delta);
-      if (keys['ArrowUp']) player.y = Math.max(0, player.y - 5*delta);
-      if (keys['ArrowDown']) player.y = Math.min(app.screen.height - player.height, player.y + 5*delta);
+      const moveSpeed = (player?.speed || 5) * delta;
+      if (keys['ArrowLeft']) player.x = Math.max(0, player.x - moveSpeed);
+      if (keys['ArrowRight']) player.x = Math.min(app.screen.width - player.width, player.x + moveSpeed);
+      if (keys['ArrowUp']) player.y = Math.max(0, player.y - moveSpeed);
+      if (keys['ArrowDown']) player.y = Math.min(app.screen.height - player.height, player.y + moveSpeed);
 
       // Powerup visual indicator
       if (player.powerup) {
@@ -578,15 +767,16 @@
           player.powerupBorder = new PIXI.Graphics();
           camera.addChild(player.powerupBorder);
         }
+        const accent = player.accentColor || 0xffff00;
         player.powerupBorder.clear();
-        player.powerupBorder.lineStyle(2, 0xffff00, 1);
+        player.powerupBorder.lineStyle(2, accent, 1);
         player.powerupBorder.drawRect(player.x - pulseSize, player.y - pulseSize, player.width + pulseSize*2, player.height + pulseSize*2);
-        
+
         // Powerup timer bar
         const timerWidth = player.width;
         const timerPercent = player.powerupTimer / 300;
         player.powerupBorder.beginFill(0x000000, 0.5).drawRect(player.x, player.y - 8, timerWidth, 4).endFill();
-        player.powerupBorder.beginFill(0xffff00, 1).drawRect(player.x, player.y - 8, timerWidth * timerPercent, 4).endFill();
+        player.powerupBorder.beginFill(accent, 1).drawRect(player.x, player.y - 8, timerWidth * timerPercent, 4).endFill();
       } else if (player.powerupBorder) {
         camera.removeChild(player.powerupBorder);
         player.powerupBorder = null;
@@ -600,7 +790,7 @@
           b.y += b.speed*delta;
           if (player && hit(b, player)) {
             state.health -= 5; playSound('hit', 0.4); camera.removeChild(b); bullets.splice(i,1);
-            if (state.health <= 0) { state.lives--; if (state.lives<=0) gameOver(); else state.health = 100; }
+            if (state.health <= 0) { state.lives--; if (state.lives<=0) gameOver(); else state.health = state.maxHealth; }
             updateHud();
           }
           if (b.y > app.screen.height + 40) { camera.removeChild(b); bullets.splice(i,1); }
@@ -646,7 +836,7 @@
           state.health -= 10; playSound('hit', 0.5); createExplosion(e.x+e.width/2, e.y+e.height/2); 
           if (e.healthBar) { camera.removeChild(e.healthBar); }
           camera.removeChild(e); enemies.splice(i,1);
-          if (state.health <= 0) { state.lives--; if (state.lives<=0) gameOver(); else state.health = 100; }
+          if (state.health <= 0) { state.lives--; if (state.lives<=0) gameOver(); else state.health = state.maxHealth; }
           updateHud();
         }
         if (e.y > app.screen.height + 60) { 
@@ -697,7 +887,7 @@
           const colors = { shield:0x00ffff, rapid:0xffff00, triple:0xff00ff, health:0x00ff00 };
           createFloatingText(player.x+player.width/2, player.y, names[p.type], colors[p.type]);
           
-          if (p.type==='shield'){ state.health = 100; }
+          if (p.type==='shield'){ state.health = state.maxHealth; }
           if (p.type==='rapid'){ state.shootDelay = 100; player.powerup='rapid'; player.powerupTimer=300; }
           if (p.type==='triple'){ player.powerup='triple'; player.powerupTimer=300; }
           if (p.type==='health'){ state.lives++; }
@@ -706,7 +896,7 @@
       }
 
       // Powerup timer
-      if (player.powerupTimer>0){ player.powerupTimer--; if (player.powerupTimer===0){ player.powerup=null; state.shootDelay=250; } }
+      if (player.powerupTimer>0){ player.powerupTimer--; if (player.powerupTimer===0){ player.powerup=null; state.shootDelay=state.baseShootDelay; } }
 
       // Combo timer
       if (state.comboTimer>0){ state.comboTimer--; if (state.comboTimer===0){ state.combo=0; state.comboMultiplier=1; } }
