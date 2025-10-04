@@ -97,6 +97,28 @@
       background-color: #ff0000;
       transition: width 0.2s ease-out;
     }
+    /* Brand Logo Overlay (Watermark) */
+    #brand-logo {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      z-index: 120; /* above hud */
+      width: 110px;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      background: rgba(10,14,39,0.55);
+      border: 2px solid #00ffff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,255,255,0.35);
+      backdrop-filter: blur(4px);
+      animation: fadeInBrand 0.8s ease-out;
+      pointer-events: none; /* do not block clicks */
+    }
+    #brand-logo img { width: 100%; height: auto; image-rendering: auto; filter: drop-shadow(0 0 4px #000); }
+    @keyframes fadeInBrand { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
   </style>
 </head>
 <body>
@@ -152,6 +174,11 @@
   <div id="app" style="display: none;">
     <div class="badge">alexle135.de<br/><span style="font-size:8px">COSMIC DEFENDER (3D)</span></div>
     <div class="hint">Left/Right: Move • Space: Fire</div>
+    <!-- Brand Logo (Watermark) -->
+    <div id="brand-logo">
+      <!-- Nutzt das bereitgestellte Logo (alexle135.de). Passe Pfad an falls verschoben. Fallback: /logo.svg -->
+      <img src="/alex-skin.png" alt="alexle135.de Logo" onerror="this.onerror=null;this.src='/logo.svg';" />
+    </div>
 
     <div class="hud">
       <div id="score">PUNKTE: 0</div>
@@ -224,6 +251,11 @@
       window.selectedPlayerSkin = skinPath;
       hideAllMenus();
       document.getElementById('app').style.display = 'block';
+      // Optional: Brand Logo nach ein paar Sekunden leicht ausblenden (kommentiere aus, falls dauerhaft sichtbar)
+      const brand = document.getElementById('brand-logo');
+      if(brand){
+        setTimeout(()=>{ brand.style.transition='opacity 1.5s ease'; brand.style.opacity='0.25'; }, 6000);
+      }
       // Starte das Spiel erst jetzt (Refactored three-game.js)
       if (window.startSpaceShooterGame) {
         window.startSpaceShooterGame(window.selectedPlayerSkin);
