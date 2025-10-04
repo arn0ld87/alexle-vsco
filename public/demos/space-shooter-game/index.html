@@ -97,6 +97,49 @@
       background-color: #ff0000;
       transition: width 0.2s ease-out;
     }
+    /* Brand Logo Overlay (Watermark) */
+    #brand-logo {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      z-index: 120; /* above hud */
+      width: 110px;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      background: rgba(10,14,39,0.55);
+      border: 2px solid #00ffff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,255,255,0.35);
+      backdrop-filter: blur(4px);
+      animation: fadeInBrand 0.8s ease-out;
+      pointer-events: none; /* do not block clicks */
+    }
+    #brand-logo img { width: 100%; height: auto; image-rendering: auto; filter: drop-shadow(0 0 4px #000); }
+    @keyframes fadeInBrand { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    /* Loading Overlay */
+    #loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 40% 35%, #112244, #050814 70%);
+      display: none; /* shown programmatically */
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      z-index: 1600;
+      font-family: 'Press Start 2P', monospace;
+      color: #00ffff;
+      text-align: center;
+    }
+    #loading-overlay.fade-out { animation: fadeOutLoading .9s ease forwards; }
+    @keyframes fadeOutLoading { to { opacity:0; pointer-events:none; } }
+    .loading-bar-wrapper { width: 60%; max-width: 480px; height: 22px; border:2px solid #00ffff; background: rgba(0,0,0,0.4); box-shadow:0 0 10px rgba(0,255,255,0.4); position:relative; }
+    .loading-bar { position:absolute; left:0; top:0; height:100%; width:0%; background: linear-gradient(90deg,#00ffff,#0088ff); box-shadow:0 0 12px #00ffff inset; transition: width .25s ease; }
+    .loading-detail { font-size:10px; color:#ffff00; letter-spacing:1px; }
+    .loading-title { font-size:16px; text-shadow:2px 2px #000; }
   </style>
 </head>
 <body>
@@ -150,8 +193,20 @@
   </div>
 
   <div id="app" style="display: none;">
+    <!-- Loading Overlay (shown while 3D assets load) -->
+    <div id="loading-overlay">
+      <div class="loading-title">LADE 3D-ASSETS ...</div>
+      <div class="loading-bar-wrapper"><div id="loading-bar" class="loading-bar"></div></div>
+      <div id="loading-text" style="font-size:12px;">0%</div>
+      <div id="loading-detail" class="loading-detail">Initialisiere ...</div>
+    </div>
     <div class="badge">alexle135.de<br/><span style="font-size:8px">COSMIC DEFENDER (3D)</span></div>
     <div class="hint">Left/Right: Move • Space: Fire</div>
+    <!-- Brand Logo (Watermark) -->
+    <div id="brand-logo">
+      <!-- Nutzt das bereitgestellte Logo (alexle135.de). Passe Pfad an falls verschoben. Fallback: /logo.svg -->
+      <img src="/alex-skin.png" alt="alexle135.de Logo" onerror="this.onerror=null;this.src='/logo.svg';" />
+    </div>
 
     <div class="hud">
       <div id="score">PUNKTE: 0</div>
@@ -224,6 +279,11 @@
       window.selectedPlayerSkin = skinPath;
       hideAllMenus();
       document.getElementById('app').style.display = 'block';
+      // Optional: Brand Logo nach ein paar Sekunden leicht ausblenden (kommentiere aus, falls dauerhaft sichtbar)
+      const brand = document.getElementById('brand-logo');
+      if(brand){
+        setTimeout(()=>{ brand.style.transition='opacity 1.5s ease'; brand.style.opacity='0.25'; }, 6000);
+      }
       // Starte das Spiel erst jetzt (Refactored three-game.js)
       if (window.startSpaceShooterGame) {
         window.startSpaceShooterGame(window.selectedPlayerSkin);
