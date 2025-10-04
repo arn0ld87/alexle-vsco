@@ -133,3 +133,4 @@ All changes successfully pushed to GitHub repository `arn0ld87/alexle-vsco`:
 - **Player Collision**: Enemies can hit and damage the player
 - **Level Progression**: Boss fights after reaching score thresholds
 - **Mobile Support**: Touch controls for mobile devices
+

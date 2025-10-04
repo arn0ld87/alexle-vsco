@@ -39,8 +39,13 @@
     
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     
+    // ✅ VISIBILITY FIX: Enable sRGB and tone mapping
+    renderer.outputColorSpace = THREE.SRGBColorSpace || THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    
     renderer.setSize(appContainer.clientWidth, appContainer.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75)); // Cap to 1.75 for performance
     appContainer.appendChild(renderer.domElement);
     
     // Ensure canvas fills the container
@@ -54,14 +59,15 @@
     const shootSound = new THREE.Audio(listener);
     const explosionSound = new THREE.Audio(listener);
   
-    audioLoader.load('Sounds-Music/Shots & Explosions/Laser Shot 1.mp3', (buffer) => {
+    // ✅ FIX: Correct path to sound files
+    audioLoader.load('./Sounds-Music/Shots & Explosions/Laser Shot 1.mp3', (buffer) => {
       shootSound.setBuffer(buffer);
       shootSound.setVolume(0.3);
-    });
-    audioLoader.load('Sounds-Music/Shots & Explosions/Explosion 1.mp3', (buffer) => {
+    }, undefined, (err) => console.warn('Sound load failed:', err));
+    audioLoader.load('./Sounds-Music/Shots & Explosions/Explosion 1.mp3', (buffer) => {
       explosionSound.setBuffer(buffer);
       explosionSound.setVolume(0.4);
-    });
+    }, undefined, (err) => console.warn('Sound load failed:', err));
   
     // ===== Lighting & Skybox =====
     // ✅ VISIBILITY FIX: Increased lighting for better ship visibility
@@ -76,8 +82,14 @@
     scene.add(pointLight);
   
     const cubeTextureLoader = new THREE.CubeTextureLoader();
-    cubeTextureLoader.setPath('assets/skybox/');
-    const textureCube = cubeTextureLoader.load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png']);
+    // ✅ FIX: Correct path to skybox
+    cubeTextureLoader.setPath('./assets/skybox/');
+    const textureCube = cubeTextureLoader.load(
+      ['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'],
+      undefined,
+      undefined,
+      (err) => console.warn('Skybox load failed:', err)
+    );
     scene.background = textureCube;
   
     // ===== Game Area =====
@@ -256,8 +268,9 @@
 
   // Load models and start game (with fallback)
   if (loader) {
+    // ✅ FIX: Correct path to model files
     loader.load(
-      'assets/space-kit/Models/GLTF format/craft_speederA.glb',
+      './assets/space-kit/Models/GLTF format/craft_speederA.glb',
       // Success callback
       (gltf) => {
         player = gltf.scene;
@@ -296,7 +309,7 @@
           });
         }
 
-        loader.load('assets/space-kit/Models/GLTF format/craft_miner.glb', (gltf) => {
+        loader.load('./assets/space-kit/Models/GLTF format/craft_miner.glb', (gltf) => {
           enemyModel = gltf.scene;
           
           // ✅ VISIBILITY FIX: Larger enemy ships
@@ -314,7 +327,7 @@
             }
           });
 
-          loader.load('assets/space-kit/Models/GLTF format/craft_cargoB.glb', (gltf) => {
+          loader.load('./assets/space-kit/Models/GLTF format/craft_cargoB.glb', (gltf) => {
             bossModel = gltf.scene;
             
             // ✅ VISIBILITY FIX: Larger boss
@@ -332,7 +345,7 @@
               }
             });
             
-            loader.load('assets/space-kit/Models/GLTF format/craft_speederD.glb', (gltf) => {
+            loader.load('./assets/space-kit/Models/GLTF format/craft_speederD.glb', (gltf) => {
               enemyModel2 = gltf.scene;
               
               // ✅ VISIBILITY FIX: Larger enemy variant
@@ -886,7 +899,7 @@
     
     // Reset player position
     if (player) {
-      player.position.set(0, 0, 0);
+      player.position.set(0, 0, 5); // ✅ FIX: Match initial forward position
     }
     
     // Restart spawning
