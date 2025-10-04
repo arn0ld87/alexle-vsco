@@ -74,13 +74,26 @@ export function startGame(selectedSkin){
   function checkWaveCompletion(){ if(enemies.length>0) return; const cfg=getLevelConfig(state.level); state.wavesCompleted++; if(state.wavesCompleted < cfg.waves){ state.wave++; startWave(); } else { state.gameState='bossfight'; spawnBoss(); } }
   function applyPlayerSkin(){ if(!selectedSkin||!player) return; const texLoader=new THREE.TextureLoader(); texLoader.load(selectedSkin,tex=>{ player.traverse(c=>{ if(c.isMesh && c.material){ c.material.map=tex; c.material.needsUpdate=true; }}); }); }
   function loadModels(){ if(!gltfLoader){ createFallbackPlayer(); enemyModelA=createSimpleEnemy(); enemyModelB=createSimpleEnemyAlt(); bossModel=createBossFallback(); startLevel(); return; }
-    gltfLoader.load('assets/space-kit/Models/GLTF format/craft_speederA.glb',g=>{ player=g.scene; player.scale.set(2.5,2.5,2.5); player.rotation.x=Math.PI/2; player.position.set(0,0,5); enhance(player,0x0088ff,.5); scene.add(player); applyPlayerSkin();
+    // 1) Try custom manta ship first
+    gltfLoader.load('manta_spaceship.glb', g=>{ player=g.scene; player.scale.set(2.2,2.2,2.2); player.rotation.x=Math.PI/2; player.position.set(0,0,5); enhance(player,0x33aaff,.65); scene.add(player); applyPlayerSkin();
+      // Continue loading enemies & boss
+      gltfLoader.load('assets/space-kit/Models/GLTF format/craft_miner.glb',g2=>{ enemyModelA=g2.scene; enemyModelA.scale.set(2,2,2); enemyModelA.rotation.x=Math.PI/2; enhance(enemyModelA,0xff0000,.6);
+        gltfLoader.load('assets/space-kit/Models/GLTF format/craft_speederD.glb',g3=>{ enemyModelB=g3.scene; enemyModelB.scale.set(2,2,2); enemyModelB.rotation.x=Math.PI/2; enhance(enemyModelB,0xff4400,.6);
+          gltfLoader.load('assets/space-kit/Models/GLTF format/craft_cargoB.glb',g4=>{ bossModel=g4.scene; bossModel.scale.set(4,4,4); bossModel.rotation.x=Math.PI/2; enhance(bossModel,0xff6600,.7); startLevel(); },undefined,e=>{console.warn('Boss load fail',e); bossModel=createBossFallback(); startLevel();});
+        },undefined,e=>{console.warn('EnemyB load fail',e); enemyModelB=createSimpleEnemyAlt(); startLevel();});
+      },undefined,e=>{console.warn('EnemyA load fail',e); enemyModelA=createSimpleEnemy(); enemyModelB=createSimpleEnemyAlt(); startLevel();});
+    },
+    // If custom manta fails, revert to original player chain
+    undefined, err=>{
+      console.warn('Custom manta ship load failed, fallback to default', err);
+      gltfLoader.load('assets/space-kit/Models/GLTF format/craft_speederA.glb',g=>{ player=g.scene; player.scale.set(2.5,2.5,2.5); player.rotation.x=Math.PI/2; player.position.set(0,0,5); enhance(player,0x0088ff,.5); scene.add(player); applyPlayerSkin();
       gltfLoader.load('assets/space-kit/Models/GLTF format/craft_miner.glb',g2=>{ enemyModelA=g2.scene; enemyModelA.scale.set(2,2,2); enemyModelA.rotation.x=Math.PI/2; enhance(enemyModelA,0xff0000,.6);
         gltfLoader.load('assets/space-kit/Models/GLTF format/craft_speederD.glb',g3=>{ enemyModelB=g3.scene; enemyModelB.scale.set(2,2,2); enemyModelB.rotation.x=Math.PI/2; enhance(enemyModelB,0xff4400,.6);
           gltfLoader.load('assets/space-kit/Models/GLTF format/craft_cargoB.glb',g4=>{ bossModel=g4.scene; bossModel.scale.set(4,4,4); bossModel.rotation.x=Math.PI/2; enhance(bossModel,0xff6600,.7); startLevel(); },undefined,e=>{console.warn('Boss load fail',e); bossModel=createBossFallback(); startLevel();});
         },undefined,e=>{console.warn('EnemyB load fail',e); enemyModelB=createSimpleEnemyAlt(); startLevel();});
       },undefined,e=>{console.warn('EnemyA load fail',e); enemyModelA=createSimpleEnemy(); enemyModelB=createSimpleEnemyAlt(); startLevel();});
     },undefined,e=>{console.warn('Player load fail',e); createFallbackPlayer(); enemyModelA=createSimpleEnemy(); enemyModelB=createSimpleEnemyAlt(); startLevel();});
+    });
   }
   function enhance(root,color,emissiveIntensity){ root.traverse(c=>{ if(c.isMesh&&c.material){ c.material.emissive=new THREE.Color(color); c.material.emissiveIntensity=emissiveIntensity; c.material.metalness=.35; c.material.roughness=.5; c.material.needsUpdate=true; }}); }
   function createFallbackPlayer(){
