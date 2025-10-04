@@ -84,14 +84,15 @@ export function startGame(selectedSkin){
   function loadGLB(path,label,scale=2,playerRotation=true){ return new Promise((resolve,reject)=>{ if(!gltfLoader) { return reject('No GLTF Loader'); } const t0=performance.now(); gltfLoader.load(path,(g)=>{ const obj=g.scene; if(scale!==1) obj.scale.set(scale,scale,scale); if(playerRotation) obj.rotation.x=Math.PI/2; const dt=((performance.now()-t0)/1000).toFixed(2); console.log('[Asset] Loaded',path,'in',dt,'s'); resolve(obj); },(ev)=>{ if(ev.total){ const pct=Math.round((ev.loaded/ev.total)*100); setLoadingProgress(Math.min(99,pct),`Lade ${label} (${pct}%)`); } },(err)=>{ console.warn('Failed to load',path,err); reject(err); }); }); }
   async function loadModels(){ showLoading(); if(!gltfLoader){ console.warn('GLTFLoader fehlt – verwende Fallback-Geometrien'); createFallbackPlayer(); enemyModelA=createSimpleEnemy(); enemyModelB=createSimpleEnemyAlt(); bossModel=createBossFallback(); setLoadingProgress(100,'Fertig (Fallback)'); hideLoading(); startLevel(); return; }
     const tasks=[
-      { key:'player', paths:['manta_spaceship.glb','assets/space-kit/Models/GLTF format/craft_speederA.glb'], label:'Spieler' },
+      // Versuche erst relative (gleicher Ordner), dann evtl. Unterordner Varianten
+      { key:'player', paths:['manta_spaceship.glb','./manta_spaceship.glb','/demos/space-shooter-game/manta_spaceship.glb','assets/space-kit/Models/GLTF format/craft_speederA.glb'], label:'Spieler' },
       { key:'enemyA', paths:['assets/space-kit/Models/GLTF format/craft_miner.glb'], label:'Gegner A' },
       { key:'enemyB', paths:['assets/space-kit/Models/GLTF format/craft_speederD.glb'], label:'Gegner B' },
       { key:'boss', paths:['assets/space-kit/Models/GLTF format/craft_cargoB.glb'], label:'Boss' }
     ];
     let completed=0; const total=tasks.length;
-    for(const t of tasks){ let loaded=null; for(const p of t.paths){ try { setLoadingProgress(Math.round((completed/total)*100),`Lade ${t.label}…`); loaded = await loadGLB(p,t.label, t.key==='boss'?4:(t.key==='player'?2.3:2)); if(t.key==='player'){ player=loaded; player.position.set(0,0,5); enhance(player,0x33aaff,.65); scene.add(player); applyPlayerSkin(); } else if(t.key==='enemyA'){ enemyModelA=loaded; enhance(enemyModelA,0xff0000,.6); } else if(t.key==='enemyB'){ enemyModelB=loaded; enhance(enemyModelB,0xff4400,.6); } else if(t.key==='boss'){ bossModel=loaded; enhance(bossModel,0xff6600,.7); }
-        break; } catch(e){ console.warn('Asset Versuch fehlgeschlagen:',p); }
+  for(const t of tasks){ let loaded=null; for(const p of t.paths){ try { console.log('[Loader] Versuche',t.key,'Pfad:',p); setLoadingProgress(Math.round((completed/total)*100),`Lade ${t.label}…`); loaded = await loadGLB(p,t.label, t.key==='boss'?4:(t.key==='player'?2.3:2)); console.log('[Loader] Erfolg',t.key,'via',p); if(t.key==='player'){ player=loaded; player.position.set(0,0,5); enhance(player,0x33aaff,.65); scene.add(player); applyPlayerSkin(); } else if(t.key==='enemyA'){ enemyModelA=loaded; enhance(enemyModelA,0xff0000,.6); } else if(t.key==='enemyB'){ enemyModelB=loaded; enhance(enemyModelB,0xff4400,.6); } else if(t.key==='boss'){ bossModel=loaded; enhance(bossModel,0xff6600,.7); }
+    break; } catch(e){ console.warn('[Loader] Fehlgeschlagen',t.key,'Pfad:',p,e); }
       }
       if(!loaded){ console.warn('Nutze Fallback für',t.key); if(t.key==='player'){ createFallbackPlayer(); } else if(t.key==='enemyA'){ enemyModelA=createSimpleEnemy(); } else if(t.key==='enemyB'){ enemyModelB=createSimpleEnemyAlt(); } else if(t.key==='boss'){ bossModel=createBossFallback(); } }
       completed++; const pct=Math.round((completed/total)*100); setLoadingProgress(pct, completed===total? 'Assets fertig' : `Lade ${t.label} OK (${pct}%)`); }
