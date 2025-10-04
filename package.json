@@ -8,6 +8,7 @@
     "dev:host": "astro dev --host",
     "build": "astro build",
     "preview": "astro preview",
+    "test": "playwright test",
     "lint": "eslint ."
   },
   "dependencies": {
