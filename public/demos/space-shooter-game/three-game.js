@@ -112,7 +112,7 @@
   const loader = window.THREE && THREE.GLTFLoader ? new THREE.GLTFLoader() : null;
   
   const playerSpeed = 0.2;
-  const bulletSpeed = 0.5;
+  // bulletSpeed no longer used (replaced by per-bullet velocity along forward)
   
   // Fire rate limiting
   const FIRE_INTERVAL_MS = 200;
@@ -153,6 +153,12 @@
     if (shootSound.isPlaying) shootSound.stop();
     shootSound.play();
 
+    // Use real forward direction (-Z convention) and spawn slightly ahead
+    const forward = new THREE.Vector3();
+    player.getWorldDirection(forward).normalize();
+
+    const muzzleOffset = 1.2;
+
     // ✅ VISIBILITY FIX: Larger, brighter bullets
     const bulletGeometry = new THREE.SphereGeometry(0.3, 8, 8); // Increased from 0.1 to 0.3
     const bulletMaterial = new THREE.MeshBasicMaterial({ 
@@ -161,8 +167,14 @@
       emissiveIntensity: 1.0
     });
     const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
-    bullet.position.copy(player.position);
-    bullet.position.z -= 0.5;
+
+    const spawnPos = player.getWorldPosition(new THREE.Vector3());
+    spawnPos.addScaledVector(forward, muzzleOffset);
+    bullet.position.copy(spawnPos);
+
+    bullet.userData.vel = forward.clone().multiplyScalar(40); // speed units/sec
+    bullet.userData.prev = spawnPos.clone();
+    bullet.userData.radius = 0.12;
     scene.add(bullet);
     bullets.push(bullet);
   }
@@ -246,7 +258,7 @@
       roughness: 0.4
     });
     player = new THREE.Mesh(geometry, material);
-    player.rotation.x = Math.PI;
+    player.rotation.set(0, Math.PI, 0);
     player.position.set(0, 0, 5); // Moved forward (was 0, 0, 0)
     scene.add(player);
   }
@@ -277,8 +289,9 @@
         
         // ✅ VISIBILITY FIX: Larger scale and better positioning
         player.scale.set(2.5, 2.5, 2.5); // Increased from 0.5 to 2.5 (5x larger)
-        player.rotation.x = Math.PI / 2;
-        player.position.set(0, 0, 5); // Moved forward from origin
+        // Align model so that its forward faces -Z (rotate if model originally faced +Z)
+        player.rotation.set(0, Math.PI, 0);
+        player.position.set(0, 0, 5); // Positioned forward
         
         // ✅ VISIBILITY FIX: Enhance materials for better visibility
         player.traverse((child) => {
@@ -314,7 +327,7 @@
           
           // ✅ VISIBILITY FIX: Larger enemy ships
           enemyModel.scale.set(2.0, 2.0, 2.0); // Increased from 0.4 to 2.0 (5x larger)
-          enemyModel.rotation.x = Math.PI / 2;
+          enemyModel.rotation.set(0, Math.PI, 0);
           
           // ✅ VISIBILITY FIX: Enhance enemy materials
           enemyModel.traverse((child) => {
@@ -332,7 +345,7 @@
             
             // ✅ VISIBILITY FIX: Larger boss
             bossModel.scale.set(4.0, 4.0, 4.0); // Increased from 1 to 4
-            bossModel.rotation.x = Math.PI / 2;
+            bossModel.rotation.set(0, Math.PI, 0);
             
             // ✅ VISIBILITY FIX: Enhance boss materials
             bossModel.traverse((child) => {
@@ -350,7 +363,7 @@
               
               // ✅ VISIBILITY FIX: Larger enemy variant
               enemyModel2.scale.set(2.0, 2.0, 2.0); // Increased from 0.4 to 2.0
-              enemyModel2.rotation.x = Math.PI / 2;
+              enemyModel2.rotation.set(0, Math.PI, 0);
               
               // ✅ VISIBILITY FIX: Enhance materials
               enemyModel2.traverse((child) => {
@@ -593,6 +606,146 @@
       this.enabled = false;
       this.state.left = false;
       this.state.right = false;
+
+  // Fixed timestep integration
+  let accumulator = 0; let lastTime = performance.now(); const FIXED_DT = 1/60;
+  function step(dt) {
+    // Shooting Logic with rate limiting
+    if (input.state.fire && player && state.gameState === 'playing') {
+      if (state.powerup === 'laser') {
+        if (!laserBeam) {
+          const beamGeometry = new THREE.CylinderGeometry(0.1, 0.1, gameHeight * 2, 8);
+          const beamMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.7 });
+          laserBeam = new THREE.Mesh(beamGeometry, beamMaterial);
+          scene.add(laserBeam);
+        }
+        laserBeam.visible = true;
+        laserBeam.position.copy(player.position);
+        laserBeam.position.z -= gameHeight;
+      } else {
+        const now = Date.now();
+        if (now - lastShotAt >= FIRE_INTERVAL_MS) { shoot(); lastShotAt = now; }
+      }
+    } else if (laserBeam) { laserBeam.visible = false; }
+
+    // Update bullets with real dt
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      const bullet = bullets[i];
+      if (!bullet.userData.prev) bullet.userData.prev = bullet.position.clone();
+      bullet.userData.prev.copy(bullet.position);
+      bullet.position.addScaledVector(bullet.userData.vel, dt);
+      if (bullet.position.z < -gameHeight) {
+        scene.remove(bullet); bullets.splice(i,1); continue; }
+    }
+
+    // Update enemies
+    const enemySpeed = 0.05 + (state.level - 1) * 0.01;
+    if (state.gameState === 'playing') {
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i];
+        enemy.position.z += enemySpeed;
+        if (enemy.userData.type === 'sinus') {
+          enemy.position.x = Math.sin(enemy.position.z + enemy.userData.sinusOffset) * (gameWidth / 4);
+        }
+        if (enemy.position.z > gameHeight / 2 + 5) {
+          scene.remove(enemy); enemies.splice(i,1); }
+      }
+    }
+
+    // Update powerups
+    for (let i = powerups.length - 1; i >= 0; i--) {
+      const powerup = powerups[i];
+      powerup.rotation.y += 0.02; powerup.rotation.x += 0.01; powerup.position.z += enemySpeed * 0.8;
+      if (powerup.position.z > gameHeight / 2 + 5) { scene.remove(powerup); powerups.splice(i,1); }
+    }
+
+    // Player-Powerup Collision
+    if (player) {
+      const playerBox = new THREE.Box3().setFromObject(player);
+      for (let i = powerups.length - 1; i >= 0; i--) {
+        const powerup = powerups[i];
+        const powerupBox = new THREE.Box3().setFromObject(powerup);
+        if (playerBox.intersectsBox(powerupBox)) {
+          state.powerup = powerup.userData.type; state.powerupTimer = 600;
+          scene.remove(powerup); powerups.splice(i,1);
+        }
+      }
+    }
+
+    if (state.powerupTimer > 0) { state.powerupTimer--; if (state.powerupTimer <= 0) state.powerup = null; }
+
+    // Boss logic
+    if (state.gameState === 'bossfight' && boss) {
+      if (boss.position.z < -gameHeight / 2 + 4) { boss.position.z += enemySpeed * 0.5; }
+      else { boss.position.x = Math.sin(Date.now() * 0.001) * (gameWidth / 3); }
+    }
+
+    // Swept bullet collisions (reuse earlier logic by calling inline)
+    const segTmp = { a:new THREE.Vector3(), b:new THREE.Vector3(), p:new THREE.Vector3(), cp:new THREE.Vector3() };
+    function segmentPointDistance(a,b,p){ const ab = segTmp.b.copy(b).sub(a); const t = Math.max(0, Math.min(1, segTmp.p.copy(p).sub(a).dot(ab) / ab.lengthSq())); segTmp.cp.copy(a).addScaledVector(ab,t); return segTmp.cp.distanceTo(p); }
+
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      const bullet = bullets[i];
+      const prev = bullet.userData.prev || bullet.position; const curr = bullet.position;
+      if (state.gameState === 'playing') {
+        for (let j = enemies.length - 1; j >= 0; j--) {
+          const enemy = enemies[j];
+            const center = enemy.getWorldPosition(new THREE.Vector3());
+            const radius = (enemy.userData.radius || 1.2) + (bullet.userData.radius || 0.12);
+            if (segmentPointDistance(prev, curr, center) <= radius) {
+              createExplosion(enemy.position);
+              if (explosionSound.isPlaying) explosionSound.stop(); explosionSound.play();
+              state.score += 100;
+              if (state.gameState === 'playing' && state.score >= state.level * 1000) { state.gameState = 'bossfight'; clearInterval(spawnInterval); enemies.forEach(e=>scene.remove(e)); enemies.length=0; spawnBoss(); }
+              updateHUD();
+              scene.remove(bullet); bullets.splice(i,1); scene.remove(enemy); enemies.splice(j,1); break;
+            }
+        }
+      } else if (state.gameState === 'bossfight' && boss) {
+        const center = boss.getWorldPosition(new THREE.Vector3());
+        const radius = (boss.userData && boss.userData.radius ? boss.userData.radius : 4.0) + (bullet.userData.radius || 0.12);
+        if (segmentPointDistance(prev, curr, center) <= radius) {
+          createExplosion(bullet.position); if (explosionSound.isPlaying) explosionSound.stop(); explosionSound.play();
+          boss.health -= 5; updateBossHUD();
+          scene.remove(bullet); bullets.splice(i,1);
+          if (boss.health <= 0) { createExplosion(boss.position); scene.remove(boss); boss=null; bossHudEl.style.display='none'; state.level++; state.gameState='playing'; adjustSpawning(); updateHUD(); }
+        }
+      }
+    }
+
+    // Player-Enemy collision
+    if (player && state.gameState === 'playing') {
+      const playerBox = new THREE.Box3().setFromObject(player);
+      for (let j = enemies.length - 1; j >= 0; j--) {
+        const enemy = enemies[j];
+        const enemyBox = new THREE.Box3().setFromObject(enemy);
+        if (playerBox.intersectsBox(enemyBox)) {
+          createExplosion(player.position); if (explosionSound.isPlaying) explosionSound.stop(); explosionSound.play();
+          state.lives--; updateHUD(); scene.remove(enemy); enemies.splice(j,1);
+          if (state.lives <= 0) { state.gameState='gameover'; if (window.showGameOver) window.showGameOver(state.score); return; }
+        }
+      }
+    }
+
+    // Particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const particle = particles[i]; particle.position.add(particle.velocity); particle.lifetime--; if (particle.lifetime <= 0) { scene.remove(particle); particles.splice(i,1);} }
+
+    // Player movement
+    if (player && state.gameState === 'playing') {
+      if (input.state.left) player.position.x = Math.max(-gameWidth / 2, player.position.x - playerSpeed);
+      if (input.state.right) player.position.x = Math.min(gameWidth / 2, player.position.x + playerSpeed);
+    }
+  }
+
+  function animateFixed(now){
+    state.animationId = requestAnimationFrame(animateFixed);
+    if (state.isPaused){ renderer.render(scene, camera); return; }
+    const delta = Math.min(0.25, (now - lastTime)/1000); lastTime = now; accumulator += delta;
+    while(accumulator >= FIXED_DT){ step(FIXED_DT); accumulator -= FIXED_DT; }
+    renderer.render(scene, camera);
+  }
+
       this.state.fire = false;
       if (this.mobileControls) {
         this.mobileControls.container.style.display = 'none';
@@ -641,13 +794,18 @@
       if (laserBeam) laserBeam.visible = false;
     }
 
-    // Update bullets
+    // Update bullets with swept collision (segment vs sphere) and real velocity
     for (let i = bullets.length - 1; i >= 0; i--) {
       const bullet = bullets[i];
-      bullet.position.z -= bulletSpeed;
+      if (!bullet.userData.prev) bullet.userData.prev = bullet.position.clone();
+      bullet.userData.prev.copy(bullet.position);
+      // dt approximated per frame (will be stabilized by fixed timestep later if applied)
+      const dt = 1/60; // temporary assumption replaced by fixed step below
+      bullet.position.addScaledVector(bullet.userData.vel, dt);
       if (bullet.position.z < -gameHeight) {
         scene.remove(bullet);
         bullets.splice(i, 1);
+        continue;
       }
     }
 
@@ -767,21 +925,32 @@
       }
     }
 
+    // Swept collision for bullets
+    const segTmp = { a:new THREE.Vector3(), b:new THREE.Vector3(), p:new THREE.Vector3(), cp:new THREE.Vector3() };
+    function segmentPointDistance(a,b,p){
+      const ab = segTmp.b.copy(b).sub(a);
+      const t = Math.max(0, Math.min(1, segTmp.p.copy(p).sub(a).dot(ab) / ab.lengthSq()));
+      segTmp.cp.copy(a).addScaledVector(ab, t);
+      return segTmp.cp.distanceTo(p);
+    }
+
     for (let i = bullets.length - 1; i >= 0; i--) {
       const bullet = bullets[i];
-      bulletBox.setFromObject(bullet);
+      const prev = bullet.userData.prev || bullet.position;
+      const curr = bullet.position;
 
-      // vs Enemies
+      // vs Enemies (segment-sphere)
       if (state.gameState === 'playing') {
         for (let j = enemies.length - 1; j >= 0; j--) {
           const enemy = enemies[j];
-          enemyBox.setFromObject(enemy);
-          if (bulletBox.intersectsBox(enemyBox)) {
+          const center = enemy.getWorldPosition(new THREE.Vector3());
+          const radius = (enemy.userData.radius || 1.2) + (bullet.userData.radius || 0.12);
+          const dist = segmentPointDistance(prev, curr, center);
+          if (dist <= radius) {
             createExplosion(enemy.position);
             if (explosionSound.isPlaying) explosionSound.stop();
             explosionSound.play();
             state.score += 100;
-
             if (state.gameState === 'playing' && state.score >= state.level * 1000) {
               state.gameState = 'bossfight';
               clearInterval(spawnInterval);
@@ -789,7 +958,6 @@
               enemies.length = 0;
               spawnBoss();
             }
-
             updateHUD();
             scene.remove(bullet);
             bullets.splice(i, 1);
@@ -798,20 +966,18 @@
             break;
           }
         }
-      }
-      // vs Boss
-      else if (state.gameState === 'bossfight' && boss) {
-        const bossBox = new THREE.Box3().setFromObject(boss);
-        if (bulletBox.intersectsBox(bossBox)) {
+      } else if (state.gameState === 'bossfight' && boss) {
+        const center = boss.getWorldPosition(new THREE.Vector3());
+        const radius = (boss.userData && boss.userData.radius ? boss.userData.radius : 4.0) + (bullet.userData.radius || 0.12);
+        const dist = segmentPointDistance(prev, curr, center);
+        if (dist <= radius) {
           createExplosion(bullet.position);
           if (explosionSound.isPlaying) explosionSound.stop();
           explosionSound.play();
           boss.health -= 5;
           updateBossHUD();
-
           scene.remove(bullet);
           bullets.splice(i, 1);
-
           if (boss.health <= 0) {
             createExplosion(boss.position);
             scene.remove(boss);
@@ -922,5 +1088,5 @@
 
   // Start Game
   updateHUD();
-  animate();
+  animateFixed(performance.now());
 })();
