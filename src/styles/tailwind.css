@@ -4,11 +4,11 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
-  :root.light {
-    color-scheme: light;
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
@@ -39,25 +39,30 @@
   }
 
   /* Light mode styles */
-  html.light body {
+  html:not(.dark) body {
     background-color: #f9fafb;
     color: #111827;
   }
 
-  html.light h1, html.light h2, html.light h3, html.light h4, html.light h5, html.light h6 {
+  html:not(.dark) h1,
+  html:not(.dark) h2,
+  html:not(.dark) h3,
+  html:not(.dark) h4,
+  html:not(.dark) h5,
+  html:not(.dark) h6 {
     @apply font-semibold tracking-tight text-gray-900;
   }
 
-  html.light p {
+  html:not(.dark) p {
     @apply text-gray-700;
   }
 
-  html.light a {
+  html:not(.dark) a {
     @apply text-blue-600 transition-colors duration-150;
   }
 
-  html.light a:hover,
-  html.light a:focus-visible {
+  html:not(.dark) a:hover,
+  html:not(.dark) a:focus-visible {
     @apply text-blue-700;
   }
 
@@ -66,7 +71,7 @@
     @apply border-white/10 bg-gray-950/80;
   }
 
-  html.light header {
+  html:not(.dark) header {
     @apply border-gray-200 bg-white/80;
   }
 
@@ -74,7 +79,7 @@
     @apply text-blue-400;
   }
 
-  html.light header a {
+  html:not(.dark) header a {
     @apply text-blue-600;
   }
 
@@ -82,7 +87,7 @@
     @apply text-gray-300;
   }
 
-  html.light header nav ul {
+  html:not(.dark) header nav ul {
     @apply text-gray-700;
   }
 
@@ -90,7 +95,7 @@
     @apply text-white;
   }
 
-  html.light header a:hover {
+  html:not(.dark) header a:hover {
     @apply text-gray-900;
   }
 
@@ -99,7 +104,7 @@
     @apply text-gray-400 hover:bg-white/10 hover:text-white;
   }
 
-  html.light #theme-toggle {
+  html:not(.dark) #theme-toggle {
     @apply text-gray-600 hover:bg-gray-200 hover:text-gray-900;
   }
 }
@@ -117,7 +122,7 @@
     @apply border-white/10 bg-white/5;
   }
 
-  html.light .card-glass {
+  html:not(.dark) .card-glass {
     @apply border-gray-200 bg-white shadow-md;
   }
 }

@@ -1,24 +1,26 @@
 ---
-// This component is designed to be placed in the <head> of the document.
-// It runs a small, blocking script to set the theme before the page content renders,
-// preventing the "flash of unstyled content" (FOUC) that can occur with client-side theme toggles.
 ---
 <script is:inline>
-  const theme = (() => {
-    if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-      return localStorage.getItem('theme');
+  const storageKey = 'theme';
+  const root = document.documentElement;
+  const readStoredTheme = () => {
+    try {
+      return localStorage.getItem(storageKey);
+    } catch (error) {
+      return null;
     }
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
+  };
+  const applyTheme = (theme) => {
+    const isDark = theme === 'dark';
+    root.classList.toggle('dark', isDark);
+    try {
+      localStorage.setItem(storageKey, theme);
+    } catch (error) {
+      /* ignore */
     }
-    return 'light';
-  })();
-
-  if (theme === 'dark') {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
-  // Also set the initial value on the html tag for Astro's View Transitions.
-  document.documentElement.setAttribute('data-theme', theme);
+  };
+  const stored = readStoredTheme();
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const initialTheme = stored ?? (prefersDark ? 'dark' : 'light');
+  applyTheme(initialTheme);
 </script>

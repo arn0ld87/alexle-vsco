@@ -1,10 +1,9 @@
 ---
-// Simplified Theme Toggle Component
 ---
 <button
   id="theme-toggle"
   type="button"
-  aria-label="Theme wechseln"
+  aria-label="Darstellung umschalten"
   class="rounded-lg p-2 text-gray-400 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
 >
   <svg id="theme-icon-dark" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -16,34 +15,47 @@
 </button>
 
 <script is:inline>
-  const button = document.getElementById('theme-toggle');
-  const darkIcon = document.getElementById('theme-icon-dark');
-  const lightIcon = document.getElementById('theme-icon-light');
-
-  function updateIcons(isDark) {
-    if (darkIcon && lightIcon) {
-      darkIcon.classList.toggle('hidden', !isDark);
-      lightIcon.classList.toggle('hidden', isDark);
+  const storageKey = 'theme';
+  const root = document.documentElement;
+  const applyTheme = (theme, icons) => {
+    const isDark = theme === 'dark';
+    root.classList.toggle('dark', isDark);
+    icons.dark.classList.toggle('hidden', !isDark);
+    icons.light.classList.toggle('hidden', isDark);
+    try {
+      localStorage.setItem(storageKey, theme);
+    } catch (error) {
+      /* ignore */
     }
-  }
-
-  function toggleTheme() {
-    const isDark = document.documentElement.classList.toggle('dark');
-    const theme = isDark ? 'dark' : 'light';
-    localStorage.setItem('theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
-    updateIcons(isDark);
-  }
-
-  // Set initial icon state & attach event listener
-  function setup() {
-    const isInitiallyDark = document.documentElement.classList.contains('dark');
-    updateIcons(isInitiallyDark);
-    button.addEventListener('click', toggleTheme);
-  }
-
-  setup();
-
-  // Re-run setup after Astro's View Transitions
-  document.addEventListener('astro:after-swap', setup);
+  };
+  const initToggle = () => {
+    const button = document.getElementById('theme-toggle');
+    const icons = {
+      dark: document.getElementById('theme-icon-dark'),
+      light: document.getElementById('theme-icon-light')
+    };
+    if (!button || !icons.dark || !icons.light) {
+      return;
+    }
+    const currentTheme = root.classList.contains('dark') ? 'dark' : 'light';
+    icons.dark.classList.toggle('hidden', currentTheme !== 'dark');
+    icons.light.classList.toggle('hidden', currentTheme === 'dark');
+    button.onclick = () => {
+      const nextTheme = root.classList.contains('dark') ? 'light' : 'dark';
+      applyTheme(nextTheme, icons);
+    };
+  };
+  initToggle();
+  document.addEventListener('astro:after-swap', initToggle);
+  window.addEventListener('storage', (event) => {
+    if (event.key === storageKey && typeof event.newValue === 'string') {
+      const icons = {
+        dark: document.getElementById('theme-icon-dark'),
+        light: document.getElementById('theme-icon-light')
+      };
+      if (icons.dark && icons.light) {
+        applyTheme(event.newValue, icons);
+      }
+    }
+  });
 </script>
