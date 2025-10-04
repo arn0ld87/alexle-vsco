@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Analytics from '../components/Analytics.astro';
+import ThemeLoader from '../components/ThemeLoader.astro';
 
 const GA_ID = 'G-MWDF3CGRHL';
 const {
@@ -37,14 +38,7 @@ const absoluteOgImage = ogImage.startsWith('http')
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={absoluteOgImage} />
-    <script is:inline>
-      // Theme initialization (before paint to prevent flash)
-      (function() {
-        const theme = localStorage.getItem('theme') || 
-          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.classList.add(theme);
-      })();
-    </script>
+    <ThemeLoader />
     {import.meta.env.PROD && (
       <>
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>

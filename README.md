@@ -70,3 +70,22 @@ Nach Änderungen: `pnpm build` → automatisches Deployment via GitHub Actions
 
 ---
 Letzter Stand: 02.10.2025
+
+---
+
+## Features & Demos
+
+This project includes several interactive demos and features.
+
+### Space Shooter Game
+A 3D space shooter game built with Three.js, located under `/demos/space-shooter-game/`.
+
+**Controls:**
+- **Movement:** `Arrow Keys` or `WASD`
+- **Fire:** `Spacebar`
+- **Pause/Resume:** `ESC`
+
+The game has been refactored to use a modular architecture and includes performance enhancements like object pooling. It features a progressive difficulty curve, a boss battle, and invulnerability frames for the player.
+
+### Light/Dark Mode Toggle
+The site supports both light and dark modes. The theme toggle button in the header allows you to switch between them. Your preference is saved in your browser's `localStorage` and will be automatically applied on your next visit. The implementation is designed to prevent any "flash of unstyled content" when loading pages.

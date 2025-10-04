@@ -1,5 +1,5 @@
 ---
-// Theme Toggle Component
+// Simplified Theme Toggle Component
 ---
 <button
   id="theme-toggle"
@@ -16,75 +16,34 @@
 </button>
 
 <script>
-  const STORAGE_KEY = 'theme';
-  const DARK = 'dark';
-  const LIGHT = 'light';
+  const button = document.getElementById('theme-toggle');
+  const darkIcon = document.getElementById('theme-icon-dark');
+  const lightIcon = document.getElementById('theme-icon-light');
 
-  function setTheme(theme) {
-    const root = document.documentElement;
-    const isDark = theme === DARK;
-
-    // Remove all theme classes
-    root.classList.remove(DARK, LIGHT);
-    root.classList.add(theme);
-    
-    // Also set data-theme attribute for better CSS targeting
-    root.setAttribute('data-theme', theme);
-
-    const darkIcon = document.getElementById('theme-icon-dark');
-    const lightIcon = document.getElementById('theme-icon-light');
-
+  function updateIcons(isDark) {
     if (darkIcon && lightIcon) {
-      if (isDark) {
-        darkIcon.classList.remove('hidden');
-        lightIcon.classList.add('hidden');
-      } else {
-        darkIcon.classList.add('hidden');
-        lightIcon.classList.remove('hidden');
-      }
+      darkIcon.classList.toggle('hidden', !isDark);
+      lightIcon.classList.toggle('hidden', isDark);
     }
-
-    localStorage.setItem(STORAGE_KEY, theme);
-  }
-
-  function initTheme() {
-    const savedTheme = localStorage.getItem(STORAGE_KEY);
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (prefersDark ? DARK : LIGHT);
-    setTheme(theme);
   }
 
   function toggleTheme() {
-    const root = document.documentElement;
-    const currentTheme = root.classList.contains(DARK) ? DARK : LIGHT;
-    const newTheme = currentTheme === DARK ? LIGHT : DARK;
-    setTheme(newTheme);
+    const isDark = document.documentElement.classList.toggle('dark');
+    const theme = isDark ? 'dark' : 'light';
+    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    updateIcons(isDark);
   }
 
-  function setupToggleButton() {
-    const button = document.getElementById('theme-toggle');
-    if (!button) {
-      return;
-    }
-
-    // Avoid registering multiple listeners when Astro swaps pages
-    button.removeEventListener('click', toggleTheme);
+  // Set initial icon state & attach event listener
+  function setup() {
+    const isInitiallyDark = document.documentElement.classList.contains('dark');
+    updateIcons(isInitiallyDark);
     button.addEventListener('click', toggleTheme);
   }
 
-  function onReady() {
-    initTheme();
-    setupToggleButton();
-  }
+  setup();
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', onReady, { once: true });
-  } else {
-    onReady();
-  }
-
-  // Re-init after Astro page transitions (if using View Transitions)
-  document.addEventListener('astro:after-swap', () => {
-    onReady();
-  });
+  // Re-run setup after Astro's View Transitions
+  document.addEventListener('astro:after-swap', setup);
 </script>

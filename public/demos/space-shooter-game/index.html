@@ -194,11 +194,11 @@
       window.selectedPlayerSkin = skinPath;
       hideAllMenus();
       document.getElementById('app').style.display = 'block';
-      // Dynamically load the game script after selection
-      const gameScript = document.createElement('script');
-      gameScript.src = './three-game.js?v=20251003'; // ✅ FIX: Use relative path
-      gameScript.defer = true;
-      document.body.appendChild(gameScript);
+      // Dynamically import the new game module
+      import('./src/game/main.js').catch(err => {
+        console.error("Failed to load the game module.", err);
+        document.getElementById('app').innerHTML = `<div class="error-screen"><h2>Failed to load game</h2><p>Could not load game module. Check console.</p></div>`;
+      });
     }
     
     function pauseGame() {
@@ -247,7 +247,15 @@
       }
     });
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- ES Module Shims for importmap support in older browsers (optional but good practice) -->
+  <script async src="https://unpkg.com/es-module-shims@1.10.0/dist/es-module-shims.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/examples/jsm/loaders/GLTFLoader.js": "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js"
+      }
+    }
+  </script>
 </html>
 
