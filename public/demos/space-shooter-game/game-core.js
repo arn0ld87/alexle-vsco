@@ -73,28 +73,29 @@ export function startGame(selectedSkin){
   function startWave(){ const cfg=getLevelConfig(state.level); state.wavesTotal=cfg.waves; state.gameState='playing'; state.enemiesLeft=cfg.enemiesPerWave; state.enemiesSpawnedInWave=0; updateHUD(); state.spawning=true; const interval=Math.max(160, 780 - state.level*55); const waveTimer=setInterval(()=>{ if(state.gameState!=='playing'){ clearInterval(waveTimer); return; } if(state.enemiesSpawnedInWave>=cfg.enemiesPerWave){ state.spawning=false; clearInterval(waveTimer); checkWaveCompletion(); return; } spawnEnemy(); state.enemiesSpawnedInWave++; updateHUD(); }, interval); }
   function checkWaveCompletion(){ if(enemies.length>0) return; const cfg=getLevelConfig(state.level); state.wavesCompleted++; if(state.wavesCompleted < cfg.waves){ state.wave++; startWave(); } else { state.gameState='bossfight'; spawnBoss(); } }
   function applyPlayerSkin(){ if(!selectedSkin||!player) return; const texLoader=new THREE.TextureLoader(); texLoader.load(selectedSkin,tex=>{ player.traverse(c=>{ if(c.isMesh && c.material){ c.material.map=tex; c.material.needsUpdate=true; }}); }); }
-  function loadModels(){ if(!gltfLoader){ createFallbackPlayer(); enemyModelA=createSimpleEnemy(); enemyModelB=createSimpleEnemyAlt(); bossModel=createBossFallback(); startLevel(); return; }
-    // 1) Try custom manta ship first
-    gltfLoader.load('manta_spaceship.glb', g=>{ player=g.scene; player.scale.set(2.2,2.2,2.2); player.rotation.x=Math.PI/2; player.position.set(0,0,5); enhance(player,0x33aaff,.65); scene.add(player); applyPlayerSkin();
-      // Continue loading enemies & boss
-      gltfLoader.load('assets/space-kit/Models/GLTF format/craft_miner.glb',g2=>{ enemyModelA=g2.scene; enemyModelA.scale.set(2,2,2); enemyModelA.rotation.x=Math.PI/2; enhance(enemyModelA,0xff0000,.6);
-        gltfLoader.load('assets/space-kit/Models/GLTF format/craft_speederD.glb',g3=>{ enemyModelB=g3.scene; enemyModelB.scale.set(2,2,2); enemyModelB.rotation.x=Math.PI/2; enhance(enemyModelB,0xff4400,.6);
-          gltfLoader.load('assets/space-kit/Models/GLTF format/craft_cargoB.glb',g4=>{ bossModel=g4.scene; bossModel.scale.set(4,4,4); bossModel.rotation.x=Math.PI/2; enhance(bossModel,0xff6600,.7); startLevel(); },undefined,e=>{console.warn('Boss load fail',e); bossModel=createBossFallback(); startLevel();});
-        },undefined,e=>{console.warn('EnemyB load fail',e); enemyModelB=createSimpleEnemyAlt(); startLevel();});
-      },undefined,e=>{console.warn('EnemyA load fail',e); enemyModelA=createSimpleEnemy(); enemyModelB=createSimpleEnemyAlt(); startLevel();});
-    },
-    // If custom manta fails, revert to original player chain
-    undefined, err=>{
-      console.warn('Custom manta ship load failed, fallback to default', err);
-      gltfLoader.load('assets/space-kit/Models/GLTF format/craft_speederA.glb',g=>{ player=g.scene; player.scale.set(2.5,2.5,2.5); player.rotation.x=Math.PI/2; player.position.set(0,0,5); enhance(player,0x0088ff,.5); scene.add(player); applyPlayerSkin();
-      gltfLoader.load('assets/space-kit/Models/GLTF format/craft_miner.glb',g2=>{ enemyModelA=g2.scene; enemyModelA.scale.set(2,2,2); enemyModelA.rotation.x=Math.PI/2; enhance(enemyModelA,0xff0000,.6);
-        gltfLoader.load('assets/space-kit/Models/GLTF format/craft_speederD.glb',g3=>{ enemyModelB=g3.scene; enemyModelB.scale.set(2,2,2); enemyModelB.rotation.x=Math.PI/2; enhance(enemyModelB,0xff4400,.6);
-          gltfLoader.load('assets/space-kit/Models/GLTF format/craft_cargoB.glb',g4=>{ bossModel=g4.scene; bossModel.scale.set(4,4,4); bossModel.rotation.x=Math.PI/2; enhance(bossModel,0xff6600,.7); startLevel(); },undefined,e=>{console.warn('Boss load fail',e); bossModel=createBossFallback(); startLevel();});
-        },undefined,e=>{console.warn('EnemyB load fail',e); enemyModelB=createSimpleEnemyAlt(); startLevel();});
-      },undefined,e=>{console.warn('EnemyA load fail',e); enemyModelA=createSimpleEnemy(); enemyModelB=createSimpleEnemyAlt(); startLevel();});
-    },undefined,e=>{console.warn('Player load fail',e); createFallbackPlayer(); enemyModelA=createSimpleEnemy(); enemyModelB=createSimpleEnemyAlt(); startLevel();});
-    });
-  }
+  // Loading overlay helpers
+  const loadingOverlay=document.getElementById('loading-overlay');
+  const loadingBar=document.getElementById('loading-bar');
+  const loadingText=document.getElementById('loading-text');
+  const loadingDetail=document.getElementById('loading-detail');
+  function setLoadingProgress(p,label){ if(loadingBar) loadingBar.style.width=p+'%'; if(loadingText) loadingText.textContent=p+'%'; if(label && loadingDetail) loadingDetail.textContent=label; }
+  function showLoading(){ if(loadingOverlay) loadingOverlay.style.display='flex'; setLoadingProgress(0,'Initialisiere ...'); }
+  function hideLoading(){ if(!loadingOverlay) return; loadingOverlay.classList.add('fade-out'); setTimeout(()=>{ if(loadingOverlay && loadingOverlay.parentNode){ loadingOverlay.parentNode.removeChild(loadingOverlay); } },900); }
+  function loadGLB(path,label,scale=2,playerRotation=true){ return new Promise((resolve,reject)=>{ if(!gltfLoader) { return reject('No GLTF Loader'); } const t0=performance.now(); gltfLoader.load(path,(g)=>{ const obj=g.scene; if(scale!==1) obj.scale.set(scale,scale,scale); if(playerRotation) obj.rotation.x=Math.PI/2; const dt=((performance.now()-t0)/1000).toFixed(2); console.log('[Asset] Loaded',path,'in',dt,'s'); resolve(obj); },(ev)=>{ if(ev.total){ const pct=Math.round((ev.loaded/ev.total)*100); setLoadingProgress(Math.min(99,pct),`Lade ${label} (${pct}%)`); } },(err)=>{ console.warn('Failed to load',path,err); reject(err); }); }); }
+  async function loadModels(){ showLoading(); if(!gltfLoader){ console.warn('GLTFLoader fehlt – verwende Fallback-Geometrien'); createFallbackPlayer(); enemyModelA=createSimpleEnemy(); enemyModelB=createSimpleEnemyAlt(); bossModel=createBossFallback(); setLoadingProgress(100,'Fertig (Fallback)'); hideLoading(); startLevel(); return; }
+    const tasks=[
+      { key:'player', paths:['manta_spaceship.glb','assets/space-kit/Models/GLTF format/craft_speederA.glb'], label:'Spieler' },
+      { key:'enemyA', paths:['assets/space-kit/Models/GLTF format/craft_miner.glb'], label:'Gegner A' },
+      { key:'enemyB', paths:['assets/space-kit/Models/GLTF format/craft_speederD.glb'], label:'Gegner B' },
+      { key:'boss', paths:['assets/space-kit/Models/GLTF format/craft_cargoB.glb'], label:'Boss' }
+    ];
+    let completed=0; const total=tasks.length;
+    for(const t of tasks){ let loaded=null; for(const p of t.paths){ try { setLoadingProgress(Math.round((completed/total)*100),`Lade ${t.label}…`); loaded = await loadGLB(p,t.label, t.key==='boss'?4:(t.key==='player'?2.3:2)); if(t.key==='player'){ player=loaded; player.position.set(0,0,5); enhance(player,0x33aaff,.65); scene.add(player); applyPlayerSkin(); } else if(t.key==='enemyA'){ enemyModelA=loaded; enhance(enemyModelA,0xff0000,.6); } else if(t.key==='enemyB'){ enemyModelB=loaded; enhance(enemyModelB,0xff4400,.6); } else if(t.key==='boss'){ bossModel=loaded; enhance(bossModel,0xff6600,.7); }
+        break; } catch(e){ console.warn('Asset Versuch fehlgeschlagen:',p); }
+      }
+      if(!loaded){ console.warn('Nutze Fallback für',t.key); if(t.key==='player'){ createFallbackPlayer(); } else if(t.key==='enemyA'){ enemyModelA=createSimpleEnemy(); } else if(t.key==='enemyB'){ enemyModelB=createSimpleEnemyAlt(); } else if(t.key==='boss'){ bossModel=createBossFallback(); } }
+      completed++; const pct=Math.round((completed/total)*100); setLoadingProgress(pct, completed===total? 'Assets fertig' : `Lade ${t.label} OK (${pct}%)`); }
+    setLoadingProgress(100,'Fertig'); hideLoading(); startLevel(); }
   function enhance(root,color,emissiveIntensity){ root.traverse(c=>{ if(c.isMesh&&c.material){ c.material.emissive=new THREE.Color(color); c.material.emissiveIntensity=emissiveIntensity; c.material.metalness=.35; c.material.roughness=.5; c.material.needsUpdate=true; }}); }
   function createFallbackPlayer(){
     const group=new THREE.Group();
