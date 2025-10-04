@@ -103,19 +103,17 @@
   <a href="/" style="position: fixed; left: 16px; top: 16px; text-decoration: none; color: #fff; font-size: 12px;">← HOME</a>
   <!-- Start Menu -->
   <div id="start-menu" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; position: absolute; top: 0; left: 0; background: #0a0e27; z-index: 1000;">
-    <img src="./assets/logo.avif" alt="Alexander Schneider Logo" style="width: 150px; height: auto; margin-bottom: 20px;">
-    <h1 style="color: #00ffff; text-shadow: 2px 2px #000000; margin-bottom: 10px;">COSMIC DEFENDER</h1>
-    <p style="color: #fff; font-size: 12px; margin-bottom: 5px;">Developed by Alexander Schneider</p>
-    <p style="color: #fff; font-size: 12px; margin-bottom: 30px;">
-      <a href="https://alexle135.de" target="_blank" rel="noopener" style="color: #00ffff; text-decoration: none;">alexle135.de</a>
-    </p>
-    <div style="text-align: center; color: #ffff00; margin-bottom: 40px;">
-      <h2>Steuerung:</h2>
-      <p>Left/Right: Move</p>
-      <p>Space: Fire</p>
-      <p>ESC: Pause</p>
+    <img src="/logo.svg" alt="Alexander Schneider Logo" style="width: 160px; height: auto; margin-bottom: 24px; filter: drop-shadow(0 0 6px #00ffff);">
+    <h1 style="color: #00ffff; text-shadow: 2px 2px #000000; margin: 0 0 6px; text-align:center;">COSMIC DEFENDER</h1>
+    <p style="color: #ffff00; font-size: 11px; margin: 0 0 18px; text-align:center;">Alexander Schneider – <a href="https://alexle135.de" target="_blank" rel="noopener" style="color:#00ffff; text-decoration:none;">alexle135.de</a></p>
+    <div style="text-align: center; color: #ffff00; margin-bottom: 34px; font-size:11px; line-height:1.5;">
+      <h2 style="margin:0 0 10px; font-size:14px;">Steuerung</h2>
+      <p style="margin:4px 0;">A / D oder ← / → : Bewegen</p>
+      <p style="margin:4px 0;">W / S (optional): Feinjustierung</p>
+      <p style="margin:4px 0;">SPACE: Feuer</p>
+      <p style="margin:4px 0;">ESC: Pause</p>
     </div>
-    <button onclick="showCharacterSelection()" style="background: #00ffff; color: #0a0e27; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px;">SPIEL STARTEN</button>
+    <button onclick="showCharacterSelection()" style="background: linear-gradient(90deg,#00ffff,#0088ff); color: #0a0e27; border: 2px solid #00ffff; padding: 15px 34px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 6px; box-shadow:0 0 12px rgba(0,255,255,.4);">SPIEL STARTEN</button>
   </div>
 
   <!-- Character Selection -->
@@ -140,6 +138,7 @@
     <button onclick="resumeGame()" style="background: #00ffff; color: #0a0e27; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px; margin: 10px;">WEITERSPIELEN</button>
     <button onclick="restartGame()" style="background: #ff0000; color: #fff; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px; margin: 10px;">NEU STARTEN</button>
     <button onclick="showStartMenu()" style="background: #666; color: #fff; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px; margin: 10px;">HAUPTMENÜ</button>
+    <button onclick="openSettings()" style="background: #0088ff; color: #fff; border: none; padding: 15px 30px; font-family: 'Press Start 2P', monospace; font-size: 14px; cursor: pointer; border-radius: 5px; margin: 10px;">EINSTELLUNGEN</button>
   </div>
 
   <!-- Game Over Screen -->
@@ -158,12 +157,44 @@
       <div id="score">PUNKTE: 0</div>
       <div id="lives">LEBEN: 3</div>
       <div id="level">LEVEL: 1</div>
+      <div id="powerup-indicator" style="display:none; margin-top:6px; font-size:11px; color:#ff00ff;">
+        POWERUP: <span id="powerup-name">–</span>
+        <div style="position:relative; width:140px; height:6px; border:1px solid #ff00ff; margin-top:4px;">
+          <div id="powerup-bar" style="position:absolute;left:0;top:0;height:100%;width:100%;background:linear-gradient(90deg,#ff00ff,#ffa0ff);"></div>
+        </div>
+      </div>
+      <div id="enemies-remaining" style="margin-top:6px; font-size:11px; color:#00ffff;">ENEMIES: 0</div>
+      <div id="fps" style="margin-top:6px; font-size:11px; color:#ffff00;">FPS: --</div>
     </div>
 
     <div id="boss-hud" style="display: none;">
       <div id="boss-health"></div>
     </div>
 
+  </div>
+
+  <!-- Settings Menu -->
+  <div id="settings-menu" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(10,14,39,0.95); z-index:1100; flex-direction:column; align-items:center; justify-content:center; font-family:'Press Start 2P', monospace;">
+    <h1 style="color:#00ffff; text-shadow:2px 2px #000; margin-bottom:20px;">EINSTELLUNGEN</h1>
+    <div style="display:flex; flex-direction:column; gap:14px; font-size:12px; color:#fff; min-width:320px;">
+      <label style="display:flex; justify-content:space-between; align-items:center;">Partikel Qualität
+        <select id="setting-particles" style="font-family:'Press Start 2P'; background:#0a0e27; color:#00ffff; border:2px solid #00ffff; padding:4px 8px;">
+          <option value="high">HIGH</option>
+          <option value="medium">MEDIUM</option>
+          <option value="low">LOW</option>
+        </select>
+      </label>
+      <label style="display:flex; justify-content:space-between; align-items:center;">FPS Anzeige
+        <input id="setting-fps" type="checkbox" checked />
+      </label>
+      <label style="display:flex; justify-content:space-between; align-items:center;">Musik
+        <input id="setting-music" type="checkbox" checked />
+      </label>
+    </div>
+    <div style="margin-top:30px; display:flex; gap:20px;">
+      <button onclick="applySettingsAndClose()" style="background:#00ffff; color:#0a0e27; border:none; padding:12px 20px; cursor:pointer; font-family:'Press Start 2P'; border-radius:6px;">OK</button>
+      <button onclick="closeSettings()" style="background:#666; color:#fff; border:none; padding:12px 20px; cursor:pointer; font-family:'Press Start 2P'; border-radius:6px;">ABBRECHEN</button>
+    </div>
   </div>
 
   <script>
@@ -190,15 +221,15 @@
     
     function selectCharacter(skinPath) {
       selectedPlayerSkin = skinPath;
-      // Make skin available globally for the game script
       window.selectedPlayerSkin = skinPath;
       hideAllMenus();
       document.getElementById('app').style.display = 'block';
-      // Dynamically import the new game module
-      import('./src/game/main.js').catch(err => {
-        console.error("Failed to load the game module.", err);
-        document.getElementById('app').innerHTML = `<div class="error-screen"><h2>Failed to load game</h2><p>Could not load game module. Check console.</p></div>`;
-      });
+      // Starte das Spiel erst jetzt (Refactored three-game.js)
+      if (window.startSpaceShooterGame) {
+        window.startSpaceShooterGame(window.selectedPlayerSkin);
+      } else {
+        console.error('Game core not loaded yet.');
+      }
     }
     
     function pauseGame() {
@@ -230,6 +261,23 @@
       document.getElementById('final-score').textContent = `PUNKTE: ${finalScore}`;
       document.getElementById('game-over-screen').style.display = 'flex';
     }
+
+    function openSettings(){ document.getElementById('settings-menu').style.display='flex'; }
+    function closeSettings(){ document.getElementById('settings-menu').style.display='none'; }
+    function applySettingsAndClose(){ if(window.applyGameSettings){ window.applyGameSettings({
+      particles: document.getElementById('setting-particles').value,
+      showFPS: document.getElementById('setting-fps').checked,
+      music: document.getElementById('setting-music').checked
+    }); } closeSettings(); }
+
+    window.openSettings = openSettings;
+    window.closeSettings = closeSettings;
+    window.applySettingsAndClose = applySettingsAndClose;
+
+    // For mobile hint: hide desktop hint if touch
+    if(('ontouchstart' in window) || navigator.maxTouchPoints>0){
+      const hint=document.querySelector('.hint'); if(hint) hint.style.display='none';
+    }
     
     // Make functions globally available
     window.showGameOver = showGameOver;
@@ -247,7 +295,7 @@
       }
     });
   </script>
-  <!-- ES Module Shims for importmap support in older browsers (optional but good practice) -->
+  <!-- Three.js Setup (global) -->
   <script async src="https://unpkg.com/es-module-shims@1.10.0/dist/es-module-shims.js"></script>
   <script type="importmap">
     {
@@ -257,5 +305,13 @@
       }
     }
   </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+    // Expose global for legacy script
+    window.THREE = THREE;
+    THREE.GLTFLoader = GLTFLoader;
+  </script>
+  <script src="three-game.js"></script>
 </html>
 
