@@ -1,91 +1,42 @@
-# alexle135.de – Neuaufbau
+# alexle135.de
 
-Neuaufbau der persönlichen Homepage von Alexander Schneider. Ziel ist eine schnelle, wartbare und referenzfähige Statik-Site auf Basis von Astro 4, Tailwind CSS und Content Collections.
+Schnelle, wartbare persönliche Site mit Astro + Tailwind.
 
-## Voraussetzungen
-- Node.js 20+
-- pnpm (`npm install -g pnpm`)
-
-## Entwicklung
+## Quickstart
 ```bash
 pnpm install
-pnpm run dev
+pnpm dev
 ```
-Der Dev-Server läuft standardmäßig auf <http://localhost:4321>. Für den vorhandenen Live-Server unter `http://127.0.0.1:5500` kannst du weiterhin das alte Material aus `neuaufbau/` nutzen.
-
-## Build & Preview
+Build/Preview:
 ```bash
-pnpm run build
-pnpm run preview
+pnpm build && pnpm preview
 ```
 
-## Projektstruktur (Auszug)
-```
-root
-├─ admin/             # Decap CMS (geplant)
-├─ public/            # Statische Assets (optimiert)
-│  └─ media/
-├─ src/
-│  ├─ content/        # Content Collections (MD/MDX/JSON)
-│  ├─ components/
-│  ├─ layouts/
-│  ├─ pages/
-│  └─ styles/
-├─ astro.config.mjs
-├─ package.json
-└─ AGENTS.md          # Arbeitsabsprachen & Konventionen
-```
+## Struktur
+`src/content` = sämtlicher Inhalt. Komponenten in `src/components`, Layouts in `src/layouts`.
 
-## ✅ Aktueller Stand
-- **Astro 4 + Tailwind** vollständig konfiguriert und optimiert
-- **Content Collections** implementiert (`hero`, `services`, `skills`, `about`, `projects`, `legal`)
-- **Projekttexte** mit konkreten Kennzahlen und Ergebnissen erweitert
-- **Performance-Optimierung** abgeschlossen (Lighthouse-Score: 95/100)
-- **SEO-Grundlagen** implementiert (robots.txt, sitemap.xml)
-- **Security-Headers** vollständig konfiguriert
+## Entwicklung
+- Node 20+, pnpm
+- Dark/Light Theme Toggle inkl. Persistenz vorhanden
+- Content Collections für Hero, Services, Skills, About, Projekte, Legal
 
-## 🚀 Deployment
-**GitHub Actions** automatisiert das Deployment:
-1. Code-Push triggert Build-Prozess
-2. `dist/` Ordner wird per rsync auf Server übertragen
-3. Apache serviert statische Dateien mit optimierten Headers
+## Deployment
+`pnpm build` via CI → statische Dateien nach `dist/` → Server/Hosting (siehe Workflow). Keine weiteren manuellen Schritte nötig.
 
-**Detaillierte Anleitung:** Siehe [DEPLOYMENT-GUIDE.md](./DEPLOYMENT-GUIDE.md)
+## Konventionen
+- Conventional Commits
+- Performance Budget: LCP < 1.8s mobil, kritisches JS < 100 KB
+- A11y: Fokus, Kontrast, ARIA
 
-## 📊 Performance-Metriken
-- **Ladezeit**: ~200ms
-- **LCP**: ~500ms (< 1.8s Ziel ✅)
-- **CLS**: ~0.0 (< 0.05 Ziel ✅)
-- **Lighthouse-Score**: 95/100
-- **Asset-Optimierung**: WebP-Screenshots, Gzip-Kompression
+## Edit Content
+Beispiele:
+- Projekte: `src/content/projects/*.md`
+- About: `src/content/about/about.md`
+- Services/Skills: `src/content/services/services.json`, `src/content/skills/skills.json`
+- Rechtliches: `src/content/legal/*.md`
 
-## 🔧 Content-Editing
-Inhalte werden über **Content Collections** verwaltet:
-- **Projekte**: `src/content/projects/*.md`
-- **Über-mich**: `src/content/about/about.md`
-- **Services/Skills**: `src/content/services/services.json`, `src/content/skills/skills.json`
-- **Rechtliches**: `src/content/legal/*.md`
+## Sonstiges
+- Theme wird per inline Script früh gesetzt (kein FOUC)
+- Tests/Playwright vorhanden
 
-Nach Änderungen: `pnpm build` → automatisches Deployment via GitHub Actions
-
----
-Letzter Stand: 02.10.2025
-
----
-
-## Features & Demos
-
-This project includes several interactive demos and features.
-
-### Space Shooter Game
-A 3D space shooter game built with Three.js, located under `/demos/space-shooter-game/`.
-
-**Controls:**
-- **Movement:** `Arrow Keys` or `WASD`
-- **Fire:** `Spacebar`
-- **Pause/Resume:** `ESC`
-
-The game has been refactored to use a modular architecture and includes performance enhancements like object pooling. It features a progressive difficulty curve, a boss battle, and invulnerability frames for the player.
-
-### Light/Dark Mode Toggle
-The site supports both light and dark modes. The theme toggle button in the header allows you to switch between them. Your preference is saved in your browser's `localStorage` and will be automatically applied on your next visit. The implementation is designed to prevent any "flash of unstyled content" when loading pages.
+Letztes Update: 04.10.2025
